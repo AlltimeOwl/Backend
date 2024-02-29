@@ -7,13 +7,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import java.time.LocalDate;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 @Entity
@@ -27,9 +26,6 @@ public class Member extends BaseEntity {
 
     private String phoneNumber;
 
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
-
     private LocalDate birthDay;
 
     private boolean isAuthenticated;
@@ -40,5 +36,6 @@ public class Member extends BaseEntity {
 
     private String address;
 
+    private Role role;
 
 }
