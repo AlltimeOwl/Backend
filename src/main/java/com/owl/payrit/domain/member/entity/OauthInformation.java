@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class OauthInformation {
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "oauth_provider_id")
     private String oauthProviderId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "oauth_provider")
     @Enumerated(EnumType.STRING)
     private OauthProvider oauthProvider;
 }

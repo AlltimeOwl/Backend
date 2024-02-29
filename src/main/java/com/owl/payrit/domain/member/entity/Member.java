@@ -4,6 +4,8 @@ import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,6 +18,16 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @Getter
 @Entity
+@Table(name = "member",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "oauth_unique",
+            columnNames = {
+                "oauth_provider_id",
+                "oauth_provider"
+            }
+        )
+    })
 public class Member extends BaseEntity {
 
     @Embedded
