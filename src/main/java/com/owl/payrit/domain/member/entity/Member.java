@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.member.entity;
 
+import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
