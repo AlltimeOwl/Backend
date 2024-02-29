@@ -1,25 +1,25 @@
 package com.owl.payrit.domain.member.entity;
 
-import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+@SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
 @Entity
 public class Member extends BaseEntity {
 
-    @Enumerated(EnumType.STRING)
-    private OauthProvider oauthProvider;
+    @Embedded
+    private OauthInformation oauthInformation;
 
     @Column
     private String email;
