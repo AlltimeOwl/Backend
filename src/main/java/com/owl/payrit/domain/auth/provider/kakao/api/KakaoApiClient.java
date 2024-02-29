@@ -1,4 +1,4 @@
-package com.owl.payrit.domain.auth.api;
+package com.owl.payrit.domain.auth.provider.kakao.api;
 
 import com.owl.payrit.domain.auth.dto.response.KakaoOauthResponse;
 import org.springframework.http.HttpHeaders;
