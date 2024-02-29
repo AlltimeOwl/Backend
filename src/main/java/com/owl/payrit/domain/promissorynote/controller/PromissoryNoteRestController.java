@@ -1,6 +1,6 @@
-package com.owl.payrit.promissorynote.controller;
+package com.owl.payrit.domain.promissorynote.controller;
 
-import com.owl.payrit.promissorynote.service.PromissoryNoteService;
+import com.owl.payrit.domain.promissorynote.service.PromissoryNoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 

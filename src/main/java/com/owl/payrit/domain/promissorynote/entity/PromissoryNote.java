@@ -1,4 +1,4 @@
-package com.owl.payrit.promissorynote.entity;
+package com.owl.payrit.domain.promissorynote.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

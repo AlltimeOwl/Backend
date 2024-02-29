@@ -1,6 +1,6 @@
-package com.owl.payrit.promissorynote.service;
+package com.owl.payrit.domain.promissorynote.service;
 
-import com.owl.payrit.promissorynote.repository.PromissoryNoteRepository;
+import com.owl.payrit.domain.promissorynote.repository.PromissoryNoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
