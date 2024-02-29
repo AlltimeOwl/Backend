@@ -21,21 +21,28 @@ public class Member extends BaseEntity {
     @Embedded
     private OauthInformation oauthInformation;
 
-    @Column
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String phoneNumber;
 
+    @Column(nullable = false)
     private LocalDate birthDay;
 
+    @Column
     private boolean isAuthenticated;
 
+    @Column
     private boolean isAgreeNotification;
 
+    @Column
     private String firebaseToken;
 
+    @Column
     private String address;
 
+    @Column(nullable = false)
     private Role role;
 
 }
