@@ -18,7 +18,7 @@ public record KakaoOauthResponse(
     KakaoAccount kakaoAccount
 
 ) {
-    public Member toDomain() {
+    public Member toEntity() {
         return Member.builder()
                           .oauthInformation(new OauthInformation(String.valueOf(id), OauthProvider.KAKAO))
                         .email(kakaoAccount.email)
