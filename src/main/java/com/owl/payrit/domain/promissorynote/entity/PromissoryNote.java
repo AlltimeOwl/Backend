@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.promissorynote.entity;
 
+import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,11 +19,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @ToString(callSuper = true)
-public class PromissoryNote {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+public class PromissoryNote extends BaseEntity {
 
 //    private Member creditor;
     private String creditorPhoneNumber;
