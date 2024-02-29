@@ -1,4 +1,4 @@
-package com.owl.payrit.domain.auth;
+package com.owl.payrit.domain.auth.controller;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
