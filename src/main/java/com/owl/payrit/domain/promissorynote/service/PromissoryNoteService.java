@@ -20,7 +20,7 @@ public class PromissoryNoteService {
     private final PromissoryNoteRepository promissoryNoteRepository;
 
     @Transactional
-    public void createNote(Principal principal, PromissoryNoteRequest promissoryNoteRequest) {
+    public void createNote(PromissoryNoteRequest promissoryNoteRequest) {
 
         //FIXME: 로그인한 사용자 가져오기 (Principal -> Member)
 

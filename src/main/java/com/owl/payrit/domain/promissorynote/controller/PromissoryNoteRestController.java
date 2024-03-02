@@ -18,12 +18,13 @@ public class PromissoryNoteRestController {
     private final PromissoryNoteService promissoryNoteService;
 
     @PostMapping("/write")
-    public ResponseEntity<String> createNote(@RequestBody PromissoryNoteRequest promissoryNoteRequest,
-                                             Principal principal) {
+    public ResponseEntity<String> createNote(@RequestBody PromissoryNoteRequest promissoryNoteRequest) {
 
-        promissoryNoteService.createNote(principal, promissoryNoteRequest);
+        log.info(promissoryNoteRequest.toString());
 
-        return ResponseEntity.ok().build();
+        promissoryNoteService.createNote(promissoryNoteRequest);
+
+        return ResponseEntity.ok().body("write");
     }
 
 }
