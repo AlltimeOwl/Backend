@@ -2,9 +2,8 @@ package com.owl.payrit.domain.promissorynote.dto.request;
 
 import java.time.LocalDate;
 
-public record PromissoryNoteRequest(
+public record PaperWriteRequest(
 
-        //작성자 유형(채무자 or 채권자)
         long amount,                        //총액
         LocalDate transactionDate,          //거래 날짜
         LocalDate repaymentStartDate,       //상환 시작일

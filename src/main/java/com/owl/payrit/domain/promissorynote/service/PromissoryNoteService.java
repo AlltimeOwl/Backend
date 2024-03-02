@@ -1,16 +1,12 @@
 package com.owl.payrit.domain.promissorynote.service;
 
-import com.owl.payrit.domain.promissorynote.dto.request.PromissoryNoteRequest;
+import com.owl.payrit.domain.promissorynote.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorynote.entity.PromissoryNote;
 import com.owl.payrit.domain.promissorynote.repository.PromissoryNoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.Principal;
-import java.time.LocalDate;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -20,7 +16,7 @@ public class PromissoryNoteService {
     private final PromissoryNoteRepository promissoryNoteRepository;
 
     @Transactional
-    public void createNote(PromissoryNoteRequest promissoryNoteRequest) {
+    public void createNote(PaperWriteRequest paperWriteRequest) {
 
         //FIXME: 로그인한 사용자 가져오기 (Principal -> Member)
 
@@ -30,15 +26,15 @@ public class PromissoryNoteService {
         작성자가 어떤 역할이냐에 따라 로그인한 사용자가 creditor OR debtor */
 
         PromissoryNote promissoryNote = PromissoryNote.builder()
-                .amount(promissoryNoteRequest.amount())
-                .transactionDate(promissoryNoteRequest.transactionDate())
-                .repaymentStartDate(promissoryNoteRequest.repaymentStartDate())
-                .repaymentEndDate(promissoryNoteRequest.repaymentEndDate())
-                .specialConditions(promissoryNoteRequest.specialConditions())
-                .creditorPhoneNumber(promissoryNoteRequest.creditorPhoneNumber())
-                .creditorAddress(promissoryNoteRequest.creditorAddress())
-                .debtorPhoneNumber(promissoryNoteRequest.debtorPhoneNumber())
-                .debtorAddress(promissoryNoteRequest.debtorAddress())
+                .amount(paperWriteRequest.amount())
+                .transactionDate(paperWriteRequest.transactionDate())
+                .repaymentStartDate(paperWriteRequest.repaymentStartDate())
+                .repaymentEndDate(paperWriteRequest.repaymentEndDate())
+                .specialConditions(paperWriteRequest.specialConditions())
+                .creditorPhoneNumber(paperWriteRequest.creditorPhoneNumber())
+                .creditorAddress(paperWriteRequest.creditorAddress())
+                .debtorPhoneNumber(paperWriteRequest.debtorPhoneNumber())
+                .debtorAddress(paperWriteRequest.debtorAddress())
                 .build();
 
         promissoryNoteRepository.save(promissoryNote);

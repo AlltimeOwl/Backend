@@ -1,13 +1,11 @@
 package com.owl.payrit.domain.promissorynote.controller;
 
-import com.owl.payrit.domain.promissorynote.dto.request.PromissoryNoteRequest;
+import com.owl.payrit.domain.promissorynote.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorynote.service.PromissoryNoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @Slf4j
 @RestController
@@ -18,11 +16,11 @@ public class PromissoryNoteRestController {
     private final PromissoryNoteService promissoryNoteService;
 
     @PostMapping("/write")
-    public ResponseEntity<String> createNote(@RequestBody PromissoryNoteRequest promissoryNoteRequest) {
+    public ResponseEntity<String> createNote(@RequestBody PaperWriteRequest paperWriteRequest) {
 
-        log.info(promissoryNoteRequest.toString());
+        log.info(paperWriteRequest.toString());
 
-        promissoryNoteService.createNote(promissoryNoteRequest);
+        promissoryNoteService.createNote(paperWriteRequest);
 
         return ResponseEntity.ok().body("write");
     }
