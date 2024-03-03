@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.auth.util;
 
+import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.member.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -99,6 +100,12 @@ public class JwtProvider {
 
         return refreshToken;
 
+    }
+
+    public TokenResponse createTokenResponse(Long id, String email, Role role, String secretKey) {
+        String accessToken = createToken(id, email, role, secretKey);
+        String refreshToken = createRefreshToken(email, secretKey);
+        return new TokenResponse(id, accessToken, refreshToken);
     }
 
     public String refreshAccessToken(String refreshToken, String secretKey) {

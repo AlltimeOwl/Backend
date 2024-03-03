@@ -29,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final UserDetailServiceImpl userDetailService;
     private final JwtProvider jwtProvider;
+
     @Value("${jwt.token.secret}")
     private String secretKey;
     private static final Pattern PUBLIC_ENDPOINTS = Pattern.compile("/api/v1/oauth/(login|find/.*)|/h2-console");
