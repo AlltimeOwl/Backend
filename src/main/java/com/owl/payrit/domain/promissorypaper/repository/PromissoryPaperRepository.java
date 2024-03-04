@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface PromissoryPaperRepository extends JpaRepository<PromissoryPaper, Long> {
 
     Optional<PromissoryPaper> findByPaperKey(String paperKey);
+    boolean existsByPaperKey(String paperKey);
 }
