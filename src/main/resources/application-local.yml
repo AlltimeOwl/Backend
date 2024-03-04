@@ -7,3 +7,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+
+jwt:
+  token:
+    secret: ${JWT_SECRET}
