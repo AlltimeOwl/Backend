@@ -1,12 +1,14 @@
 package com.owl.payrit.domain.promissorypaper.entity;
 
+import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.global.entity.BaseEntity;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 
@@ -18,32 +20,51 @@ import java.time.LocalDate;
 @ToString(callSuper = true)
 public class PromissoryPaper extends BaseEntity {
 
-//    private Member creditor;
+    private long amount;
+
+    private LocalDate transactionDate;
+
+    private LocalDate repaymentStartDate;
+
+    private LocalDate repaymentEndDate;
+
+    private String specialConditions;
+
+    private int interestRate;
+
+    @ColumnDefault("0")
+    private long currentRepaymentAmount;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member creditor;
+
     private String creditorPhoneNumber;
-    private boolean isCreditorAgree;
+
     private String creditorAddress;
 
-//    private Member debtor;
+    private boolean isCreditorAgree;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member debtor;
+
     private String debtorPhoneNumber;
-    private boolean isDebtorAgree;
+
     private String debtorAddress;
-    
-    private long amount;
-    private int interestRate;
-    
-    private LocalDate transactionDate;
-    private LocalDate repaymentStartDate;
-    private LocalDate repaymentEndDate;
-    private String specialConditions;
-    
-    //현재 상환액
-    //저장소 URL
+
+    private boolean isDebtorAgree;
     
     private boolean isPaid;
 
     private String noteKey;    //차용증 고유 값
 
-    //누가 작성을 요청했는지
+    //차용증을 누가 작성했는지
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member writer;
     
     //차용증 상태
+    @Enumerated(EnumType.STRING)
+    private PaperStatus paperStatus;
+
+    //저장소 URL
+    private String storageUrl;
 }

@@ -18,12 +18,12 @@ public class PromissoryPaperRestController {
     private final PromissoryPaperService promissoryPaperService;
 
     @PostMapping("/write")
-    public ResponseEntity<String> createNote(@AuthenticationPrincipal LoginUser loginUser,
+    public ResponseEntity<String> write(@AuthenticationPrincipal LoginUser loginUser,
                                              @RequestBody PaperWriteRequest paperWriteRequest) {
 
         log.info(paperWriteRequest.toString());
 
-        promissoryPaperService.createNote(paperWriteRequest);
+        promissoryPaperService.createNote(loginUser, paperWriteRequest);
 
         return ResponseEntity.ok().body("write");
     }

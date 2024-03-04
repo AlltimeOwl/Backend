@@ -1,5 +1,8 @@
 package com.owl.payrit.domain.promissorypaper.service;
 
+import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
@@ -13,10 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PromissoryPaperService {
 
+    private final MemberService memberService;
     private final PromissoryPaperRepository promissoryPaperRepository;
 
     @Transactional
-    public void createNote(PaperWriteRequest paperWriteRequest) {
+    public void createNote(LoginUser loginUser, PaperWriteRequest paperWriteRequest) {
+
+        Member loginedMember = memberService.getById(loginUser.id());
 
         PromissoryPaper promissoryPaper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
