@@ -7,6 +7,7 @@ import com.owl.payrit.domain.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +26,12 @@ public class AuthController {
     public ResponseEntity<TokenResponse> login(@PathVariable OauthProvider oauthProvider, @RequestBody LoginTokenRequest loginTokenRequest) {
         log.debug("login request {}", oauthProvider);
         TokenResponse tokenResponse = authService.login(oauthProvider, loginTokenRequest.accessToken());
+        return ResponseEntity.ok().body(tokenResponse);
+    }
+
+    @GetMapping("/test/{email}")
+    public ResponseEntity<TokenResponse> testLogin(@PathVariable(name = "email") String email) {
+        TokenResponse tokenResponse = authService.createTokenForTest(email);
         return ResponseEntity.ok().body(tokenResponse);
     }
 }

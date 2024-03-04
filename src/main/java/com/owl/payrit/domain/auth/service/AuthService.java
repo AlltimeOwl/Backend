@@ -6,6 +6,7 @@ import com.owl.payrit.domain.auth.provider.OauthClientComposite;
 import com.owl.payrit.domain.auth.util.JwtProvider;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,5 +57,10 @@ public class AuthService {
 
 
 
+    }
+
+    public TokenResponse createTokenForTest(String email) {
+        Member member = memberRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
+        return jwtProvider.createTokenResponse(member.getId(), member.getEmail(), member.getRole(), secretKey);
     }
 }
