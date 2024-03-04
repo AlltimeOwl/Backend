@@ -3,10 +3,7 @@ package com.owl.payrit.domain.promissorypaper.entity;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -32,8 +29,12 @@ public class PromissoryPaper extends BaseEntity {
 
     private int interestRate;
 
-    @ColumnDefault("0")
-    private long currentRepaymentAmount;
+    @Builder.Default
+    private long currentRepaymentAmount = 0;
+
+    //차용증을 누가 작성했는지
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member writer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member creditor;
@@ -52,18 +53,16 @@ public class PromissoryPaper extends BaseEntity {
     private String debtorAddress;
 
     private boolean isDebtorAgree;
-    
-    private boolean isPaid;
+
+    @Builder.Default
+    private boolean isPaid = false;
 
     private String noteKey;    //차용증 고유 값
-
-    //차용증을 누가 작성했는지
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member writer;
     
     //차용증 상태
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private PaperStatus paperStatus;
+    private PaperStatus paperStatus = PaperStatus.WAITING_AGREE;
 
     //저장소 URL
     private String storageUrl;

@@ -20,4 +20,12 @@ public class MemberService {
         
         return OById.get();
     }
+
+    public Member getByPhoneNumber(String phoneNumber) {
+        Optional<Member> OByPhoneNumber = memberRepository.findByPhoneNumber(phoneNumber);
+
+        //TODO: Optional 예외 처리
+
+        return OByPhoneNumber.get();
+    }
 }
