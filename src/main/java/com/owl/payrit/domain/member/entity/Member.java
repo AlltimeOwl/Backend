@@ -31,6 +31,13 @@ import org.springframework.security.core.userdetails.UserDetails;
                 "oauth_provider_id",
                 "oauth_provider"
             }
+        ),
+        @UniqueConstraint(
+            name = "phone_name",
+            columnNames = {
+                "name",
+                "phone_number"
+            }
         )
     })
 public class Member extends BaseEntity implements UserDetails {
@@ -41,11 +48,14 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "phone_number")
     private String phoneNumber;
 
     @Column(nullable = false)
     private LocalDate birthDay;
+
+    @Column(nullable = false)
+    private String name;
 
     @Column
     private boolean isAuthenticated;
