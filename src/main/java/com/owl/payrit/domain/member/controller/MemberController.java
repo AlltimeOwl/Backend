@@ -25,5 +25,4 @@ public class MemberController {
         log.debug(" ");
         return ResponseEntity.ok().body("hello");
     }
-
 }
