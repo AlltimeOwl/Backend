@@ -11,6 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -46,10 +49,23 @@ public class PromissoryPaperService {
                 .debtorPhoneNumber(paperWriteRequest.debtorPhoneNumber())
                 .debtorAddress(paperWriteRequest.debtorAddress())
                 .isDebtorAgree(false)       //FIXME 작성자가 누군지에 따라 동의 여부 설정 필요
-                .noteKey(null)              //FIXME
+                .paperKey(getRandomKey())              //FIXME
                 .storageUrl(null)           //FIXME
                 .build();
 
         promissoryPaperRepository.save(paper);
+    }
+
+    public String getRandomKey() {
+
+        String paperKey = UUID.randomUUID().toString();
+
+        Optional<PromissoryPaper> OByPaperKey = promissoryPaperRepository.findByPaperKey(paperKey);
+
+        if(OByPaperKey.isEmpty()){
+            return paperKey;
+        } else {
+            return getRandomKey();
+        }
     }
 }

@@ -57,7 +57,7 @@ public class PromissoryPaper extends BaseEntity {
     @Builder.Default
     private boolean isPaid = false;
 
-    private String noteKey;    //차용증 고유 값
+    private String paperKey;    //차용증 고유 값
     
     //차용증 상태
     @Builder.Default
