@@ -27,11 +27,11 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.getById(loginUser.id());
 
-        //FIXME: 상대방이 회원가입 하지 않은 상황이면, 조회가 불가능
+        //FIXME: 상대방이 회원가입 하지 않은 상황이면, 조회가 불가능? => 일단 null로 반환함.
         Member creditor = memberService.getByPhoneNumber(paperWriteRequest.creditorPhoneNumber());
         Member debtor = memberService.getByPhoneNumber(paperWriteRequest.debtorPhoneNumber());
 
-        //TODO: 폼 입력 데이터와 문서 입력 데이터가 일치하는지 검사 필요??
+        //TODO: 폼 입력 데이터와 사전 입력 데이터가 일치하는지 검사 필요??
 
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
@@ -44,13 +44,13 @@ public class PromissoryPaperService {
                 .creditor(creditor)
                 .creditorPhoneNumber(paperWriteRequest.creditorPhoneNumber())
                 .creditorAddress(paperWriteRequest.creditorAddress())
-                .isCreditorAgree(false)     //FIXME 작성자가 누군지에 따라 동의 여부 설정 필요
+                .isCreditorAgree(loginedMember.equals(creditor))
                 .debtor(debtor)
                 .debtorPhoneNumber(paperWriteRequest.debtorPhoneNumber())
                 .debtorAddress(paperWriteRequest.debtorAddress())
-                .isDebtorAgree(false)       //FIXME 작성자가 누군지에 따라 동의 여부 설정 필요
-                .paperKey(getRandomKey())              //FIXME
-                .storageUrl(null)           //FIXME
+                .isDebtorAgree(loginedMember.equals(debtor))
+                .paperKey(getRandomKey())
+                .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
 
         promissoryPaperRepository.save(paper);

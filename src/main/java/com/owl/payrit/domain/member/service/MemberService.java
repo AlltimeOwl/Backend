@@ -26,6 +26,6 @@ public class MemberService {
 
         //TODO: Optional 예외 처리
 
-        return OByPhoneNumber.get();
+        return OByPhoneNumber.orElse(null);
     }
 }

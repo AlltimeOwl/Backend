@@ -23,7 +23,7 @@ public class PromissoryPaperRestController {
 
         log.info(paperWriteRequest.toString());
 
-        promissoryPaperService.createNote(loginUser, paperWriteRequest);
+        promissoryPaperService.writePaper(loginUser, paperWriteRequest);
 
         return ResponseEntity.ok().body("write");
     }
