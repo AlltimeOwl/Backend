@@ -31,9 +31,10 @@ public class AuthService {
         Member kakaoMemberInformation = oauthClientComposite.fetch(oauthProvider, accessToken);
         Member savedMember = memberRepository.findByOauthInformation(kakaoMemberInformation.getOauthInformation())
                                          .orElseGet(() -> memberRepository.save(kakaoMemberInformation));
-
+        // 새로 만들었다면, 차용증 매핑
         return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getEmail(), savedMember.getRole(), secretKey);
     }
+
 
     private void verifyDuplicated(Member kakaoMemberInformation) {
         /*
