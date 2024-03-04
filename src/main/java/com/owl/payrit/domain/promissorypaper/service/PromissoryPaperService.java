@@ -25,11 +25,11 @@ public class PromissoryPaperService {
     @Transactional
     public void writePaper(LoginUser loginUser, PaperWriteRequest paperWriteRequest) {
 
-        Member loginedMember = memberService.getById(loginUser.id());
+        Member loginedMember = memberService.findById(loginUser.id());
 
         //FIXME: 상대방이 회원가입 하지 않은 상황이면, 조회가 불가능? => 일단 null로 반환함.
-        Member creditor = memberService.getByPhoneNumber(paperWriteRequest.creditorPhoneNumber());
-        Member debtor = memberService.getByPhoneNumber(paperWriteRequest.debtorPhoneNumber());
+        Member creditor = memberService.findByPhoneNumber(paperWriteRequest.creditorPhoneNumber());
+        Member debtor = memberService.findByPhoneNumber(paperWriteRequest.debtorPhoneNumber());
 
         //TODO: 폼 입력 데이터와 사전 입력 데이터가 일치하는지 검사 필요??
 

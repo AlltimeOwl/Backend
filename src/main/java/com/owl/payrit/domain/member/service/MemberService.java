@@ -1,11 +1,11 @@
 package com.owl.payrit.domain.member.service;
 
 import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.member.exception.MemberException;
 import com.owl.payrit.domain.member.repository.MemberRepository;
+import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -13,19 +13,16 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public Member getById(long id) {
-        Optional<Member> OById = memberRepository.findById(id);
+    public Member findById(long id) {
 
-        //TODO: Optional 예외처리
-        
-        return OById.get();
+        return memberRepository.findById(id)
+                               .orElseThrow(() -> new MemberException(
+                                   ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public Member getByPhoneNumber(String phoneNumber) {
-        Optional<Member> OByPhoneNumber = memberRepository.findByPhoneNumber(phoneNumber);
+    public Member findByPhoneNumber(String phoneNumber) {
 
-        //TODO: Optional 예외 처리
-
-        return OByPhoneNumber.orElse(null);
+        return memberRepository.findByPhoneNumber(phoneNumber)
+                               .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }
