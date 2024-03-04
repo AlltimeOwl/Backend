@@ -26,14 +26,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name = "member",
     uniqueConstraints = {
         @UniqueConstraint(
-            name = "oauth_unique",
+            name = "OAUTH",
             columnNames = {
                 "oauth_provider_id",
                 "oauth_provider"
             }
         ),
         @UniqueConstraint(
-            name = "phone_name",
+            name = "DUPLICATED",
             columnNames = {
                 "name",
                 "phone_number"
@@ -45,7 +45,7 @@ public class Member extends BaseEntity implements UserDetails {
     @Embedded
     private OauthInformation oauthInformation;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false, name = "phone_number")
