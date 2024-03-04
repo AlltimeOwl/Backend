@@ -1,8 +1,8 @@
-package com.owl.payrit.domain.promissorynote.service;
+package com.owl.payrit.domain.promissorypaper.service;
 
-import com.owl.payrit.domain.promissorynote.dto.request.PaperWriteRequest;
-import com.owl.payrit.domain.promissorynote.entity.PromissoryNote;
-import com.owl.payrit.domain.promissorynote.repository.PromissoryNoteRepository;
+import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
+import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
+import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,14 +11,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PromissoryNoteService {
+public class PromissoryPaperService {
 
-    private final PromissoryNoteRepository promissoryNoteRepository;
+    private final PromissoryPaperRepository promissoryPaperRepository;
 
     @Transactional
     public void createNote(PaperWriteRequest paperWriteRequest) {
 
-        PromissoryNote promissoryNote = PromissoryNote.builder()
+        PromissoryPaper promissoryPaper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
@@ -30,6 +30,6 @@ public class PromissoryNoteService {
                 .debtorAddress(paperWriteRequest.debtorAddress())
                 .build();
 
-        promissoryNoteRepository.save(promissoryNote);
+        promissoryPaperRepository.save(promissoryPaper);
     }
 }

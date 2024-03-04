@@ -1,4 +1,4 @@
-package com.owl.payrit.domain.promissorynote.dto.request;
+package com.owl.payrit.domain.promissorypaper.dto.request;
 
 import java.time.LocalDate;
 
