@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.auth.filter;
 
+import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.service.UserDetailServiceImpl;
 import com.owl.payrit.domain.auth.util.JwtProvider;
 import jakarta.servlet.FilterChain;
@@ -78,14 +79,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String email = jwtProvider.getEmail(token, secretKey);
+        Long id = jwtProvider.getId(token, secretKey);
         UserDetails user = userDetailService.loadUserByUsername(email);
-
-        authorizeUser(email, user.getAuthorities(), request);
+        LoginUser loginUser = new LoginUser(id, email);
+        authorizeUser(loginUser, user.getAuthorities(), request);
     }
 
-    private void authorizeUser(String email, Collection<? extends GrantedAuthority> authorities, HttpServletRequest request) {
+    private void authorizeUser(LoginUser loginUser, Collection<? extends GrantedAuthority> authorities, HttpServletRequest request) {
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, null, authorities);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginUser, null, authorities);
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
