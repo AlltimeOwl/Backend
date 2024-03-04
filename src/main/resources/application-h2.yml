@@ -1,0 +1,31 @@
+server:
+  port: 80
+
+jwt:
+  token:
+    secret: ${JWT_SECRET}
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:paylit
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600
+      cache-null-values: false
