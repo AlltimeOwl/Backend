@@ -19,7 +19,8 @@ public class OauthClientComposite {
                          .collect(
                              Collectors.toMap(
                                  OauthClient::oauthProvider,
-                                 Function.identity()
+                                 Function.identity(),
+                                 (existing, replacement) -> existing
                              )
                          );
     }

@@ -82,7 +82,7 @@ public class JwtProvider {
     public String createRefreshToken(String email, String secretKey) {
 
         Claims claims = Jwts.claims();
-        claims.put("loginId", email);
+        claims.put("email", email);
 
         Date now = new Date();
         Date refreshTokenExpiration = new Date(now.getTime() + refreshTokenExpireTimeMs);
@@ -143,6 +143,7 @@ public class JwtProvider {
 
         } catch (Exception e) {
             // Refresh Token 검증 실패
+            System.out.println(e.getMessage());
             throw new RuntimeException();
         }
     }
