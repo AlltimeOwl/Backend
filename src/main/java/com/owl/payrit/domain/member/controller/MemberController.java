@@ -25,4 +25,9 @@ public class MemberController {
         log.debug(" ");
         return ResponseEntity.ok().body("hello");
     }
+
+    @GetMapping("/")
+    public ResponseEntity<LoginUser> test(@AuthenticationPrincipal LoginUser loginUser) {
+        return ResponseEntity.ok().body(loginUser);
+    }
 }

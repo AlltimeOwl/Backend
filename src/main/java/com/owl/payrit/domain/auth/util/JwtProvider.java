@@ -6,6 +6,7 @@ import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.entity.Role;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -15,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class JwtProvider {
 
     private final ObjectMapper objectMapper;
     private final RedisTemplate<OauthInformation, String> redisTemplate;
-    private final long accessTokenExpireTimeMs = 1209600000L; // 1시간
+    private final long accessTokenExpireTimeMs = 3600000L; // 1주일
     private final long refreshTokenExpireTimeMs = 1209600000L; // 2주일
 
     public Long getId(String token, String secretKey) {
@@ -47,32 +47,32 @@ public class JwtProvider {
                    .get("email", String.class);
     }
 
+    //TODO : 변경고민
+    @SuppressWarnings("unchecked")
     public OauthInformation getOauthInformation(String token, String secretKey) {
-        return Jwts.parserBuilder()
+        return parseOauthInformation(Jwts.parserBuilder()
                    .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
                    .build()
                    .parseClaimsJws(token)
                    .getBody()
-                   .get("OauthInformation", OauthInformation.class);
+                   .get("oauthInformation", Map.class));
     }
 
     public boolean isExpired(String token, String secretKey) {
         try {
-            Jwts.parserBuilder()
-                .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
-                .require("exp", new Predicate<Date>() {
-                    @Override
-                    public boolean test(Date expirationDate) {
-                        return expirationDate.before(new Date());
-                    }
-                })
-                .build()
-                .parseClaimsJws(token);
-            return false;
+            Jws<Claims> claimsJws = Jwts.parserBuilder()
+                                        .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
+                                        .build()
+                                        .parseClaimsJws(token);
+
+            Date expirationDate = claimsJws.getBody().get("exp", Date.class);
+            return expirationDate.before(new Date());
         } catch (JwtException e) {
+            System.out.println(e.getMessage());
             return true;
         }
     }
+
 
     public String createToken(Long id, OauthInformation oauthInformation, Role role, String secretKey) {
         Claims claims = Jwts.claims();
