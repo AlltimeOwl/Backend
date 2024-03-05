@@ -43,4 +43,11 @@ public class AuthController {
         authService.logout(loginUser);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/leave")
+    public ResponseEntity<Void> leave(@AuthenticationPrincipal LoginUser loginUser) {
+        log.debug("'{}' member request leave paylit", loginUser.oauthInformation().getOauthProviderId());
+        authService.leave(loginUser);
+        return ResponseEntity.noContent().build();
+    }
 }

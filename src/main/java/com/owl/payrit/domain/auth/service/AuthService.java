@@ -7,7 +7,9 @@ import com.owl.payrit.domain.auth.provider.OauthClientComposite;
 import com.owl.payrit.domain.auth.util.JwtProvider;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
+import com.owl.payrit.domain.member.exception.MemberException;
 import com.owl.payrit.domain.member.repository.MemberRepository;
+import com.owl.payrit.global.exception.ErrorCode;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -73,5 +75,13 @@ public class AuthService {
     public void logout(LoginUser loginUser) {
         boolean tokenExists = Boolean.TRUE.equals(oauthRedisTemplate.hasKey(loginUser.oauthInformation()));
         if(tokenExists) oauthRedisTemplate.delete(loginUser.oauthInformation());
+    }
+
+    @Transactional
+    public void leave(LoginUser loginUser) {
+        Member member = memberRepository.findByOauthInformation(loginUser.oauthInformation())
+                                        .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+
+        memberRepository.delete(member);
     }
 }
