@@ -11,6 +11,8 @@ import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -89,5 +91,23 @@ public class PromissoryPaperService {
         }
 
         return false;
+    }
+
+    public List<CreditorPaperResponse> getCreditorPaperList(LoginUser loginUser) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        List<PromissoryPaper> creditorPaperList = promissoryPaperRepository.findAllByCreditor(loginedMember);
+
+        //FIXME: 없으면 null 인 상태로라도 리스트를 전달해야 프론트에서 처리? or exception 발생?
+
+        List<CreditorPaperResponse> creditorPaperResponseList = new ArrayList<>();
+        for(PromissoryPaper paper : creditorPaperList) {
+            creditorPaperResponseList.add(new CreditorPaperResponse(paper));
+        }
+        
+        //TODO: Creditor과 Debtor을 한번에 처리할만한 방법 있을지 모색 필요
+
+        return creditorPaperResponseList;
     }
 }

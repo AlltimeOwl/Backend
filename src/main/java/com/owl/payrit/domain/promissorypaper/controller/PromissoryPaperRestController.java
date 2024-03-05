@@ -50,7 +50,7 @@ public class PromissoryPaperRestController {
 
         log.info("request user id : " + loginUser.id());
 
-        List<CreditorPaperResponse> creditorPaperResponseList = new ArrayList<>();  //TODO: 내용 대입 필요
+        List<CreditorPaperResponse> creditorPaperResponseList = promissoryPaperService.getCreditorPaperList(loginUser);
 
         return ResponseEntity.ok().body(creditorPaperResponseList);
     }
