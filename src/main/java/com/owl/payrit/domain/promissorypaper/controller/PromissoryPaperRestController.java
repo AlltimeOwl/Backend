@@ -2,6 +2,7 @@ package com.owl.payrit.domain.promissorypaper.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
+import com.owl.payrit.domain.promissorypaper.dto.response.DetailResponse;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,12 +30,14 @@ public class PromissoryPaperRestController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> detail(@AuthenticationPrincipal LoginUser loginUser,
-                                         @PathVariable(value="id") Long id) {
+    public ResponseEntity<DetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
+                                                 @PathVariable(value="id") Long id) {
 
         log.info("request paper id : " + id);
 
-        return ResponseEntity.ok().body("detail");
+        DetailResponse detailResponse = null;       //TODO: 내용 대입 필요
+
+        return ResponseEntity.ok().body(detailResponse);
     }
 
     @GetMapping("/list/creditor")
