@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 public class JwtProvider {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final long accessTokenExpireTimeMs = 3600000L; // 1시간
+    private final long accessTokenExpireTimeMs = 1209600000L; // 1시간
     private final long refreshTokenExpireTimeMs = 1209600000L; // 2주일
 
     public Long getId(String token, String secretKey) {
