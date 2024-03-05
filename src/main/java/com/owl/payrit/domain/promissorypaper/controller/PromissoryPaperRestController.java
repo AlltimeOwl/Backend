@@ -40,7 +40,7 @@ public class PromissoryPaperRestController {
 
         log.info("request paper id : " + id);
 
-        PaperDetailResponse paperDetailResponse = null;       //TODO: 내용 대입 필요
+        PaperDetailResponse paperDetailResponse = promissoryPaperService.getDetail(loginUser, id);
 
         return ResponseEntity.ok().body(paperDetailResponse);
     }

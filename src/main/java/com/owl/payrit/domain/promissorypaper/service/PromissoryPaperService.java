@@ -2,11 +2,19 @@ package com.owl.payrit.domain.promissorypaper.service;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.member.exception.MemberException;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
+import com.owl.payrit.domain.promissorypaper.dto.response.CreditorPaperResponse;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
+import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
+
+import java.util.Optional;
 import java.util.UUID;
+
+import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PromissoryPaperService {
 
     private final MemberService memberService;
@@ -58,5 +67,29 @@ public class PromissoryPaperService {
 
         String paperKey = UUID.randomUUID().toString();
         return promissoryPaperRepository.existsByPaperKey(paperKey) ? getRandomKey() : paperKey;
+    }
+
+    public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        PromissoryPaper promissoryPaper = promissoryPaperRepository.findById(paperId).orElseThrow(
+                () -> new PromissoryPaperException(ErrorCode.PAPER_NOT_FOUND));
+
+        if(!isMine(loginUser.id(), promissoryPaper)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
+        }
+
+        return new PaperDetailResponse(promissoryPaper);
+    }
+
+    private boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
+
+        if(promissoryPaper.getCreditor().getId().equals(memberId)
+                || promissoryPaper.getDebtor().getId().equals(memberId)) {
+            return true;
+        }
+
+        return false;
     }
 }

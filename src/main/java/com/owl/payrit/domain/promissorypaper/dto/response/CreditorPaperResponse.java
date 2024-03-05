@@ -11,7 +11,7 @@ public record CreditorPaperResponse(
         String debtorName,
         int dueDate,
         String paperStatus
-        ) {
+) {
     public CreditorPaperResponse(PromissoryPaper promissoryPaper) {
         this(
                 promissoryPaper.getAmount(),
