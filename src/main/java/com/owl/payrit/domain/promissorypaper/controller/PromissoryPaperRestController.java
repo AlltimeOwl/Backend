@@ -27,4 +27,29 @@ public class PromissoryPaperRestController {
 
         return ResponseEntity.ok().body("write");
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<String> detail(@AuthenticationPrincipal LoginUser loginUser,
+                                         @PathVariable(value="id") Long id) {
+
+        log.info("request paper id : " + id);
+
+        return ResponseEntity.ok().body("detail");
+    }
+
+    @GetMapping("/list/creditor")
+    public ResponseEntity<String> creditorList(@AuthenticationPrincipal LoginUser loginUser) {
+
+        log.info("request user id : " + loginUser.id());
+
+        return ResponseEntity.ok().body("creditorList");
+    }
+
+    @GetMapping("/list/debtor")
+    public ResponseEntity<String> debtorList(@AuthenticationPrincipal LoginUser loginUser) {
+
+        log.info("request user id : " + loginUser.id());
+
+        return ResponseEntity.ok().body("debtorList");
+    }
 }
