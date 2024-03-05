@@ -71,8 +71,6 @@ public class PromissoryPaperService {
 
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
 
-        Member loginedMember = memberService.findById(loginUser.id());
-
         PromissoryPaper promissoryPaper = promissoryPaperRepository.findById(paperId).orElseThrow(
                 () -> new PromissoryPaperException(ErrorCode.PAPER_NOT_FOUND));
 
