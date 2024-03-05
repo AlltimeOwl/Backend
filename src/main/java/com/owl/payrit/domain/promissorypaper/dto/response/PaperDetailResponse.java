@@ -2,7 +2,7 @@ package com.owl.payrit.domain.promissorypaper.dto.response;
 
 import java.time.LocalDate;
 
-public record DetailResponse(
+public record PaperDetailResponse(
     //FIXME: 단순 Paper객체가 아닌 Response를 반환하는 것과의 차이점...?
 
     String paperUrl,
