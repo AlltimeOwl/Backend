@@ -1,14 +1,19 @@
 package com.owl.payrit.domain.auth.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
+import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.entity.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.jackson.io.JacksonDeserializer;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +24,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtProvider {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper;
+    private final RedisTemplate<OauthInformation, String> redisTemplate;
     private final long accessTokenExpireTimeMs = 1209600000L; // 1시간
     private final long refreshTokenExpireTimeMs = 1209600000L; // 2주일
 
@@ -41,6 +47,15 @@ public class JwtProvider {
                    .get("email", String.class);
     }
 
+    public OauthInformation getOauthInformation(String token, String secretKey) {
+        return Jwts.parserBuilder()
+                   .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
+                   .build()
+                   .parseClaimsJws(token)
+                   .getBody()
+                   .get("OauthInformation", OauthInformation.class);
+    }
+
     public boolean isExpired(String token, String secretKey) {
         try {
             Jwts.parserBuilder()
@@ -59,10 +74,10 @@ public class JwtProvider {
         }
     }
 
-    public String createToken(Long id, String email, Role role, String secretKey) {
+    public String createToken(Long id, OauthInformation oauthInformation, Role role, String secretKey) {
         Claims claims = Jwts.claims();
         claims.put("id", id);
-        claims.put("email", email);
+        claims.put("oauthInformation", oauthInformation);
         claims.put("role", role.name());
 
         Date now = new Date();
@@ -79,10 +94,10 @@ public class JwtProvider {
 
     }
 
-    public String createRefreshToken(String email, String secretKey) {
+    public String createRefreshToken(OauthInformation oauthInformation, String secretKey) {
 
         Claims claims = Jwts.claims();
-        claims.put("email", email);
+        claims.put("oauthInformation", oauthInformation);
 
         Date now = new Date();
         Date refreshTokenExpiration = new Date(now.getTime() + refreshTokenExpireTimeMs);
@@ -96,15 +111,15 @@ public class JwtProvider {
                                       SignatureAlgorithm.HS256)
                                   .compact();
         redisTemplate.opsForValue()
-                     .set(email, refreshToken, refreshTokenExpireTimeMs, TimeUnit.MILLISECONDS);
+                     .set(oauthInformation, refreshToken, refreshTokenExpireTimeMs, TimeUnit.MILLISECONDS);
 
         return refreshToken;
 
     }
 
-    public TokenResponse createTokenResponse(Long id, String email, Role role, String secretKey) {
-        String accessToken = createToken(id, email, role, secretKey);
-        String refreshToken = createRefreshToken(email, secretKey);
+    public TokenResponse createTokenResponse(Long id, OauthInformation oauthInformation, Role role, String secretKey) {
+        String accessToken = createToken(id, oauthInformation, role, secretKey);
+        String refreshToken = createRefreshToken(oauthInformation, secretKey);
         return new TokenResponse(id, accessToken, refreshToken);
     }
 
@@ -112,14 +127,16 @@ public class JwtProvider {
         try {
             Claims claims = Jwts.parserBuilder()
                                 .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
+                                .deserializeJsonWith(new JacksonDeserializer<>(objectMapper))
                                 .build()
                                 .parseClaimsJws(refreshToken)
                                 .getBody();
+            //TODO : 로직 변경 고려
+            OauthInformation oauthInformation = parseOauthInformation(claims.get("oauthInformation", Map.class));
 
-            String email = claims.get("email", String.class);
             // Redis 또는 데이터베이스에서 저장된 refreshToken과 전달된 refreshToken이 일치하는지 확인
             String storedRefreshToken = redisTemplate.opsForValue()
-                                                     .get(email);
+                                                     .get(oauthInformation);
 
             if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
                 throw new RuntimeException();
@@ -130,7 +147,7 @@ public class JwtProvider {
             Date accessTokenExpiration = new Date(now.getTime() + accessTokenExpireTimeMs);
 
             Claims newClaims = Jwts.claims();
-            newClaims.put("email", email);
+            newClaims.put("oauthInformation", oauthInformation);
 
             return Jwts.builder()
                        .setClaims(newClaims)
@@ -148,5 +165,12 @@ public class JwtProvider {
         }
     }
 
+
+    private OauthInformation parseOauthInformation(Map<String, Object> map) {
+        // Map에서 필요한 정보를 추출하여 OauthInformation 객체를 생성하는 로직
+        String oauthProviderId = (String) map.get("oauthProviderId");
+        OauthProvider oauthProvider = OauthProvider.valueOf((String) map.get("oauthProvider"));
+        return new OauthInformation(oauthProviderId, oauthProvider);
+    }
 
 }

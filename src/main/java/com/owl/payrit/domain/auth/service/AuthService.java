@@ -33,7 +33,7 @@ public class AuthService {
         Member savedMember = memberRepository.findByOauthInformation(kakaoMemberInformation.getOauthInformation())
                                          .orElseGet(() -> memberRepository.save(kakaoMemberInformation));
         // 새로 만들었다면, 차용증 매핑
-        return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getEmail(), savedMember.getRole(), secretKey);
+        return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getOauthInformation(), savedMember.getRole(), secretKey);
     }
 
 
@@ -61,6 +61,6 @@ public class AuthService {
 
     public TokenResponse createTokenForTest(String email) {
         Member member = memberRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
-        return jwtProvider.createTokenResponse(member.getId(), member.getEmail(), member.getRole(), secretKey);
+        return jwtProvider.createTokenResponse(member.getId(), member.getOauthInformation(), member.getRole(), secretKey);
     }
 }
