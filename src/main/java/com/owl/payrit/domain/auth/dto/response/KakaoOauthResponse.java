@@ -22,6 +22,7 @@ public record KakaoOauthResponse(
         return Member.builder()
                           .oauthInformation(new OauthInformation(String.valueOf(id), OauthProvider.KAKAO))
                         .email(kakaoAccount.email)
+                        .name(kakaoAccount.name)
                         .phoneNumber(kakaoAccount.phoneNumber)
                         .birthDay(kakaoAccount.birthConverter())
                         .role(Role.MEMBER)

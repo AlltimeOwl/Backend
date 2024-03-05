@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:payritTest
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600
+      cache-null-values: false
+
+jwt:
+  token:
+    secret: testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
