@@ -1,6 +1,8 @@
 package com.owl.payrit.domain.member.service;
 
+import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.exception.MemberException;
 import com.owl.payrit.domain.member.repository.MemberRepository;
 import com.owl.payrit.global.exception.ErrorCode;
@@ -36,4 +38,14 @@ public class MemberService {
         return memberRepository.findByPhoneNumber(phoneNumber);
     }
 
+    public Member findByOauthInformation(OauthInformation oauthInformation) {
+        return memberRepository.findByOauthInformation(oauthInformation)
+                               .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    @Transactional
+    public void modifyAlarmStatus(LoginUser loginUser) {
+        Member member = findByOauthInformation(loginUser.oauthInformation());
+        member.modifyAlarmStatus();
+    }
 }

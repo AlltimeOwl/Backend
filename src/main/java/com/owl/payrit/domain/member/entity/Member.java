@@ -57,10 +57,10 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isAuthenticated;
 
-    @Column
+    @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isAgreeNotification;
 
     @Column
@@ -75,6 +75,10 @@ public class Member extends BaseEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(getRole().name()));
+    }
+
+    public void modifyAlarmStatus() {
+        this.isAgreeNotification = !this.isAgreeNotification;
     }
 
     @Override
