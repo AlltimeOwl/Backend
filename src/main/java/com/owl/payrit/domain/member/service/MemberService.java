@@ -31,6 +31,11 @@ public class MemberService {
                                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
+    public Member findByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                               .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
     /*
     차용증 작성 시, 상대방이 가입되어있지 않을 상황을 고려해 Optional<Member> 반환
      */
@@ -43,9 +48,17 @@ public class MemberService {
                                .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    @Transactional
+    public Member findByOauthInformationOrSave(Member member) {
+        return memberRepository.findByOauthInformation(member.getOauthInformation())
+                               .orElseGet(() -> memberRepository.save(member));
+    }
+
     public void modifyAlarmStatus(LoginUser loginUser) {
         Member member = findByOauthInformation(loginUser.oauthInformation());
         member.modifyAlarmStatus();
+    }
+
+    public void delete(Member member) {
+        memberRepository.delete(member);
     }
 }
