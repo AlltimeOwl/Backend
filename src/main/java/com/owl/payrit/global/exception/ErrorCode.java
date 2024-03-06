@@ -10,6 +10,7 @@ public enum ErrorCode {
 
     EXAMPLE_EXCEPTION(HttpStatus.BAD_REQUEST, "예시 에러입니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원이 존재하지 않습니다."),
+    IMPROPER_OAUTH_INFORMATION(HttpStatus.BAD_REQUEST, "올바른 OAUTH 정보가 아닙니다."),
     PAPER_NOT_FOUND(HttpStatus.NOT_FOUND, "차용증 정보가 존재하지 않습니다."),
     PAPER_IS_NOT_MINE(HttpStatus.FORBIDDEN, "차용증 접근 권한이 없습니다.");
 
