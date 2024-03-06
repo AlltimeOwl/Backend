@@ -9,7 +9,7 @@ public record PaperWriteRequest(
         LocalDate repaymentStartDate,       //상환 시작일
         LocalDate repaymentEndDate,         //상환 종료일
         String specialConditions,           //특약 사항
-        int interestRate,                   //연 이자율
+        float interestRate,                   //연 이자율
         String creditorName,                //채권자 이름(혹은 Member)
         String creditorPhoneNumber,         //채권자 휴대폰 번호
         String creditorAddress,             //채권자 주소

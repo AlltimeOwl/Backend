@@ -27,7 +27,7 @@ public class PromissoryPaper extends BaseEntity {
 
     private String specialConditions;
 
-    private int interestRate;
+    private float interestRate;
 
     @Builder.Default
     private long currentRepaymentAmount = 0;

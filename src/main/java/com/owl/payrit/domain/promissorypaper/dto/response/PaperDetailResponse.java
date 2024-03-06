@@ -9,7 +9,7 @@ public record PaperDetailResponse(
 
         String paperUrl,
         long totalAmount,                   //원금 + 이자로 이루어진 총액 (차용 금액 X)
-        int repaymentRate,                  //상환 비율({현재 상환액} / {원금 + 이자})
+        float repaymentRate,                  //상환 비율({현재 상환액} / {원금 + 이자})
         long currentRepaymentAmount,
         LocalDate repaymentStartDate,       //FIXME: 거래 날짜 : repaymentStartDate or transactionDate
         LocalDate repaymentEndDate,

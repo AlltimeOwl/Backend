@@ -73,6 +73,7 @@ public class PromissoryPaperService {
 
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
 
+
         PromissoryPaper promissoryPaper = promissoryPaperRepository.findById(paperId).orElseThrow(
                 () -> new PromissoryPaperException(ErrorCode.PAPER_NOT_FOUND));
 
