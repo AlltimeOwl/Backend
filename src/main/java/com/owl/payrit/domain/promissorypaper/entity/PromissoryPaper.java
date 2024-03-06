@@ -5,7 +5,6 @@ import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 
@@ -39,6 +38,8 @@ public class PromissoryPaper extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member creditor;
 
+    private String creditorName;
+
     private String creditorPhoneNumber;
 
     private String creditorAddress;
@@ -47,6 +48,8 @@ public class PromissoryPaper extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member debtor;
+
+    private String debtorName;
 
     private String debtorPhoneNumber;
 
