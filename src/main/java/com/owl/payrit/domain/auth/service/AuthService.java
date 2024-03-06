@@ -1,27 +1,30 @@
 package com.owl.payrit.domain.auth.service;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.auth.provider.OauthClientComposite;
 import com.owl.payrit.domain.auth.util.JwtProvider;
 import com.owl.payrit.domain.member.entity.Member;
-import com.owl.payrit.domain.member.repository.MemberRepository;
-import jakarta.persistence.EntityNotFoundException;
-import java.util.Optional;
+import com.owl.payrit.domain.member.entity.OauthInformation;
+import com.owl.payrit.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 @Service
 public class AuthService {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final OauthClientComposite oauthClientComposite;
     private final JwtProvider jwtProvider;
+    private final RedisTemplate<OauthInformation, String> oauthRedisTemplate;
 
     @Value("${jwt.token.secret}")
     private String secretKey;
@@ -29,11 +32,10 @@ public class AuthService {
     @Transactional
     public TokenResponse login(OauthProvider oauthProvider, String accessToken) {
 
-        Member kakaoMemberInformation = oauthClientComposite.fetch(oauthProvider, accessToken);
-        Member savedMember = memberRepository.findByOauthInformation(kakaoMemberInformation.getOauthInformation())
-                                         .orElseGet(() -> memberRepository.save(kakaoMemberInformation));
-        // 새로 만들었다면, 차용증 매핑
-        return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getEmail(), savedMember.getRole(), secretKey);
+        Member memberInformation = oauthClientComposite.fetch(oauthProvider, accessToken);
+        Member savedMember = memberService.findByOauthInformationOrSave(memberInformation);
+        // TODO : 새로 만들었다면, 차용증 매핑
+        return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getOauthInformation(), savedMember.getRole(), secretKey);
     }
 
 
@@ -46,21 +48,23 @@ public class AuthService {
         -> 있다면, 그 아이디로 로그인? 알려주기?
         -> 없다면, 회원가입 시키고 로그인
          */
-        Optional<Member> candidate = memberRepository.findByOauthInformation(kakaoMemberInformation.getOauthInformation());
-
-        if(candidate.isEmpty()) {
-            boolean exists = memberRepository.existsByNameAndPhoneNumber(kakaoMemberInformation.getName(), kakaoMemberInformation.getPhoneNumber());
-            if(exists) {
-                throw new RuntimeException();
-            }
-        }
-
-
 
     }
 
     public TokenResponse createTokenForTest(String email) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
-        return jwtProvider.createTokenResponse(member.getId(), member.getEmail(), member.getRole(), secretKey);
+        Member member = memberService.findByEmail(email);
+        return jwtProvider.createTokenResponse(member.getId(), member.getOauthInformation(), member.getRole(), secretKey);
+    }
+
+    @Transactional
+    public void logout(LoginUser loginUser) {
+        boolean tokenExists = Boolean.TRUE.equals(oauthRedisTemplate.hasKey(loginUser.oauthInformation()));
+        if(tokenExists) oauthRedisTemplate.delete(loginUser.oauthInformation());
+    }
+
+    @Transactional
+    public void leave(LoginUser loginUser) {
+        Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
+        memberService.delete(member);
     }
 }

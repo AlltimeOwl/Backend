@@ -3,6 +3,7 @@ package com.owl.payrit.domain.auth.filter;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.service.UserDetailServiceImpl;
 import com.owl.payrit.domain.auth.util.JwtProvider;
+import com.owl.payrit.domain.member.entity.OauthInformation;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,10 +79,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String email = jwtProvider.getEmail(token, secretKey);
+        OauthInformation oauthInformation = jwtProvider.getOauthInformation(token, secretKey);
         Long id = jwtProvider.getId(token, secretKey);
-        UserDetails user = userDetailService.loadUserByUsername(email);
-        LoginUser loginUser = new LoginUser(id, email);
+        UserDetails user = userDetailService.loadUserByOauthInformation(oauthInformation);
+        LoginUser loginUser = new LoginUser(id, oauthInformation);
         authorizeUser(loginUser, user.getAuthorities(), request);
     }
 

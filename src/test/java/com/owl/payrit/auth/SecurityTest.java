@@ -6,6 +6,7 @@ import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.provider.OauthClientComposite;
 import com.owl.payrit.domain.auth.util.JwtProvider;
 import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.global.testutil.FakeKakaoMemberClient;
 import com.owl.payrit.util.AbstractContainerTest;
 import io.jsonwebtoken.Jwts;
@@ -31,7 +32,7 @@ public class SecurityTest extends AbstractContainerTest {
     private JwtProvider jwtProvider;
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<OauthInformation, String> redisTemplate;
 
     @Value("${jwt.token.secret}")
     private String secretKey;
@@ -49,7 +50,7 @@ public class SecurityTest extends AbstractContainerTest {
 
         Member member = createMember();
 
-        String token = jwtProvider.createToken(member.getId(), member.getEmail(), member.getRole(), secretKey);
+        String token = jwtProvider.createToken(member.getId(), member.getOauthInformation(), member.getRole(), secretKey);
 
         assertThat(token).satisfies(t -> {
             assertThat(t).isNotNull();
@@ -63,13 +64,11 @@ public class SecurityTest extends AbstractContainerTest {
     void getPayloadByJWT() throws Exception {
 
         Member member = createMember();
-
-        String token = jwtProvider.createToken(member.getId(), member.getEmail(), member.getRole(), secretKey);
-
-        String email = jwtProvider.getEmail(token, secretKey);
+        OauthInformation oauthInformation = member.getOauthInformation();
+        String token = jwtProvider.createToken(member.getId(), member.getOauthInformation(), member.getRole(), secretKey);
 
         assertThat(member).satisfies(u -> {
-            assertThat(u.getEmail()).isEqualTo(email);
+            assertThat(u.getOauthInformation()).isEqualTo(oauthInformation);
         });
     }
 
@@ -92,7 +91,7 @@ public class SecurityTest extends AbstractContainerTest {
     @Test
     void refreshTokenGenerated() throws Exception {
 
-        String refreshToken = jwtProvider.createRefreshToken("email", secretKey);
+        String refreshToken = jwtProvider.createRefreshToken(new OauthInformation("test", OauthProvider.KAKAO), secretKey);
 
         assertThat(refreshToken).satisfies(t -> {
             assertThat(t).isNotNull();
@@ -105,10 +104,9 @@ public class SecurityTest extends AbstractContainerTest {
     @Test
     void refreshTokenIsStoredInRedis() throws Exception {
 
-
-        jwtProvider.createRefreshToken("email", secretKey);
+        jwtProvider.createRefreshToken(new OauthInformation("test", OauthProvider.KAKAO), secretKey);
         System.out.println(redisTemplate.opsForValue().get("email"));
-        boolean tokenExists = Boolean.TRUE.equals(redisTemplate.hasKey("email"));
+        boolean tokenExists = Boolean.TRUE.equals(redisTemplate.hasKey(new OauthInformation("test", OauthProvider.KAKAO)));
 
         assertThat(tokenExists).isTrue();
 
@@ -119,7 +117,7 @@ public class SecurityTest extends AbstractContainerTest {
     @Test
     void tokenIsRefreshed() throws Exception {
 
-        String refreshToken = jwtProvider.createRefreshToken("email", secretKey);
+        String refreshToken = jwtProvider.createRefreshToken(new OauthInformation("test", OauthProvider.KAKAO), secretKey);
         String accessToken = jwtProvider.refreshAccessToken(refreshToken, secretKey);
 
         assertThat(accessToken).isNotNull();

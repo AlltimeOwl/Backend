@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.auth.service;
 
+import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,5 +18,9 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return memberRepository.findByEmail(username).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public UserDetails loadUserByOauthInformation(OauthInformation oauthInformation) {
+        return memberRepository.findByOauthInformation(oauthInformation).orElseThrow(EntityNotFoundException::new);
     }
 }
