@@ -3,7 +3,6 @@ package com.owl.payrit.domain.promissorypaper.dto.response;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public record PaperListResponse(
         LocalDate repaymentStartDate,
