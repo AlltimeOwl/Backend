@@ -7,6 +7,7 @@ import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
+import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
@@ -46,6 +47,10 @@ public class PromissoryPaperService {
 
         //TODO: 동일한 데이터로 차용증을 2건 작성하려 한다면 막는 기능이 필요할 수 있다.
 
+        //TODO: 2번 회원의 인증 정보로 3번과 4번 회원의 차용증 작성은 금지되어야 한다.
+
+        //TODO: 이자율은 음수가 될 수 없다.
+
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
                 .transactionDate(paperWriteRequest.transactionDate())
@@ -79,8 +84,7 @@ public class PromissoryPaperService {
 
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
 
-        PromissoryPaper promissoryPaper = promissoryPaperRepository.findById(paperId).orElseThrow(
-                () -> new PromissoryPaperException(ErrorCode.PAPER_NOT_FOUND));
+        PromissoryPaper promissoryPaper = getById(paperId);
 
         if (!isMine(loginUser.id(), promissoryPaper)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
@@ -138,5 +142,29 @@ public class PromissoryPaperService {
         LocalDate repaymentEndDate = paper.getRepaymentEndDate();
 
         return ChronoUnit.DAYS.between(today, repaymentEndDate);
+    }
+
+    @Transactional
+    public void acceptPaper(LoginUser loginUser, Long paperId) {
+
+        PromissoryPaper paper = getById(paperId);
+
+        //나와 연관된 차용증에만 승인이 가능함
+        if (!isMine(loginUser.id(), paper)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
+        }
+
+        //작성자와 승인자가 일치할 수 없음
+        if(paper.getWriter().getId().equals(loginUser.id())) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_CANNOT_ACCEPT_SELF);
+        }
+
+        paper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
+    }
+
+    public PromissoryPaper getById(Long paperId) {
+
+        return promissoryPaperRepository.findById(paperId).orElseThrow(
+                () -> new PromissoryPaperException(ErrorCode.PAPER_NOT_FOUND));
     }
 }

@@ -69,4 +69,8 @@ public class PromissoryPaper extends BaseEntity {
 
     //저장소 URL
     private String storageUrl;
+
+    public void modifyPaperStatus(PaperStatus status) {
+        this.paperStatus = status;
+    }
 }
