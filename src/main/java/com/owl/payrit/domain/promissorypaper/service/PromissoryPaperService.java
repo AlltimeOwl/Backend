@@ -43,6 +43,8 @@ public class PromissoryPaperService {
 
         //TODO: 폼의 입력한 데이터(채권자, 채무자)중 내 정보와 일치하는 내용이 반드시 있어야 한다.
 
+        //TODO: 동일한 데이터로 차용증을 2건 작성하려 한다면 막는 기능이 필요할 수 있다.
+
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
                 .transactionDate(paperWriteRequest.transactionDate())
@@ -103,18 +105,19 @@ public class PromissoryPaperService {
         Map<String, List<PaperListResponse>> listResponseMap = new HashMap<>();
 
         List<PromissoryPaper> creditorPaperList = promissoryPaperRepository.findAllByCreditor(loginedMember);
+        List<PaperListResponse> creditorResponseList = new ArrayList<>();
 
         for (PromissoryPaper paper : creditorPaperList) {
-            List<PaperListResponse> listResponseList = new ArrayList<>();
-            listResponseList.add(new PaperListResponse(paper, paper.getDebtorName(), calcDueDate(paper)));
-            listResponseMap.put("creditor", listResponseList);
+            creditorResponseList.add(new PaperListResponse(paper, paper.getDebtorName(), calcDueDate(paper)));
+            listResponseMap.put("creditor", creditorResponseList);
         }
+
         List<PromissoryPaper> debtorPaperList = promissoryPaperRepository.findAllByDebtor(loginedMember);
+        List<PaperListResponse> debtorResponseList = new ArrayList<>();
 
         for (PromissoryPaper paper : debtorPaperList) {
-            List<PaperListResponse> listResponseList = new ArrayList<>();
-            listResponseList.add(new PaperListResponse(paper, paper.getCreditorName(), calcDueDate(paper)));
-            listResponseMap.put("debtor", listResponseList);
+            debtorResponseList.add(new PaperListResponse(paper, paper.getCreditorName(), calcDueDate(paper)));
+            listResponseMap.put("debtor", debtorResponseList);
         }
 
         return listResponseMap;
