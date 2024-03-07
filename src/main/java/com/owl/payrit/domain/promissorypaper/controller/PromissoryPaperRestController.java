@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.promissorypaper.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
@@ -26,7 +27,7 @@ public class PromissoryPaperRestController {
 
     @PostMapping("/write")
     public ResponseEntity<String> write(@AuthenticationPrincipal LoginUser loginUser,
-                                             @RequestBody PaperWriteRequest paperWriteRequest) {
+                                        @RequestBody PaperWriteRequest paperWriteRequest) {
 
         log.info(paperWriteRequest.toString());
 
@@ -37,7 +38,7 @@ public class PromissoryPaperRestController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PaperDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
-                                                      @PathVariable(value="id") Long id) {
+                                                      @PathVariable(value = "id") Long id) {
 
         log.info("request paper id : " + id);
 
@@ -58,12 +59,25 @@ public class PromissoryPaperRestController {
 
     @PutMapping("/approve/accept/{id}")
     public ResponseEntity<String> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
-                                              @PathVariable(value="id") Long paperId) {
+                                              @PathVariable(value = "id") Long paperId) {
 
         log.info("request user id : " + loginUser.id());
 
         promissoryPaperService.acceptPaper(loginUser, paperId);
 
         return ResponseEntity.ok().body("accept");
+    }
+
+    @PostMapping("/modify/request/{id}")
+    public ResponseEntity<String> requestModify(@AuthenticationPrincipal LoginUser loginUser,
+                                                @PathVariable(value = "id") Long paperId,
+                                                @RequestBody PaperModifyRequest paperModifyRequest) {
+
+        log.info("request user id : " + loginUser.id());
+        log.info("contents : " + paperModifyRequest.contents());
+
+        promissoryPaperService.sendModifyRequest(loginUser, paperId, paperModifyRequest);
+
+        return ResponseEntity.ok().body("modify request : %s".formatted(paperModifyRequest.contents()));
     }
 }

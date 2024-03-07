@@ -3,6 +3,7 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
@@ -149,7 +150,8 @@ public class PromissoryPaperService {
 
         PromissoryPaper paper = getById(paperId);
 
-        if(!paper.getPaperStatus().equals(PaperStatus.WAITING_AGREE)) {
+        //승인 대기 단계에서만 승인이 가능함
+        if (!paper.getPaperStatus().equals(PaperStatus.WAITING_AGREE)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
         }
 
@@ -159,7 +161,7 @@ public class PromissoryPaperService {
         }
 
         //작성자와 승인자가 일치할 수 없음
-        if(paper.getWriter().getId().equals(loginUser.id())) {
+        if (paper.getWriter().getId().equals(loginUser.id())) {
             throw new PromissoryPaperException(ErrorCode.PAPER_CANNOT_ACCEPT_SELF);
         }
 
@@ -170,5 +172,38 @@ public class PromissoryPaperService {
 
         return promissoryPaperRepository.findById(paperId).orElseThrow(
                 () -> new PromissoryPaperException(ErrorCode.PAPER_NOT_FOUND));
+    }
+
+    @Transactional
+    public void sendModifyRequest(LoginUser loginUser, Long paperId, PaperModifyRequest paperModifyRequest) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+        PromissoryPaper paper = getById(paperId);
+
+        //승인 대기 단계에서만 수정 요청이 가능함
+        if (!paper.getPaperStatus().equals(PaperStatus.WAITING_AGREE)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
+        }
+
+        //나와 연관된 차용증에만 수정 요청이 가능함
+        if (!isMine(loginUser.id(), paper)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
+        }
+
+        Member peerMember = getPeerMember(paper, loginedMember);
+
+        //TODO: peerMember에게 paperModifyRequest의 contents로 알림(자체 or 알림톡) 발송하는 기능 필요
+
+        paper.modifyPaperStatus(PaperStatus.MODIFYING);
+    }
+
+    //FIXME: MemberService 로 위치 이동 필요?
+    private Member getPeerMember(PromissoryPaper paper, Member loginedMember) {
+
+        if (paper.getCreditor().equals(loginedMember)) {
+            return paper.getDebtor();
+        }
+
+        return paper.getCreditor();
     }
 }

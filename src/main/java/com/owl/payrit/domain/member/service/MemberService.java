@@ -5,6 +5,7 @@ import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.exception.MemberException;
 import com.owl.payrit.domain.member.repository.MemberRepository;
+import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.global.exception.ErrorCode;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
