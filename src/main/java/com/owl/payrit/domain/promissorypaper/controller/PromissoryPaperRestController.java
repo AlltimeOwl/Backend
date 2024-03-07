@@ -4,6 +4,7 @@ import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
+import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,12 +47,12 @@ public class PromissoryPaperRestController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Map<String, List<PaperListResponse>>> creditorList(@AuthenticationPrincipal LoginUser loginUser) {
+    public ResponseEntity<List<PaperListResponse>> creditorList(@AuthenticationPrincipal LoginUser loginUser) {
 
         log.info("request user id : " + loginUser.id());
 
-        Map<String, List<PaperListResponse>> listResponses = promissoryPaperService.getListResponses(loginUser);
+        List<PaperListResponse> allListResponses = promissoryPaperService.getAllListResponse(loginUser);
 
-        return ResponseEntity.ok().body(listResponses);
+        return ResponseEntity.ok().body(allListResponses);
     }
 }

@@ -6,6 +6,7 @@ import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
+import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
@@ -96,29 +97,45 @@ public class PromissoryPaperService {
         return false;
     }
 
-    public Map<String, List<PaperListResponse>> getListResponses(LoginUser loginUser) {
+    public List<PaperListResponse> getAllListResponse(LoginUser loginUser) {
+
+        List<PaperListResponse> listResponses = new ArrayList<>();
+
+        List<PaperListResponse> creditorList =
+                getListResponsesByRole(loginUser, PaperRole.CREDITOR);
+
+        List<PaperListResponse> debtorList =
+                getListResponsesByRole(loginUser, PaperRole.DEBTOR);
+
+        listResponses.addAll(creditorList);
+        listResponses.addAll(debtorList);
+
+        return listResponses;
+    }
+
+    public List<PaperListResponse> getListResponsesByRole(LoginUser loginUser, PaperRole role) {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
-        Map<String, List<PaperListResponse>> listResponseMap = new HashMap<>();
+        List<PaperListResponse> listResponses = new ArrayList<>();
 
-        List<PromissoryPaper> creditorPaperList = promissoryPaperRepository.findAllByCreditor(loginedMember);
-        List<PaperListResponse> creditorResponseList = new ArrayList<>();
+        if (role.equals(PaperRole.CREDITOR)) {
+            List<PromissoryPaper> creditorPaperList = promissoryPaperRepository.findAllByCreditor(loginedMember);
 
-        for (PromissoryPaper paper : creditorPaperList) {
-            creditorResponseList.add(new PaperListResponse(paper, paper.getDebtorName(), calcDueDate(paper)));
-            listResponseMap.put("creditor", creditorResponseList);
+            for (PromissoryPaper paper : creditorPaperList) {
+                listResponses.add(
+                        new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(), calcDueDate(paper)));
+            }
+        } else if (role.equals(PaperRole.DEBTOR)) {
+            List<PromissoryPaper> debtorPaperList = promissoryPaperRepository.findAllByDebtor(loginedMember);
+
+            for (PromissoryPaper paper : debtorPaperList) {
+                listResponses.add(
+                        new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName(), calcDueDate(paper)));
+            }
         }
 
-        List<PromissoryPaper> debtorPaperList = promissoryPaperRepository.findAllByDebtor(loginedMember);
-        List<PaperListResponse> debtorResponseList = new ArrayList<>();
-
-        for (PromissoryPaper paper : debtorPaperList) {
-            debtorResponseList.add(new PaperListResponse(paper, paper.getCreditorName(), calcDueDate(paper)));
-            listResponseMap.put("debtor", debtorResponseList);
-        }
-
-        return listResponseMap;
+        return listResponses;
     }
 
     private long calcDueDate(PromissoryPaper paper) {
