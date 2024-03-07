@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -99,43 +101,35 @@ public class PromissoryPaperService {
 
     public List<PaperListResponse> getAllListResponse(LoginUser loginUser) {
 
-        List<PaperListResponse> listResponses = new ArrayList<>();
-
         List<PaperListResponse> creditorList =
                 getListResponsesByRole(loginUser, PaperRole.CREDITOR);
 
         List<PaperListResponse> debtorList =
                 getListResponsesByRole(loginUser, PaperRole.DEBTOR);
 
-        listResponses.addAll(creditorList);
-        listResponses.addAll(debtorList);
-
-        return listResponses;
+        return Stream.concat(creditorList.stream(), debtorList.stream())
+                .collect(Collectors.toList());
     }
 
     public List<PaperListResponse> getListResponsesByRole(LoginUser loginUser, PaperRole role) {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
-        List<PaperListResponse> listResponses = new ArrayList<>();
+        List<PromissoryPaper> papers;
 
         if (role.equals(PaperRole.CREDITOR)) {
-            List<PromissoryPaper> creditorPaperList = promissoryPaperRepository.findAllByCreditor(loginedMember);
-
-            for (PromissoryPaper paper : creditorPaperList) {
-                listResponses.add(
-                        new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(), calcDueDate(paper)));
-            }
-        } else if (role.equals(PaperRole.DEBTOR)) {
-            List<PromissoryPaper> debtorPaperList = promissoryPaperRepository.findAllByDebtor(loginedMember);
-
-            for (PromissoryPaper paper : debtorPaperList) {
-                listResponses.add(
-                        new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName(), calcDueDate(paper)));
-            }
+            papers = promissoryPaperRepository.findAllByCreditor(loginedMember);
+        } else {
+            papers = promissoryPaperRepository.findAllByDebtor(loginedMember);
         }
 
-        return listResponses;
+        return papers.stream().map(paper -> {
+            if (role.equals(PaperRole.CREDITOR)) {
+                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(), calcDueDate(paper));
+            } else {
+                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName(), calcDueDate(paper));
+            }
+        }).collect(Collectors.toList());
     }
 
     private long calcDueDate(PromissoryPaper paper) {
