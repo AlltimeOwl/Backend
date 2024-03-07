@@ -2,25 +2,25 @@ package com.owl.payrit.domain.promissorypaper.service;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
-import com.owl.payrit.domain.member.exception.MemberException;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
-import com.owl.payrit.domain.promissorypaper.dto.response.CreditorPaperResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
+import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -37,10 +37,14 @@ public class PromissoryPaperService {
         Member loginedMember = memberService.findById(loginUser.id());
 
         //FIXME: 상대방이 회원가입 하지 않은 상황이면, 조회가 불가능? => 일단 null로 반환함.
-        Member creditor = memberService.findByPhoneNumberForPromissory(paperWriteRequest.creditorPhoneNumber()).orElse(null);
-        Member debtor = memberService.findByPhoneNumberForPromissory(paperWriteRequest.debtorPhoneNumber()).orElse(null);
+        Member creditor = memberService.findByPhoneNumberForPromissory(
+                paperWriteRequest.creditorPhoneNumber()).orElse(null);
+        Member debtor = memberService.findByPhoneNumberForPromissory(
+                paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
-        //TODO: 폼 입력 데이터와 사전 입력 데이터가 일치하는지 검사 필요??
+        //TODO: 폼의 입력한 데이터(채권자, 채무자)중 내 정보와 일치하는 내용이 반드시 있어야 한다.
+
+        //TODO: 동일한 데이터로 차용증을 2건 작성하려 한다면 막는 기능이 필요할 수 있다.
 
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
@@ -51,10 +55,12 @@ public class PromissoryPaperService {
                 .interestRate(paperWriteRequest.interestRate())
                 .writer(loginedMember)
                 .creditor(creditor)
+                .creditorName(paperWriteRequest.creditorName())
                 .creditorPhoneNumber(paperWriteRequest.creditorPhoneNumber())
                 .creditorAddress(paperWriteRequest.creditorAddress())
                 .isCreditorAgree(loginedMember.equals(creditor))
                 .debtor(debtor)
+                .debtorName(paperWriteRequest.debtorName())
                 .debtorPhoneNumber(paperWriteRequest.debtorPhoneNumber())
                 .debtorAddress(paperWriteRequest.debtorAddress())
                 .isDebtorAgree(loginedMember.equals(debtor))
@@ -76,7 +82,7 @@ public class PromissoryPaperService {
         PromissoryPaper promissoryPaper = promissoryPaperRepository.findById(paperId).orElseThrow(
                 () -> new PromissoryPaperException(ErrorCode.PAPER_NOT_FOUND));
 
-        if(!isMine(loginUser.id(), promissoryPaper)) {
+        if (!isMine(loginUser.id(), promissoryPaper)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
         }
 
@@ -85,7 +91,7 @@ public class PromissoryPaperService {
 
     private boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
 
-        if(promissoryPaper.getCreditor().getId().equals(memberId)
+        if (promissoryPaper.getCreditor().getId().equals(memberId)
                 || promissoryPaper.getDebtor().getId().equals(memberId)) {
             return true;
         }
@@ -93,21 +99,44 @@ public class PromissoryPaperService {
         return false;
     }
 
-    public List<CreditorPaperResponse> getCreditorPaperList(LoginUser loginUser) {
+    public List<PaperListResponse> getAllListResponse(LoginUser loginUser) {
+
+        List<PaperListResponse> creditorList =
+                getListResponsesByRole(loginUser, PaperRole.CREDITOR);
+
+        List<PaperListResponse> debtorList =
+                getListResponsesByRole(loginUser, PaperRole.DEBTOR);
+
+        return Stream.concat(creditorList.stream(), debtorList.stream())
+                .collect(Collectors.toList());
+    }
+
+    public List<PaperListResponse> getListResponsesByRole(LoginUser loginUser, PaperRole role) {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
-        List<PromissoryPaper> creditorPaperList = promissoryPaperRepository.findAllByCreditor(loginedMember);
+        List<PromissoryPaper> papers;
 
-        //FIXME: 없으면 null 인 상태로라도 리스트를 전달해야 프론트에서 처리? or exception 발생?
-
-        List<CreditorPaperResponse> creditorPaperResponseList = new ArrayList<>();
-        for(PromissoryPaper paper : creditorPaperList) {
-            creditorPaperResponseList.add(new CreditorPaperResponse(paper));
+        if (role.equals(PaperRole.CREDITOR)) {
+            papers = promissoryPaperRepository.findAllByCreditor(loginedMember);
+        } else {
+            papers = promissoryPaperRepository.findAllByDebtor(loginedMember);
         }
-        
-        //TODO: Creditor과 Debtor을 한번에 처리할만한 방법 있을지 모색 필요
 
-        return creditorPaperResponseList;
+        return papers.stream().map(paper -> {
+            if (role.equals(PaperRole.CREDITOR)) {
+                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(), calcDueDate(paper));
+            } else {
+                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName(), calcDueDate(paper));
+            }
+        }).collect(Collectors.toList());
+    }
+
+    private long calcDueDate(PromissoryPaper paper) {
+
+        LocalDate today = LocalDate.now();
+        LocalDate repaymentEndDate = paper.getRepaymentEndDate();
+
+        return ChronoUnit.DAYS.between(today, repaymentEndDate);
     }
 }

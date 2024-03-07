@@ -2,9 +2,9 @@ package com.owl.payrit.domain.promissorypaper.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
-import com.owl.payrit.domain.promissorypaper.dto.response.CreditorPaperResponse;
-import com.owl.payrit.domain.promissorypaper.dto.response.DebtorPaperResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
+import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -45,23 +46,13 @@ public class PromissoryPaperRestController {
         return ResponseEntity.ok().body(paperDetailResponse);
     }
 
-    @GetMapping("/list/creditor")
-    public ResponseEntity<List<CreditorPaperResponse>> creditorList(@AuthenticationPrincipal LoginUser loginUser) {
+    @GetMapping("/list")
+    public ResponseEntity<List<PaperListResponse>> creditorList(@AuthenticationPrincipal LoginUser loginUser) {
 
         log.info("request user id : " + loginUser.id());
 
-        List<CreditorPaperResponse> creditorPaperResponseList = promissoryPaperService.getCreditorPaperList(loginUser);
+        List<PaperListResponse> allListResponses = promissoryPaperService.getAllListResponse(loginUser);
 
-        return ResponseEntity.ok().body(creditorPaperResponseList);
-    }
-
-    @GetMapping("/list/debtor")
-    public ResponseEntity<List<DebtorPaperResponse>> debtorList(@AuthenticationPrincipal LoginUser loginUser) {
-
-        log.info("request user id : " + loginUser.id());
-        
-        List<DebtorPaperResponse> debtorPaperResponseList = new ArrayList<>(); //TODO: 내용 대입 필요
-
-        return ResponseEntity.ok().body(debtorPaperResponseList);
+        return ResponseEntity.ok().body(allListResponses);
     }
 }
