@@ -5,6 +5,7 @@ import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
@@ -14,7 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -36,7 +41,7 @@ public class PromissoryPaperService {
         Member debtor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
-        //TODO: 폼 입력 데이터와 사전 입력 데이터가 일치하는지 검사 필요??
+        //TODO: 폼의 입력한 데이터(채권자, 채무자)중 내 정보와 일치하는 내용이 반드시 있어야 한다.
 
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
@@ -71,7 +76,6 @@ public class PromissoryPaperService {
 
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
 
-
         PromissoryPaper promissoryPaper = promissoryPaperRepository.findById(paperId).orElseThrow(
                 () -> new PromissoryPaperException(ErrorCode.PAPER_NOT_FOUND));
 
@@ -90,5 +94,37 @@ public class PromissoryPaperService {
         }
 
         return false;
+    }
+
+    public Map<String, List<PaperListResponse>> getListResponses(LoginUser loginUser) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        Map<String, List<PaperListResponse>> listResponseMap = new HashMap<>();
+
+        List<PromissoryPaper> creditorPaperList = promissoryPaperRepository.findAllByCreditor(loginedMember);
+
+        for (PromissoryPaper paper : creditorPaperList) {
+            List<PaperListResponse> listResponseList = new ArrayList<>();
+            listResponseList.add(new PaperListResponse(paper, paper.getDebtorName(), calcDueDate(paper)));
+            listResponseMap.put("creditor", listResponseList);
+        }
+        List<PromissoryPaper> debtorPaperList = promissoryPaperRepository.findAllByDebtor(loginedMember);
+
+        for (PromissoryPaper paper : debtorPaperList) {
+            List<PaperListResponse> listResponseList = new ArrayList<>();
+            listResponseList.add(new PaperListResponse(paper, paper.getCreditorName(), calcDueDate(paper)));
+            listResponseMap.put("debtor", listResponseList);
+        }
+
+        return listResponseMap;
+    }
+
+    private long calcDueDate(PromissoryPaper paper) {
+
+        LocalDate today = LocalDate.now();
+        LocalDate repaymentEndDate = paper.getRepaymentEndDate();
+
+        return ChronoUnit.DAYS.between(today, repaymentEndDate);
     }
 }

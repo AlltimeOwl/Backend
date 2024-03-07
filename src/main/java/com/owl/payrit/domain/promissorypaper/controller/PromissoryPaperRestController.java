@@ -3,12 +3,16 @@ package com.owl.payrit.domain.promissorypaper.controller;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -41,10 +45,12 @@ public class PromissoryPaperRestController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<String> creditorList(@AuthenticationPrincipal LoginUser loginUser) {
+    public ResponseEntity<Map<String, List<PaperListResponse>>> creditorList(@AuthenticationPrincipal LoginUser loginUser) {
 
         log.info("request user id : " + loginUser.id());
 
-        return ResponseEntity.ok().body("list");
+        Map<String, List<PaperListResponse>> listResponses = promissoryPaperService.getListResponses(loginUser);
+
+        return ResponseEntity.ok().body(listResponses);
     }
 }

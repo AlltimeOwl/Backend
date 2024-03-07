@@ -12,4 +12,5 @@ public interface PromissoryPaperRepository extends JpaRepository<PromissoryPaper
     Optional<PromissoryPaper> findByPaperKey(String paperKey);
     boolean existsByPaperKey(String paperKey);
     List<PromissoryPaper> findAllByCreditor(Member creditor);
+    List<PromissoryPaper> findAllByDebtor(Member debtor);
 }
