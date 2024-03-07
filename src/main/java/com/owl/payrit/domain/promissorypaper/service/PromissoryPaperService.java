@@ -149,6 +149,10 @@ public class PromissoryPaperService {
 
         PromissoryPaper paper = getById(paperId);
 
+        if(!paper.getPaperStatus().equals(PaperStatus.WAITING_AGREE)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
+        }
+
         //나와 연관된 차용증에만 승인이 가능함
         if (!isMine(loginUser.id(), paper)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
@@ -159,7 +163,7 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(ErrorCode.PAPER_CANNOT_ACCEPT_SELF);
         }
 
-        paper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
+        paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
     }
 
     public PromissoryPaper getById(Long paperId) {
