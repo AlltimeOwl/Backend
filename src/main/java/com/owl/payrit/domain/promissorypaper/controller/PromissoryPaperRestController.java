@@ -55,4 +55,12 @@ public class PromissoryPaperRestController {
 
         return ResponseEntity.ok().body(allListResponses);
     }
+
+    @PutMapping("/approve/accept")
+    public ResponseEntity<String> acceptPaper(@AuthenticationPrincipal LoginUser loginUser) {
+
+        log.info("request user id : " + loginUser.id());
+
+        return ResponseEntity.ok().body("accept");
+    }
 }
