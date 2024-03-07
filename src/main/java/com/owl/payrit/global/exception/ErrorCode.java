@@ -14,7 +14,8 @@ public enum ErrorCode {
     PAPER_IS_NOT_MINE(HttpStatus.FORBIDDEN, "차용증 접근 권한이 없습니다."),
     PAPER_LIST_EXCEPTION(HttpStatus.BAD_REQUEST, "차용증 리스트 조회가 올바르지 않습니다."),
     PAPER_CANNOT_ACCEPT_SELF(HttpStatus.BAD_REQUEST, "작성자는 승인할 수 없습니다."),
-    PAPER_STATUS_NOT_VALID(HttpStatus.BAD_REQUEST, "차용증에 대한 요청 단계가 올바르지 않습니다.");
+    PAPER_STATUS_NOT_VALID(HttpStatus.BAD_REQUEST, "차용증에 대한 요청 단계가 올바르지 않습니다."),
+    PAPER_WRITER_CAN_MODIFY(HttpStatus.FORBIDDEN, "첫 작성자만 수정이 가능합니다.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

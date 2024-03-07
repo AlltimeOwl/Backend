@@ -206,4 +206,38 @@ public class PromissoryPaperService {
 
         return paper.getCreditor();
     }
+
+    @Transactional
+    public void modifyingPaper(LoginUser loginUser, Long paperId, PaperWriteRequest paperWriteRequest) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+        PromissoryPaper paper = getById(paperId);
+
+        if(!paper.getPaperStatus().equals(PaperStatus.MODIFYING)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
+        }
+
+        if (!paper.getWriter().equals(loginedMember)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_WRITER_CAN_MODIFY);
+        }
+
+        //TODO: 더 좋은 방법 고려 필요. 수정할 부분이 어딘지 명시된다면?
+        PromissoryPaper modifiedPaper = paper.toBuilder()
+                .amount(paperWriteRequest.amount())
+                .transactionDate(paperWriteRequest.transactionDate())
+                .repaymentStartDate(paperWriteRequest.repaymentStartDate())
+                .repaymentEndDate(paperWriteRequest.repaymentEndDate())
+                .specialConditions(paperWriteRequest.specialConditions())
+                .interestRate(paperWriteRequest.interestRate())
+                .creditorName(paperWriteRequest.creditorName())
+                .creditorPhoneNumber(paperWriteRequest.creditorPhoneNumber())
+                .creditorAddress(paperWriteRequest.creditorAddress())
+                .debtorName(paperWriteRequest.debtorName())
+                .debtorPhoneNumber(paperWriteRequest.debtorPhoneNumber())
+                .debtorAddress(paperWriteRequest.debtorAddress())
+                .paperStatus(PaperStatus.WAITING_AGREE)
+                .build();
+
+        promissoryPaperRepository.save(modifiedPaper);
+    }
 }

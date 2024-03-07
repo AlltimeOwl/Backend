@@ -80,4 +80,15 @@ public class PromissoryPaperRestController {
 
         return ResponseEntity.ok().body("modify request : %s".formatted(paperModifyRequest.contents()));
     }
+
+    @PutMapping("/modify/accept/{id}")
+    public ResponseEntity<String> modifying(@AuthenticationPrincipal LoginUser loginUser,
+                                            @PathVariable(value = "id") Long paperId,
+                                            @RequestBody PaperWriteRequest paperWriteRequest) {
+
+        //FIXME: 수정시에도 PaperWriteRequest를 요청?
+        promissoryPaperService.modifyingPaper(loginUser, paperId, paperWriteRequest);
+
+        return ResponseEntity.ok().body("modify success");
+    }
 }
