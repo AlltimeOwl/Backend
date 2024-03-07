@@ -68,15 +68,14 @@ public class PromissoryPaperRestController {
         return ResponseEntity.ok().body("accept");
     }
 
-    @PostMapping("/modify/request/{id}")
+    @PostMapping("/modify/request")
     public ResponseEntity<String> requestModify(@AuthenticationPrincipal LoginUser loginUser,
-                                                @PathVariable(value = "id") Long paperId,
                                                 @RequestBody PaperModifyRequest paperModifyRequest) {
 
         log.info("request user id : " + loginUser.id());
         log.info("contents : " + paperModifyRequest.contents());
 
-        promissoryPaperService.sendModifyRequest(loginUser, paperId, paperModifyRequest);
+        promissoryPaperService.sendModifyRequest(loginUser, paperModifyRequest);
 
         return ResponseEntity.ok().body("modify request : %s".formatted(paperModifyRequest.contents()));
     }

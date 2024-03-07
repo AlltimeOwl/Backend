@@ -175,10 +175,9 @@ public class PromissoryPaperService {
     }
 
     @Transactional
-    public void sendModifyRequest(LoginUser loginUser, Long paperId, PaperModifyRequest paperModifyRequest) {
+    public void sendModifyRequest(LoginUser loginUser, PaperModifyRequest paperModifyRequest) {
 
-        Member loginedMember = memberService.findById(loginUser.id());
-        PromissoryPaper paper = getById(paperId);
+        PromissoryPaper paper = getById(paperModifyRequest.paperId());
 
         //승인 대기 단계에서만 수정 요청이 가능함
         if (!paper.getPaperStatus().equals(PaperStatus.WAITING_AGREE)) {
@@ -190,21 +189,10 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
         }
 
-        Member peerMember = getPeerMember(paper, loginedMember);
-
-        //TODO: peerMember에게 paperModifyRequest의 contents로 알림(자체 or 알림톡) 발송하는 기능 필요
+        //TODO: 초기 작성자에게 paperModifyRequest의 contents로 알림(자체 or 알림톡) 발송하는 기능 필요
+        Member writer = memberService.findById(paperModifyRequest.writerId());
 
         paper.modifyPaperStatus(PaperStatus.MODIFYING);
-    }
-
-    //FIXME: MemberService 로 위치 이동 필요?
-    private Member getPeerMember(PromissoryPaper paper, Member loginedMember) {
-
-        if (paper.getCreditor().equals(loginedMember)) {
-            return paper.getDebtor();
-        }
-
-        return paper.getCreditor();
     }
 
     @Transactional
