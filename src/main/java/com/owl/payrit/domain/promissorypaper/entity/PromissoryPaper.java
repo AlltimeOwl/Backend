@@ -5,6 +5,7 @@ import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @ToString(callSuper = true)
+@DynamicUpdate
 public class PromissoryPaper extends BaseEntity {
 
     private long amount;
@@ -69,4 +71,8 @@ public class PromissoryPaper extends BaseEntity {
 
     //저장소 URL
     private String storageUrl;
+
+    public void modifyPaperStatus(PaperStatus status) {
+        this.paperStatus = status;
+    }
 }
