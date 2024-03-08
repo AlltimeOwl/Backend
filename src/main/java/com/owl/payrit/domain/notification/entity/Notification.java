@@ -3,9 +3,11 @@ package com.owl.payrit.domain.notification.entity;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
@@ -25,4 +27,10 @@ public class Notification extends BaseEntity {
 
     @Column(nullable = false, columnDefinition = "boolean default false")
     private boolean isRead = false;
+
+    public Notification(Member member, String contents, NotificationType notificationType) {
+        this.member = member;
+        this.contents = contents;
+        this.notificationType = notificationType;
+    }
 }
