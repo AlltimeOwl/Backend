@@ -166,7 +166,7 @@ public class PromissoryPaperService {
         }
 
         //작성자와 승인자가 일치할 수 없음
-        if (paper.getWriter().getId().equals(loginUser.id())) {
+        if (paper.getWriter().equals(loginedMember)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_CANNOT_ACCEPT_SELF);
         }
 
