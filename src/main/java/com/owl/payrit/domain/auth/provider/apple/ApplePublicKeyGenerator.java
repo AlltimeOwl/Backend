@@ -17,7 +17,6 @@ public class ApplePublicKeyGenerator {
 
     public PublicKey generate(Map<String, String> headers, ApplePublicKeyResponse applePublicKeyResponse) {
         ApplePublicKey applePublicKey = applePublicKeyResponse.getProperKey(headers.get("kid"), headers.get("alg"));
-
         return getGenerateKey(applePublicKey);
     }
 
