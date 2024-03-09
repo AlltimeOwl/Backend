@@ -98,7 +98,7 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
         }
 
-        return new PaperDetailResponse(promissoryPaper);
+        return new PaperDetailResponse(promissoryPaper, calcRepaymentRate(promissoryPaper));
     }
 
     private boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
@@ -137,9 +137,11 @@ public class PromissoryPaperService {
 
         return papers.stream().map(paper -> {
             if (role.equals(PaperRole.CREDITOR)) {
-                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(), calcDueDate(paper));
+                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(),
+                        calcDueDate(paper), calcRepaymentRate(paper));
             } else {
-                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName(), calcDueDate(paper));
+                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName()
+                        , calcDueDate(paper), calcRepaymentRate(paper));
             }
         }).collect(Collectors.toList());
     }
@@ -267,6 +269,7 @@ public class PromissoryPaperService {
 
         LocalDate today = LocalDate.now();
 
+        //FIXME: 하드코딩 개선 필요
         if (paper.getInterestRate() > 20) {
             throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
         } else if(paper.getRepaymentStartDate().isBefore(today)) {
@@ -274,5 +277,15 @@ public class PromissoryPaperService {
         } else if(paper.getRepaymentEndDate().isBefore(paper.getRepaymentStartDate())) {
             throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
         }
+    }
+
+    public double calcRepaymentRate(PromissoryPaper paper) {
+
+        long amount = paper.getAmount();
+        long currentRepaymentAmount = paper.getRepaymentAmount();
+
+        double repaymentRate = (double) currentRepaymentAmount / amount * 100.0;
+
+        return Math.round(repaymentRate * 100.0) / 100.0;
     }
 }
