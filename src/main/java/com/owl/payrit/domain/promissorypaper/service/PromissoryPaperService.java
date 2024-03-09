@@ -45,12 +45,6 @@ public class PromissoryPaperService {
         Member debtor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
-        //TODO: 폼의 입력한 데이터(채권자, 채무자)중 내 정보와 일치하는 내용이 반드시 있어야 한다.
-
-        //TODO: 동일한 데이터로 차용증을 2건 작성하려 한다면 막는 기능이 필요할 수 있다.
-
-        //TODO: 2번 회원의 인증 정보로 3번과 4번 회원의 차용증 작성은 금지되어야 한다.
-
         //TODO: 이자율은 음수가 될 수 없다.
 
         PromissoryPaper paper = PromissoryPaper.builder()
@@ -61,6 +55,7 @@ public class PromissoryPaperService {
                 .specialConditions(paperWriteRequest.specialConditions())
                 .interestRate(paperWriteRequest.interestRate())
                 .writer(loginedMember)
+                .writerRole(paperWriteRequest.writerRole())
                 .creditor(creditor)
                 .creditorName(paperWriteRequest.creditorName())
                 .creditorPhoneNumber(paperWriteRequest.creditorPhoneNumber())
@@ -74,6 +69,11 @@ public class PromissoryPaperService {
                 .paperKey(getRandomKey())
                 .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
+
+        //승인시에도 즉시 확인이 가능하도록 엔티티에 작성자 역할 추가, 검증 순서를 아래로 내림(고려)
+        if(!checkMemberData(loginedMember, paper)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
+        }
 
         promissoryPaperRepository.save(paper);
     }
@@ -228,5 +228,20 @@ public class PromissoryPaperService {
                 .build();
 
         promissoryPaperRepository.save(modifiedPaper);
+    }
+
+    public boolean checkMemberData(Member member, PromissoryPaper paper) {
+
+        String name = member.getName();
+        String phoneNumber = member.getPhoneNumber();
+        PaperRole writerRole = paper.getWriterRole();
+
+        if(writerRole.equals(PaperRole.CREDITOR)) {
+            return name.equals(paper.getCreditorName()) &&
+                    phoneNumber.equals(paper.getCreditorPhoneNumber());
+        } else {
+            return name.equals(paper.getDebtorName()) &&
+                    phoneNumber.equals(paper.getDebtorPhoneNumber());
+        }
     }
 }

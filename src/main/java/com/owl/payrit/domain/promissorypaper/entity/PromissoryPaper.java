@@ -37,6 +37,9 @@ public class PromissoryPaper extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;
 
+    @Enumerated(EnumType.STRING)
+    private PaperRole writerRole;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member creditor;
 
