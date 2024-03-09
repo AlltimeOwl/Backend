@@ -242,6 +242,10 @@ public class PromissoryPaperService {
                 .paperStatus(PaperStatus.WAITING_AGREE)
                 .build();
 
+        if(!checkMemberData(loginedMember, modifiedPaper, modifiedPaper.getWriterRole())) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
+        }
+
         promissoryPaperRepository.save(modifiedPaper);
     }
 
