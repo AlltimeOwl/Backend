@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.auth.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
@@ -13,6 +14,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.jackson.io.JacksonDeserializer;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +31,27 @@ public class JwtProvider {
     private final RedisTemplate<OauthInformation, String> redisTemplate;
     private final long accessTokenExpireTimeMs = 604800000L; // 1주일
     private final long refreshTokenExpireTimeMs = 1209600000L; // 2주일
+
+    @Component
+    static class AppleJwtValidator {
+
+        public Map<String, String> parseHeaders(String token) throws JsonProcessingException {
+            String header = token.split("\\.")[0];
+            return new ObjectMapper().readValue(decodeHeader(header), Map.class);
+        }
+
+        public String decodeHeader(String header) {
+            return new String(Base64.getDecoder().decode(header), StandardCharsets.UTF_8);
+        }
+
+        public Claims getTokenClaims(String token, PublicKey publicKey) {
+            return Jwts.parserBuilder()
+                       .setSigningKey(publicKey)
+                       .build()
+                       .parseClaimsJws(token)
+                       .getBody();
+        }
+    }
 
     public Long getId(String token, String secretKey) {
         return Jwts.parserBuilder()
