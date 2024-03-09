@@ -3,6 +3,8 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.notification.entity.NotificationType;
+import com.owl.payrit.domain.notification.service.NotificationService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
@@ -32,6 +34,7 @@ import java.util.stream.Stream;
 public class PromissoryPaperService {
 
     private final MemberService memberService;
+    private final NotificationService notificationService;
     private final PromissoryPaperRepository promissoryPaperRepository;
 
     @Transactional
@@ -169,6 +172,13 @@ public class PromissoryPaperService {
         if (paper.getWriter().equals(loginedMember)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_CANNOT_ACCEPT_SELF);
         }
+
+        //FIXME: contents 템플릿 필요 + 알림 발송 방식 고려(1.직접 호출 / 2.Event / 3.Batch)
+        notificationService.create(paper.getCreditor(),
+                "차용증이 성공적으로 작성되었습니다..", NotificationType.PAPER_AGREE);
+
+        notificationService.create(paper.getDebtor(),
+                "차용증이 성공적으로 작성되었습니다..", NotificationType.PAPER_AGREE);
 
         paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
     }
