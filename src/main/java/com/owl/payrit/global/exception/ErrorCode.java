@@ -16,7 +16,8 @@ public enum ErrorCode {
     PAPER_CANNOT_ACCEPT_SELF(HttpStatus.BAD_REQUEST, "작성자는 승인할 수 없습니다."),
     PAPER_STATUS_NOT_VALID(HttpStatus.BAD_REQUEST, "차용증에 대한 요청 단계가 올바르지 않습니다."),
     PAPER_WRITER_CAN_MODIFY(HttpStatus.FORBIDDEN, "첫 작성자만 수정이 가능합니다."),
-    PAPER_MATCHING_FAILED(HttpStatus.BAD_REQUEST, "차용증 정보와 회원의 정보가 일치하지 않습니다.");
+    PAPER_MATCHING_FAILED(HttpStatus.BAD_REQUEST, "차용증 정보와 회원의 정보가 일치하지 않습니다."),
+    PAPER_DATA_BAD_REQUEST(HttpStatus.BAD_REQUEST, "차용증 데이터가 올바르지 않습니다.");
 
     private final HttpStatus httpStatus;
     private final String errorMessage;

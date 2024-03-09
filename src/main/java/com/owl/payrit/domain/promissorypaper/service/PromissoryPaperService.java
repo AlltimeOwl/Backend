@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -42,17 +43,14 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
+        //TODO: 본인 인증이 완료된 회원만 차용증 작성이 가능하다.(v2)
+        //if(!loginedMember.isAuthentication) { throw new exception ... }
+
         //FIXME: 상대방이 회원가입 하지 않은 상황이면, 조회가 불가능? => 일단 null로 반환함.
         Member creditor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.creditorPhoneNumber()).orElse(null);
         Member debtor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
-
-        //TODO: 본인 인증이 완료된 회원만 차용증 작성이 가능하다.(v2)
-
-        //TODO: 이자율은 음수가 될 수 없다.
-
-        //TODO: 상환 시작일(송금일)은 당일 이후여야 하며, 상환 마감일은 상환 시작일 이후여야 한다.
 
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
@@ -77,10 +75,12 @@ public class PromissoryPaperService {
                 .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
 
-        //REVIEW: 승인시에도 즉시 확인이 가능하도록 엔티티에 작성자 역할 추가, 검증 순서를 아래로 내림(고려)
-        if(!checkMemberData(loginedMember, paper, paper.getWriterRole())) {
+        //REVIEW: 승인, 수정 시에도 호출이 가능하도록 엔티티에 작성자 역할 추가, 검증 순서를 아래로 내림(어떤 것이 더 효율적인가?)
+        if (!checkMemberData(loginedMember, paper, paper.getWriterRole())) {
             throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
         }
+
+        checkPaperData(paper);
 
         promissoryPaperRepository.save(paper);
     }
@@ -217,7 +217,7 @@ public class PromissoryPaperService {
         Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperId);
 
-        if(!paper.getPaperStatus().equals(PaperStatus.MODIFYING)) {
+        if (!paper.getPaperStatus().equals(PaperStatus.MODIFYING)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
         }
 
@@ -242,7 +242,7 @@ public class PromissoryPaperService {
                 .paperStatus(PaperStatus.WAITING_AGREE)
                 .build();
 
-        if(!checkMemberData(loginedMember, modifiedPaper, modifiedPaper.getWriterRole())) {
+        if (!checkMemberData(loginedMember, modifiedPaper, modifiedPaper.getWriterRole())) {
             throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
         }
 
@@ -254,12 +254,25 @@ public class PromissoryPaperService {
         String name = member.getName();
         String phoneNumber = member.getPhoneNumber();
 
-        if(paperRole.equals(PaperRole.CREDITOR)) {
+        if (paperRole.equals(PaperRole.CREDITOR)) {
             return name.equals(paper.getCreditorName()) &&
                     phoneNumber.equals(paper.getCreditorPhoneNumber());
         } else {
             return name.equals(paper.getDebtorName()) &&
                     phoneNumber.equals(paper.getDebtorPhoneNumber());
+        }
+    }
+
+    public void checkPaperData(PromissoryPaper paper) {
+
+        LocalDate today = LocalDate.now();
+
+        if (paper.getInterestRate() > 20) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
+        } else if(paper.getRepaymentStartDate().isBefore(today)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
+        } else if(paper.getRepaymentEndDate().isBefore(paper.getRepaymentStartDate())) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
         }
     }
 }
