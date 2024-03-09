@@ -206,7 +206,7 @@ public class PromissoryPaperService {
         }
 
         //TODO: 초기 작성자에게 paperModifyRequest의 contents로 알림(자체 or 알림톡) 발송하는 기능 필요
-        Member writer = memberService.findById(paperModifyRequest.writerId());
+        Member writer = paper.getWriter();
 
         paper.modifyPaperStatus(PaperStatus.MODIFYING);
     }
