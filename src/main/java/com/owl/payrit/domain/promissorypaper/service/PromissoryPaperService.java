@@ -45,7 +45,11 @@ public class PromissoryPaperService {
         Member debtor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
+        //TODO: 본인 인증이 완료된 회원만 차용증 작성이 가능하다.(v2)
+
         //TODO: 이자율은 음수가 될 수 없다.
+
+        //TODO: 상환 시작일(송금일)은 당일 이후여야 하며, 상환 마감일은 상환 시작일 이후여야 한다.
 
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
@@ -70,8 +74,8 @@ public class PromissoryPaperService {
                 .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
 
-        //승인시에도 즉시 확인이 가능하도록 엔티티에 작성자 역할 추가, 검증 순서를 아래로 내림(고려)
-        if(!checkMemberData(loginedMember, paper)) {
+        //REVIEW: 승인시에도 즉시 확인이 가능하도록 엔티티에 작성자 역할 추가, 검증 순서를 아래로 내림(고려)
+        if(!checkMemberData(loginedMember, paper, paper.getWriterRole())) {
             throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
         }
 
@@ -79,7 +83,6 @@ public class PromissoryPaperService {
     }
 
     private String getRandomKey() {
-
         String paperKey = UUID.randomUUID().toString();
         return promissoryPaperRepository.existsByPaperKey(paperKey) ? getRandomKey() : paperKey;
     }
@@ -149,6 +152,7 @@ public class PromissoryPaperService {
     @Transactional
     public void acceptPaper(LoginUser loginUser, Long paperId) {
 
+        Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperId);
 
         //승인 대기 단계에서만 승인이 가능함
@@ -156,9 +160,9 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
         }
 
-        //나와 연관된 차용증에만 승인이 가능함
-        if (!isMine(loginUser.id(), paper)) {
-            throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
+        //할당 역할에 대한 정보와 회원 정보가 일치해야함
+        if (!checkMemberData(loginedMember, paper, paper.getWriterRole().getReverse())) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
         }
 
         //작성자와 승인자가 일치할 수 없음
@@ -178,6 +182,7 @@ public class PromissoryPaperService {
     @Transactional
     public void sendModifyRequest(LoginUser loginUser, PaperModifyRequest paperModifyRequest) {
 
+        Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperModifyRequest.paperId());
 
         //승인 대기 단계에서만 수정 요청이 가능함
@@ -185,8 +190,8 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
         }
 
-        //나와 연관된 차용증에만 수정 요청이 가능함
-        if (!isMine(loginUser.id(), paper)) {
+        //승인 요청을 받은 사람만 수정 요청이 가능하다.
+        if (!checkMemberData(loginedMember, paper, paper.getWriterRole().getReverse())) {
             throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
         }
 
@@ -230,13 +235,12 @@ public class PromissoryPaperService {
         promissoryPaperRepository.save(modifiedPaper);
     }
 
-    public boolean checkMemberData(Member member, PromissoryPaper paper) {
+    public boolean checkMemberData(Member member, PromissoryPaper paper, PaperRole paperRole) {
 
         String name = member.getName();
         String phoneNumber = member.getPhoneNumber();
-        PaperRole writerRole = paper.getWriterRole();
 
-        if(writerRole.equals(PaperRole.CREDITOR)) {
+        if(paperRole.equals(PaperRole.CREDITOR)) {
             return name.equals(paper.getCreditorName()) &&
                     phoneNumber.equals(paper.getCreditorPhoneNumber());
         } else {
