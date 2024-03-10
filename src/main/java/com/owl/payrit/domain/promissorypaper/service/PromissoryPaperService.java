@@ -17,6 +17,7 @@ import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepositor
 import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -182,7 +183,9 @@ public class PromissoryPaperService {
         notificationService.create(paper.getDebtor(),
                 "차용증이 성공적으로 작성되었습니다..", NotificationType.PAPER_AGREE);
 
-        paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
+        //FIXME: 결제 연동 후 상태 변경
+        //paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
+        paper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
     }
 
     public PromissoryPaper getById(Long paperId) {
@@ -272,9 +275,9 @@ public class PromissoryPaperService {
         //FIXME: 하드코딩 개선 필요
         if (paper.getInterestRate() > 20) {
             throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
-        } else if(paper.getRepaymentStartDate().isBefore(today)) {
+        } else if (paper.getRepaymentStartDate().isBefore(today)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
-        } else if(paper.getRepaymentEndDate().isBefore(paper.getRepaymentStartDate())) {
+        } else if (paper.getRepaymentEndDate().isBefore(paper.getRepaymentStartDate())) {
             throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
         }
     }
@@ -287,5 +290,17 @@ public class PromissoryPaperService {
         double repaymentRate = (double) currentRepaymentAmount / amount * 100.0;
 
         return Math.round(repaymentRate * 100.0) / 100.0;
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void expiring() {
+
+        List<PromissoryPaper> expiringTargets = promissoryPaperRepository
+                .findAllByRepaymentEndDateAndPaperStatus(LocalDate.now(), PaperStatus.COMPLETE_WRITING);
+
+        for (PromissoryPaper paper : expiringTargets) {
+            paper.modifyPaperStatus(PaperStatus.EXPIRED);
+        }
     }
 }
