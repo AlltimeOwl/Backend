@@ -3,11 +3,13 @@ package com.owl.payrit.domain.auth.service;
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
+import com.owl.payrit.domain.auth.exception.AuthException;
 import com.owl.payrit.domain.auth.provider.OauthClientComposite;
 import com.owl.payrit.domain.auth.util.JwtProvider;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -72,7 +74,7 @@ public class AuthService {
         Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
         boolean status = member.isAuthenticated();
         if(Boolean.FALSE.equals(status)) {
-            throw new RuntimeException("권한이 없습니다.");
+            throw new AuthException(ErrorCode.NOT_AUTHORIZED_MEMBER);
         }
         return true;
     }
