@@ -20,6 +20,8 @@ public class PromissoryPaper extends BaseEntity {
 
     private long amount;
 
+    private long remainingAmount;
+
     private LocalDate transactionDate;
 
     private LocalDate repaymentStartDate;
@@ -29,9 +31,6 @@ public class PromissoryPaper extends BaseEntity {
     private String specialConditions;
 
     private float interestRate;
-
-    @Builder.Default
-    private long repaymentAmount = 0;
 
     //차용증을 누가 작성했는지
     @ManyToOne(fetch = FetchType.LAZY)
