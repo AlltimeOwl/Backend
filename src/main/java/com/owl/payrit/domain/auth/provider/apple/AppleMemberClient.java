@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.auth.provider.apple;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.response.AppleUser;
 import com.owl.payrit.domain.auth.provider.OauthClient;
 import com.owl.payrit.domain.member.entity.Member;
 import io.jsonwebtoken.Claims;
@@ -24,12 +25,21 @@ public class AppleMemberClient implements OauthClient {
 
     @Override
     public Member fetch(String accessToken) {
-
         ApplePublicKeyResponse applePublicKeyResponse = appleApiClient.fetchPublicKey();
         Map<String, String> appleToken = appleJwtValidator.parseHeaders(accessToken);
         PublicKey publicKey = applePublicKeyGenerator.generate(appleToken, applePublicKeyResponse);
         Claims claims = appleJwtValidator.getTokenClaims(accessToken, publicKey);
-        //TODO: Oauth2Member to member
-        return null;
+        return mapClaimToMember(claims);
+    }
+
+    public Member mapClaimToMember(Claims claims) {
+        final String SUB = "sub";
+        final String EMAIL = "email";
+
+        final String appleId = claims.get(SUB, String.class);
+        final String appleEmail = claims.get(EMAIL, String.class);
+
+        AppleUser appleUser = new AppleUser(appleId, appleEmail);
+        return appleUser.toEntity();
     }
 }
