@@ -67,4 +67,13 @@ public class AuthService {
         Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
         memberService.delete(member);
     }
+
+    public boolean checkAuthentication(LoginUser loginUser) {
+        Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
+        boolean status = member.isAuthenticated();
+        if(Boolean.FALSE.equals(status)) {
+            throw new RuntimeException("권한이 없습니다.");
+        }
+        return true;
+    }
 }
