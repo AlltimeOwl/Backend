@@ -51,10 +51,10 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(nullable = false, name = "phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column
     private LocalDate birthDay;
 
-    @Column(nullable = false)
+    @Column
     private String name;
 
     @Column(nullable = false, columnDefinition = "boolean default false")
