@@ -5,13 +5,11 @@ import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import java.time.LocalDate;
 
 public record PaperDetailResponse(
-        //FIXME: 단순 Paper객체가 아닌 Response를 반환하는 것과의 차이점...?
 
         String paperUrl,
-        long totalAmount,
+        long remainingAmount,
         float interestRate,
         double repaymentRate,
-        long currentRepaymentAmount,
         LocalDate repaymentStartDate,
         LocalDate repaymentEndDate,
         String creditorName,
@@ -25,10 +23,9 @@ public record PaperDetailResponse(
     public PaperDetailResponse(PromissoryPaper promissoryPaper, double repaymentRate) {
         this(
                 promissoryPaper.getStorageUrl(),
-                promissoryPaper.getAmount(),
+                promissoryPaper.getRemainingAmount(),
                 promissoryPaper.getInterestRate(),
                 repaymentRate,
-                promissoryPaper.getRepaymentAmount(),
                 promissoryPaper.getRepaymentStartDate(),
                 promissoryPaper.getRepaymentEndDate(),
                 promissoryPaper.getCreditor().getName(),

@@ -94,16 +94,16 @@ public class PromissoryPaperService {
         return promissoryPaperRepository.existsByPaperKey(paperKey) ? getRandomKey() : paperKey;
     }
 
-//    public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
-//
-//        PromissoryPaper promissoryPaper = getById(paperId);
-//
-//        if (!isMine(loginUser.id(), promissoryPaper)) {
-//            throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
-//        }
-//
-//        return new PaperDetailResponse(promissoryPaper, calcRepaymentRate(promissoryPaper));
-//    }
+    public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
+
+        PromissoryPaper promissoryPaper = getById(paperId);
+
+        if (!isMine(loginUser.id(), promissoryPaper)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
+        }
+
+        return new PaperDetailResponse(promissoryPaper, calcRepaymentRate(promissoryPaper));
+    }
 
     private boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
 
@@ -115,40 +115,40 @@ public class PromissoryPaperService {
         return false;
     }
 
-//    public List<PaperListResponse> getAllListResponse(LoginUser loginUser) {
-//
-//        List<PaperListResponse> creditorList =
-//                getListResponsesByRole(loginUser, PaperRole.CREDITOR);
-//
-//        List<PaperListResponse> debtorList =
-//                getListResponsesByRole(loginUser, PaperRole.DEBTOR);
-//
-//        return Stream.concat(creditorList.stream(), debtorList.stream())
-//                .collect(Collectors.toList());
-//    }
+    public List<PaperListResponse> getAllListResponse(LoginUser loginUser) {
 
-//    public List<PaperListResponse> getListResponsesByRole(LoginUser loginUser, PaperRole role) {
-//
-//        Member loginedMember = memberService.findById(loginUser.id());
-//
-//        List<PromissoryPaper> papers;
-//
-//        if (role.equals(PaperRole.CREDITOR)) {
-//            papers = promissoryPaperRepository.findAllByCreditor(loginedMember);
-//        } else {
-//            papers = promissoryPaperRepository.findAllByDebtor(loginedMember);
-//        }
-//
-//        return papers.stream().map(paper -> {
-//            if (role.equals(PaperRole.CREDITOR)) {
-//                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(),
-//                        calcDueDate(paper), calcRepaymentRate(paper));
-//            } else {
-//                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName()
-//                        , calcDueDate(paper), calcRepaymentRate(paper));
-//            }
-//        }).collect(Collectors.toList());
-//    }
+        List<PaperListResponse> creditorList =
+                getListResponsesByRole(loginUser, PaperRole.CREDITOR);
+
+        List<PaperListResponse> debtorList =
+                getListResponsesByRole(loginUser, PaperRole.DEBTOR);
+
+        return Stream.concat(creditorList.stream(), debtorList.stream())
+                .collect(Collectors.toList());
+    }
+
+    public List<PaperListResponse> getListResponsesByRole(LoginUser loginUser, PaperRole role) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        List<PromissoryPaper> papers;
+
+        if (role.equals(PaperRole.CREDITOR)) {
+            papers = promissoryPaperRepository.findAllByCreditor(loginedMember);
+        } else {
+            papers = promissoryPaperRepository.findAllByDebtor(loginedMember);
+        }
+
+        return papers.stream().map(paper -> {
+            if (role.equals(PaperRole.CREDITOR)) {
+                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(),
+                        calcDueDate(paper), calcRepaymentRate(paper));
+            } else {
+                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName()
+                        , calcDueDate(paper), calcRepaymentRate(paper));
+            }
+        }).collect(Collectors.toList());
+    }
 
     private long calcDueDate(PromissoryPaper paper) {
 
@@ -285,16 +285,19 @@ public class PromissoryPaperService {
         }
     }
 
-    //FIXME: 상환 내역 생성 후 수정 필요
-//    public double calcRepaymentRate(PromissoryPaper paper) {
-//
+
+    public double calcRepaymentRate(PromissoryPaper paper) {
+
+        //FIXME: 상환 내역 생성 후 수정 필요
 //        long amount = paper.getAmount();
-//        long currentRepaymentAmount = paper.getRepaymentAmount();
+//        long remainingAmount
 //
 //        double repaymentRate = (double) currentRepaymentAmount / amount * 100.0;
 //
 //        return Math.round(repaymentRate * 100.0) / 100.0;
-//    }
+
+        return 0.0;
+    }
 
     @Transactional
     @Scheduled(cron = "0 0 0 * * ?")
