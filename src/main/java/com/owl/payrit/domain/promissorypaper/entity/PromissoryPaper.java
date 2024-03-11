@@ -31,11 +31,14 @@ public class PromissoryPaper extends BaseEntity {
     private float interestRate;
 
     @Builder.Default
-    private long currentRepaymentAmount = 0;
+    private long repaymentAmount = 0;
 
     //차용증을 누가 작성했는지
     @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;
+
+    @Enumerated(EnumType.STRING)
+    private PaperRole writerRole;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member creditor;

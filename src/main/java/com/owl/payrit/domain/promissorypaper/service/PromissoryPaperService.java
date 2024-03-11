@@ -17,10 +17,12 @@ import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepositor
 import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -42,19 +44,14 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
+        //TODO: 본인 인증이 완료된 회원만 차용증 작성이 가능하다.(v2)
+        //if(!loginedMember.isAuthentication) { throw new exception ... }
+
         //FIXME: 상대방이 회원가입 하지 않은 상황이면, 조회가 불가능? => 일단 null로 반환함.
         Member creditor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.creditorPhoneNumber()).orElse(null);
         Member debtor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
-
-        //TODO: 폼의 입력한 데이터(채권자, 채무자)중 내 정보와 일치하는 내용이 반드시 있어야 한다.
-
-        //TODO: 동일한 데이터로 차용증을 2건 작성하려 한다면 막는 기능이 필요할 수 있다.
-
-        //TODO: 2번 회원의 인증 정보로 3번과 4번 회원의 차용증 작성은 금지되어야 한다.
-
-        //TODO: 이자율은 음수가 될 수 없다.
 
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(paperWriteRequest.amount())
@@ -64,6 +61,7 @@ public class PromissoryPaperService {
                 .specialConditions(paperWriteRequest.specialConditions())
                 .interestRate(paperWriteRequest.interestRate())
                 .writer(loginedMember)
+                .writerRole(paperWriteRequest.writerRole())
                 .creditor(creditor)
                 .creditorName(paperWriteRequest.creditorName())
                 .creditorPhoneNumber(paperWriteRequest.creditorPhoneNumber())
@@ -78,11 +76,17 @@ public class PromissoryPaperService {
                 .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
 
+        //REVIEW: 승인, 수정 시에도 호출이 가능하도록 엔티티에 작성자 역할 추가, 검증 순서를 아래로 내림(어떤 것이 더 효율적인가?)
+        if (!checkMemberData(loginedMember, paper, paper.getWriterRole())) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
+        }
+
+        checkPaperData(paper);
+
         promissoryPaperRepository.save(paper);
     }
 
     private String getRandomKey() {
-
         String paperKey = UUID.randomUUID().toString();
         return promissoryPaperRepository.existsByPaperKey(paperKey) ? getRandomKey() : paperKey;
     }
@@ -95,7 +99,7 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
         }
 
-        return new PaperDetailResponse(promissoryPaper);
+        return new PaperDetailResponse(promissoryPaper, calcRepaymentRate(promissoryPaper));
     }
 
     private boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
@@ -134,9 +138,11 @@ public class PromissoryPaperService {
 
         return papers.stream().map(paper -> {
             if (role.equals(PaperRole.CREDITOR)) {
-                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(), calcDueDate(paper));
+                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(),
+                        calcDueDate(paper), calcRepaymentRate(paper));
             } else {
-                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName(), calcDueDate(paper));
+                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName()
+                        , calcDueDate(paper), calcRepaymentRate(paper));
             }
         }).collect(Collectors.toList());
     }
@@ -152,6 +158,7 @@ public class PromissoryPaperService {
     @Transactional
     public void acceptPaper(LoginUser loginUser, Long paperId) {
 
+        Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperId);
 
         //승인 대기 단계에서만 승인이 가능함
@@ -159,13 +166,13 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
         }
 
-        //나와 연관된 차용증에만 승인이 가능함
-        if (!isMine(loginUser.id(), paper)) {
-            throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
+        //할당 역할에 대한 정보와 회원 정보가 일치해야함
+        if (!checkMemberData(loginedMember, paper, paper.getWriterRole().getReverse())) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
         }
 
         //작성자와 승인자가 일치할 수 없음
-        if (paper.getWriter().getId().equals(loginUser.id())) {
+        if (paper.getWriter().equals(loginedMember)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_CANNOT_ACCEPT_SELF);
         }
 
@@ -176,7 +183,9 @@ public class PromissoryPaperService {
         notificationService.create(paper.getDebtor(),
                 "차용증이 성공적으로 작성되었습니다..", NotificationType.PAPER_AGREE);
 
-        paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
+        //FIXME: 결제 연동 후 상태 변경
+        //paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
+        paper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
     }
 
     public PromissoryPaper getById(Long paperId) {
@@ -188,6 +197,7 @@ public class PromissoryPaperService {
     @Transactional
     public void sendModifyRequest(LoginUser loginUser, PaperModifyRequest paperModifyRequest) {
 
+        Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperModifyRequest.paperId());
 
         //승인 대기 단계에서만 수정 요청이 가능함
@@ -195,13 +205,13 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
         }
 
-        //나와 연관된 차용증에만 수정 요청이 가능함
-        if (!isMine(loginUser.id(), paper)) {
+        //승인 요청을 받은 사람만 수정 요청이 가능하다.
+        if (!checkMemberData(loginedMember, paper, paper.getWriterRole().getReverse())) {
             throw new PromissoryPaperException(ErrorCode.PAPER_IS_NOT_MINE);
         }
 
         //TODO: 초기 작성자에게 paperModifyRequest의 contents로 알림(자체 or 알림톡) 발송하는 기능 필요
-        Member writer = memberService.findById(paperModifyRequest.writerId());
+        Member writer = paper.getWriter();
 
         paper.modifyPaperStatus(PaperStatus.MODIFYING);
     }
@@ -212,7 +222,7 @@ public class PromissoryPaperService {
         Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperId);
 
-        if(!paper.getPaperStatus().equals(PaperStatus.MODIFYING)) {
+        if (!paper.getPaperStatus().equals(PaperStatus.MODIFYING)) {
             throw new PromissoryPaperException(ErrorCode.PAPER_STATUS_NOT_VALID);
         }
 
@@ -237,6 +247,60 @@ public class PromissoryPaperService {
                 .paperStatus(PaperStatus.WAITING_AGREE)
                 .build();
 
+        if (!checkMemberData(loginedMember, modifiedPaper, modifiedPaper.getWriterRole())) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
+        }
+
         promissoryPaperRepository.save(modifiedPaper);
+    }
+
+    public boolean checkMemberData(Member member, PromissoryPaper paper, PaperRole paperRole) {
+
+        String name = member.getName();
+        String phoneNumber = member.getPhoneNumber();
+
+        if (paperRole.equals(PaperRole.CREDITOR)) {
+            return name.equals(paper.getCreditorName()) &&
+                    phoneNumber.equals(paper.getCreditorPhoneNumber());
+        } else {
+            return name.equals(paper.getDebtorName()) &&
+                    phoneNumber.equals(paper.getDebtorPhoneNumber());
+        }
+    }
+
+    public void checkPaperData(PromissoryPaper paper) {
+
+        LocalDate today = LocalDate.now();
+
+        //FIXME: 하드코딩 개선 필요
+        if (paper.getInterestRate() > 20) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
+        } else if (paper.getRepaymentStartDate().isBefore(today)) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
+        } else if (paper.getRepaymentEndDate().isBefore(paper.getRepaymentStartDate())) {
+            throw new PromissoryPaperException(ErrorCode.PAPER_DATA_BAD_REQUEST);
+        }
+    }
+
+    public double calcRepaymentRate(PromissoryPaper paper) {
+
+        long amount = paper.getAmount();
+        long currentRepaymentAmount = paper.getRepaymentAmount();
+
+        double repaymentRate = (double) currentRepaymentAmount / amount * 100.0;
+
+        return Math.round(repaymentRate * 100.0) / 100.0;
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void expiring() {
+
+        List<PromissoryPaper> expiringTargets = promissoryPaperRepository
+                .findAllByRepaymentEndDateAndPaperStatus(LocalDate.now(), PaperStatus.COMPLETE_WRITING);
+
+        for (PromissoryPaper paper : expiringTargets) {
+            paper.modifyPaperStatus(PaperStatus.EXPIRED);
+        }
     }
 }

@@ -13,9 +13,11 @@ public record PaperListResponse(
         long amount,
         PaperStatus paperStatus,
         String peerName,
-        long dueDate
+        long dueDate,
+        double repaymentRate
 ) {
-    public PaperListResponse(PromissoryPaper promissoryPaper, PaperRole paperRole, String peerName, long dueDate) {
+    public PaperListResponse(PromissoryPaper promissoryPaper, PaperRole paperRole,
+                             String peerName, long dueDate, double repaymentRate) {
         this(
                 paperRole,
                 promissoryPaper.getRepaymentStartDate(),
@@ -23,7 +25,8 @@ public record PaperListResponse(
                 promissoryPaper.getAmount(),
                 promissoryPaper.getPaperStatus(),
                 peerName,
-                dueDate
+                dueDate,
+                repaymentRate
         );
     }
 }
