@@ -3,6 +3,8 @@ package com.owl.payrit.domain.repaymenthistory.entity;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,7 +27,7 @@ public class RepaymentHistory extends BaseEntity {
 
     private LocalDate repaymentDate;
 
-    private long repaymentRound;
+    private int repaymentRound;
 
     private long repaymentAmount;
 }

@@ -14,6 +14,8 @@ import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
+import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
 import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,7 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class PromissoryPaperService {
 
+    private final RepaymentHistoryService repaymentHistoryService;
     private final MemberService memberService;
     private final NotificationService notificationService;
     private final PromissoryPaperRepository promissoryPaperRepository;
@@ -285,7 +288,6 @@ public class PromissoryPaperService {
         }
     }
 
-
     public double calcRepaymentRate(PromissoryPaper paper) {
 
         //FIXME: 상환 내역 생성 후 수정 필요
@@ -314,5 +316,19 @@ public class PromissoryPaperService {
     public long calcInterest(long amount, float interestRate) {
 
         return Math.round(amount * interestRate / 100);
+    }
+
+    @Transactional
+    public void repayment(LoginUser loginUser, RepaymentRequest repaymentRequest) {
+
+        PromissoryPaper paper = getById(repaymentRequest.paperId());
+
+        repaymentHistoryService.create(paper, repaymentRequest);
+
+        PromissoryPaper modifiedPaper = paper.toBuilder()
+                .remainingAmount(paper.getRemainingAmount() - repaymentRequest.repaymentAmount())
+                .build();
+
+        promissoryPaperRepository.save(modifiedPaper);
     }
 }
