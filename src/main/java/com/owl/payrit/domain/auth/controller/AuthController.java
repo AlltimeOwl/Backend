@@ -50,4 +50,13 @@ public class AuthController {
         authService.leave(loginUser);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/check")
+    public ResponseEntity<Void> checkAuthenticationStatus(@AuthenticationPrincipal LoginUser loginUser) {
+        log.debug("check '{}' user authenticationStatus", loginUser.oauthInformation().getOauthProviderId());
+        boolean status = authService.checkAuthentication(loginUser);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

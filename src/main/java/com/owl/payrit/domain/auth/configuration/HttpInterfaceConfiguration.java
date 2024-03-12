@@ -1,6 +1,6 @@
 package com.owl.payrit.domain.auth.configuration;
 
-import com.owl.payrit.domain.auth.provider.kakao.api.KakaoApiClient;
+import com.owl.payrit.domain.auth.provider.kakao.KakaoApiClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
