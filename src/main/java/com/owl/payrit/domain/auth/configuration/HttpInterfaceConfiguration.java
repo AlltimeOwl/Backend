@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.auth.configuration;
 
+import com.owl.payrit.domain.auth.provider.apple.AppleApiClient;
 import com.owl.payrit.domain.auth.provider.kakao.KakaoApiClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,11 @@ public class HttpInterfaceConfiguration {
     @Bean
     public KakaoApiClient kakaoApiClient() {
         return createHttpInterface(KakaoApiClient.class);
+    }
+
+    @Bean
+    public AppleApiClient appleApiClient() {
+        return createHttpInterface(AppleApiClient.class);
     }
 
     private <T> T createHttpInterface(Class<T> clazz) {
