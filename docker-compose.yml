@@ -20,7 +20,7 @@ services:
   db:
     image: mariadb:latest
     environment:
-      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MARIADB_PASSWORD}
       - MYSQL_DATABASE=payrit_prod
     volumes:
       - mariadb_data:/var/lib/mysql
