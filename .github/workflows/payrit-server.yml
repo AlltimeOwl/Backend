@@ -42,9 +42,13 @@ jobs:
           username: ${{ secrets.AZURE_USERNAME }}
           key: ${{ secrets.AZURE_KEY }}
           script: |
-            sudo docker kill ${{ secrets.PROJECT_NAME }}
-            sudo docker rm -f ${{ secrets.PROJECT_NAME }}
-            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            if sudo docker ps -a | grep -q ${{ secrets.PROJECT_NAME }}; then
+              sudo docker kill ${{ secrets.PROJECT_NAME }}
+              sudo docker rm -f ${{ secrets.PROJECT_NAME }}
+            fi
+            if sudo docker images | grep -q "${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}"; then
+              sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            fi
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             sudo docker run -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
               --name ${{ secrets.PROJECT_NAME }} \
