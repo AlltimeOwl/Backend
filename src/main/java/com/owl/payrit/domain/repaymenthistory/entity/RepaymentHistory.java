@@ -1,11 +1,9 @@
 package com.owl.payrit.domain.repaymenthistory.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.global.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +20,8 @@ import java.time.LocalDate;
 @ToString(callSuper = true)
 public class RepaymentHistory extends BaseEntity {
 
-    @ManyToOne
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
     private PromissoryPaper paper;
 
     private LocalDate repaymentDate;

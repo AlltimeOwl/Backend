@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.promissorypaper.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.global.entity.BaseEntity;
@@ -24,7 +25,8 @@ public class PromissoryPaper extends BaseEntity {
 
     private long remainingAmount;
 
-    @OneToMany(mappedBy = "paper")
+    @JsonManagedReference
+    @OneToMany(mappedBy = "paper", fetch = FetchType.LAZY)
     private List<RepaymentHistory> repaymentHistory;
 
     private LocalDate transactionDate;
