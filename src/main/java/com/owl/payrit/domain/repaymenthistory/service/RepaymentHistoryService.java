@@ -5,6 +5,7 @@ import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.domain.repaymenthistory.repository.RepaymentHistoryRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -59,5 +61,17 @@ public class RepaymentHistoryService {
         if(paper.getRemainingAmount() < repaymentRequest.repaymentAmount()) {
             throw new PromissoryPaperException(ErrorCode.REPAYMENT_AMOUNT_OVER);
         }
+    }
+
+    @Transactional
+    public void remove(RepaymentHistory repaymentHistory) {
+
+        repaymentHistoryRepository.delete(repaymentHistory);
+    }
+
+    public RepaymentHistory getById(Long historyId) {
+
+        return repaymentHistoryRepository.findById(historyId).orElseThrow(
+                () -> new PromissoryPaperException(ErrorCode.REPAYMENT_HISTORY_NOT_FOUND));
     }
 }

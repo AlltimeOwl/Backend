@@ -14,7 +14,9 @@ import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
+import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
 import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -329,6 +331,28 @@ public class PromissoryPaperService {
 
         PromissoryPaper modifiedPaper = paper.toBuilder()
                 .remainingAmount(paper.getRemainingAmount() - repaymentRequest.repaymentAmount())
+                .build();
+
+        promissoryPaperRepository.save(modifiedPaper);
+    }
+
+    @Transactional
+    public void cancelRepayment(LoginUser loginUser, RepaymentCancelRequest repaymentCancelRequest) {
+
+        PromissoryPaper paper = getById(repaymentCancelRequest.paperId());
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        if(!loginedMember.equals(paper.getCreditor())) {
+            throw new PromissoryPaperException(ErrorCode.REPAYMENT_ONLY_ACCESS_CREDITOR);
+        }
+
+        RepaymentHistory history = repaymentHistoryService.getById(repaymentCancelRequest.historyId());
+
+        long repaymentAmount = history.getRepaymentAmount();
+        repaymentHistoryService.remove(history);
+
+        PromissoryPaper modifiedPaper = paper.toBuilder()
+                .remainingAmount(paper.getRemainingAmount() + repaymentAmount)
                 .build();
 
         promissoryPaperRepository.save(modifiedPaper);

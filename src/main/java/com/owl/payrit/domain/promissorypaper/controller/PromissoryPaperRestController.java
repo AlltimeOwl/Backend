@@ -6,6 +6,7 @@ import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -97,5 +98,14 @@ public class PromissoryPaperRestController {
         promissoryPaperService.repayment(loginUser, repaymentRequest);
 
         return ResponseEntity.ok().body("repayment success");
+    }
+
+    @PostMapping("/repayment/cancel")
+    public ResponseEntity<String> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
+                                                  @RequestBody RepaymentCancelRequest repaymentCancelRequest) {
+
+        promissoryPaperService.cancelRepayment(loginUser, repaymentCancelRequest);
+
+        return ResponseEntity.ok().body("repayment canceled");
     }
 }
