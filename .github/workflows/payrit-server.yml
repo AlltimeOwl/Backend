@@ -34,11 +34,6 @@ jobs:
 
       - name: DockerHub Push
         run: docker push ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
-
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
     
       - name: Application Run
         uses: appleboy/ssh-action@v0.1.6
