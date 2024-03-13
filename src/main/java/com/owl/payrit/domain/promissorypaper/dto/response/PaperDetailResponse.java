@@ -1,17 +1,18 @@
 package com.owl.payrit.domain.promissorypaper.dto.response;
 
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
+import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record PaperDetailResponse(
-        //FIXME: 단순 Paper객체가 아닌 Response를 반환하는 것과의 차이점...?
 
         String paperUrl,
-        long totalAmount,
+        long amount,
+        long remainingAmount,
         float interestRate,
         double repaymentRate,
-        long currentRepaymentAmount,
         LocalDate repaymentStartDate,
         LocalDate repaymentEndDate,
         String creditorName,
@@ -20,15 +21,16 @@ public record PaperDetailResponse(
         String debtorName,
         String debtorPhoneNumber,
         String debtorAddress,
-        String specialConditions
+        String specialConditions,
+        List<RepaymentHistory> repaymentHistories
 ) {
     public PaperDetailResponse(PromissoryPaper promissoryPaper, double repaymentRate) {
         this(
                 promissoryPaper.getStorageUrl(),
                 promissoryPaper.getAmount(),
+                promissoryPaper.getRemainingAmount(),
                 promissoryPaper.getInterestRate(),
                 repaymentRate,
-                promissoryPaper.getRepaymentAmount(),
                 promissoryPaper.getRepaymentStartDate(),
                 promissoryPaper.getRepaymentEndDate(),
                 promissoryPaper.getCreditor().getName(),
@@ -37,7 +39,8 @@ public record PaperDetailResponse(
                 promissoryPaper.getDebtor().getName(),
                 promissoryPaper.getDebtorPhoneNumber(),
                 promissoryPaper.getDebtorAddress(),
-                promissoryPaper.getSpecialConditions()
+                promissoryPaper.getSpecialConditions(),
+                promissoryPaper.getRepaymentHistory()
         );
     }
 }

@@ -6,7 +6,10 @@ import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -86,5 +89,23 @@ public class PromissoryPaperRestController {
         promissoryPaperService.modifyingPaper(loginUser, paperId, paperWriteRequest);
 
         return ResponseEntity.ok().body("modify success");
+    }
+
+    @PostMapping("/repayment/request")
+    public ResponseEntity<String> repaymentRequest(@AuthenticationPrincipal LoginUser loginUser,
+                                                   @RequestBody RepaymentRequest repaymentRequest) {
+
+        promissoryPaperService.repayment(loginUser, repaymentRequest);
+
+        return ResponseEntity.ok().body("repayment success");
+    }
+
+    @PostMapping("/repayment/cancel")
+    public ResponseEntity<String> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
+                                                  @RequestBody RepaymentCancelRequest repaymentCancelRequest) {
+
+        promissoryPaperService.cancelRepayment(loginUser, repaymentCancelRequest);
+
+        return ResponseEntity.ok().body("repayment canceled");
     }
 }

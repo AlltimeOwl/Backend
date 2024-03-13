@@ -1,6 +1,8 @@
 package com.owl.payrit.domain.promissorypaper.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,6 +23,12 @@ public class PromissoryPaper extends BaseEntity {
 
     private long amount;
 
+    private long remainingAmount;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "paper", fetch = FetchType.LAZY)
+    private List<RepaymentHistory> repaymentHistory;
+
     private LocalDate transactionDate;
 
     private LocalDate repaymentStartDate;
@@ -30,10 +39,6 @@ public class PromissoryPaper extends BaseEntity {
 
     private float interestRate;
 
-    @Builder.Default
-    private long repaymentAmount = 0;
-
-    //차용증을 누가 작성했는지
     @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;
 

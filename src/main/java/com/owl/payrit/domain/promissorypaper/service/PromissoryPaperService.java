@@ -14,6 +14,10 @@ import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
+import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
+import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
 import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +39,7 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class PromissoryPaperService {
 
+    private final RepaymentHistoryService repaymentHistoryService;
     private final MemberService memberService;
     private final NotificationService notificationService;
     private final PromissoryPaperRepository promissoryPaperRepository;
@@ -53,8 +58,12 @@ public class PromissoryPaperService {
         Member debtor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
+        long amount = paperWriteRequest.amount();
+        long calcAmount = amount + calcInterest(amount, paperWriteRequest.interestRate());
+
         PromissoryPaper paper = PromissoryPaper.builder()
-                .amount(paperWriteRequest.amount())
+                .amount(calcAmount)
+                .remainingAmount(calcAmount)
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
                 .repaymentEndDate(paperWriteRequest.repaymentEndDate())
@@ -284,10 +293,11 @@ public class PromissoryPaperService {
 
     public double calcRepaymentRate(PromissoryPaper paper) {
 
+        //FIXME: 상환 내역 생성 후 수정 필요
         long amount = paper.getAmount();
-        long currentRepaymentAmount = paper.getRepaymentAmount();
+        long needToRepaymentAmount = amount - paper.getRemainingAmount();
 
-        double repaymentRate = (double) currentRepaymentAmount / amount * 100.0;
+        double repaymentRate = (double) needToRepaymentAmount / amount * 100.0;
 
         return Math.round(repaymentRate * 100.0) / 100.0;
     }
@@ -302,5 +312,47 @@ public class PromissoryPaperService {
         for (PromissoryPaper paper : expiringTargets) {
             paper.modifyPaperStatus(PaperStatus.EXPIRED);
         }
+    }
+
+    public long calcInterest(long amount, float interestRate) {
+
+        return Math.round(amount * interestRate / 100);
+    }
+
+    @Transactional
+    public void repayment(LoginUser loginUser, RepaymentRequest repaymentRequest) {
+
+        PromissoryPaper paper = getById(repaymentRequest.paperId());
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        repaymentHistoryService.create(loginedMember, paper, repaymentRequest);
+
+        PromissoryPaper modifiedPaper = paper.toBuilder()
+                .remainingAmount(paper.getRemainingAmount() - repaymentRequest.repaymentAmount())
+                .build();
+
+        promissoryPaperRepository.save(modifiedPaper);
+    }
+
+    @Transactional
+    public void cancelRepayment(LoginUser loginUser, RepaymentCancelRequest repaymentCancelRequest) {
+
+        PromissoryPaper paper = getById(repaymentCancelRequest.paperId());
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        if(!loginedMember.equals(paper.getCreditor())) {
+            throw new PromissoryPaperException(ErrorCode.REPAYMENT_ONLY_ACCESS_CREDITOR);
+        }
+
+        RepaymentHistory history = repaymentHistoryService.getById(repaymentCancelRequest.historyId());
+
+        long repaymentAmount = history.getRepaymentAmount();
+        repaymentHistoryService.remove(history);
+
+        PromissoryPaper modifiedPaper = paper.toBuilder()
+                .remainingAmount(paper.getRemainingAmount() + repaymentAmount)
+                .build();
+
+        promissoryPaperRepository.save(modifiedPaper);
     }
 }
