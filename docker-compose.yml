@@ -31,6 +31,7 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
+    command: redis-server --requirepass ${REDIS_PASSWORD}
 
 volumes:
   mariadb_data:
