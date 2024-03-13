@@ -323,8 +323,9 @@ public class PromissoryPaperService {
     public void repayment(LoginUser loginUser, RepaymentRequest repaymentRequest) {
 
         PromissoryPaper paper = getById(repaymentRequest.paperId());
+        Member loginedMember = memberService.findById(loginUser.id());
 
-        repaymentHistoryService.create(paper, repaymentRequest);
+        repaymentHistoryService.create(loginedMember, paper, repaymentRequest);
 
         PromissoryPaper modifiedPaper = paper.toBuilder()
                 .remainingAmount(paper.getRemainingAmount() - repaymentRequest.repaymentAmount())

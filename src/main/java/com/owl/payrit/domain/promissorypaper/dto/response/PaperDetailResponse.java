@@ -1,8 +1,10 @@
 package com.owl.payrit.domain.promissorypaper.dto.response;
 
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
+import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record PaperDetailResponse(
 
@@ -19,7 +21,8 @@ public record PaperDetailResponse(
         String debtorName,
         String debtorPhoneNumber,
         String debtorAddress,
-        String specialConditions
+        String specialConditions,
+        List<RepaymentHistory> repaymentHistories
 ) {
     public PaperDetailResponse(PromissoryPaper promissoryPaper, double repaymentRate) {
         this(
@@ -36,7 +39,8 @@ public record PaperDetailResponse(
                 promissoryPaper.getDebtor().getName(),
                 promissoryPaper.getDebtorPhoneNumber(),
                 promissoryPaper.getDebtorAddress(),
-                promissoryPaper.getSpecialConditions()
+                promissoryPaper.getSpecialConditions(),
+                promissoryPaper.getRepaymentHistory()
         );
     }
 }
