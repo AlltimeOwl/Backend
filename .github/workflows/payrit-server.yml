@@ -47,20 +47,5 @@ jobs:
           username: ${{ secrets.AZURE_USERNAME }}
           key: ${{ secrets.AZURE_KEY }}
           script: |
-            if sudo docker ps -a | grep -q ${{ secrets.PROJECT_NAME }}; then
-              sudo docker kill ${{ secrets.PROJECT_NAME }}
-              sudo docker rm -f ${{ secrets.PROJECT_NAME }}
-            fi
-            if sudo docker images | grep -q "${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}"; then
-              sudo docker rmi ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
-            fi
-            sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
-            sudo docker pull ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
-            docker-compose up -d \
-              -e SPRING_DATASOURCE_URL=jdbc:mariadb://${{ secrets.MARIADB_ENDPOINT }}/payrit_prod?useSSL=false&useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true \
-              -e SPRING_DATASOURCE_USERNAME=${{ secrets.MARIADB_USER }} \
-              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.MARIADB_PASSWORD }} \
-              -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
-              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-              -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            ./scripts/deploy.sh
 
