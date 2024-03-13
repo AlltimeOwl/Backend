@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @Configuration
 public class SecurityConfiguration {
 
@@ -34,6 +34,7 @@ public class SecurityConfiguration {
                                authorize -> authorize.requestMatchers(
                                                          antMatcher("/api/v1/oauth/**")
                                                         ,antMatcher("/h2-console/**")
+                                                        ,antMatcher("/")
                                                      )
                                                      .permitAll()
                                                      .anyRequest()
