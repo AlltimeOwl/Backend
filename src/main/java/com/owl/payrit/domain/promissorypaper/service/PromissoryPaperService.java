@@ -294,14 +294,12 @@ public class PromissoryPaperService {
     public double calcRepaymentRate(PromissoryPaper paper) {
 
         //FIXME: 상환 내역 생성 후 수정 필요
-//        long amount = paper.getAmount();
-//        long remainingAmount
-//
-//        double repaymentRate = (double) currentRepaymentAmount / amount * 100.0;
-//
-//        return Math.round(repaymentRate * 100.0) / 100.0;
+        long amount = paper.getAmount();
+        long needToRepaymentAmount = amount - paper.getRemainingAmount();
 
-        return 0.0;
+        double repaymentRate = (double) needToRepaymentAmount / amount * 100.0;
+
+        return Math.round(repaymentRate * 100.0) / 100.0;
     }
 
     @Transactional
