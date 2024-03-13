@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.repaymenthistory.service;
 
 import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
@@ -42,6 +43,10 @@ public class RepaymentHistoryService {
         LocalDate requestDate = repaymentRequest.repaymentDate();
         LocalDate repaymentStartDate = paper.getRepaymentStartDate();
         LocalDate repaymentEndDate = paper.getRepaymentEndDate();
+
+        if(!paper.getPaperStatus().equals(PaperStatus.COMPLETE_WRITING)){
+            throw new PromissoryPaperException(ErrorCode.REPAYMENT_STATUS_ERROR);
+        }
 
         if(!paper.getCreditor().equals(member)) {
             throw new PromissoryPaperException(ErrorCode.REPAYMENT_ONLY_ACCESS_CREDITOR);
