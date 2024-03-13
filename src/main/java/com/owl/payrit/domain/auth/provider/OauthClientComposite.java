@@ -2,7 +2,7 @@ package com.owl.payrit.domain.auth.provider;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.member.entity.Member;
-import java.util.Map;
+import java.util.EnumMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class OauthClientComposite {
 
-    private final Map<OauthProvider, OauthClient> mapping;
+    private final EnumMap<OauthProvider, OauthClient> mapping;
 
     public OauthClientComposite(Set<OauthClient> clients) {
         mapping = clients.stream()
@@ -20,7 +20,8 @@ public class OauthClientComposite {
                              Collectors.toMap(
                                  OauthClient::oauthProvider,
                                  Function.identity(),
-                                 (existing, replacement) -> existing
+                                 (existing, replacement) -> existing,
+                                 () -> new EnumMap<OauthProvider, OauthClient>(OauthProvider.class)
                              )
                          );
     }
