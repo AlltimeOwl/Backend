@@ -25,7 +25,6 @@ public class RepaymentHistoryService {
                 .paper(paper)
                 .repaymentAmount(repaymentRequest.repaymentAmount())
                 .repaymentDate(repaymentRequest.repaymentDate())
-                .repaymentRound(repaymentHistoryRepository.countByPaper(paper) + 1)
                 .build();
 
         repaymentHistoryRepository.save(repaymentHistory);

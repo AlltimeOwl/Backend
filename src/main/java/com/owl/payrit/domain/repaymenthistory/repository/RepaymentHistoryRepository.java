@@ -5,6 +5,4 @@ import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RepaymentHistoryRepository extends JpaRepository<RepaymentHistory, Long> {
-
-    int countByPaper(PromissoryPaper paper);
 }

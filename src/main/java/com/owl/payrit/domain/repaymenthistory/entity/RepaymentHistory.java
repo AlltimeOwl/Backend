@@ -27,7 +27,5 @@ public class RepaymentHistory extends BaseEntity {
 
     private LocalDate repaymentDate;
 
-    private int repaymentRound;
-
     private long repaymentAmount;
 }

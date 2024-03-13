@@ -7,6 +7,7 @@ import java.time.LocalDate;
 public record PaperDetailResponse(
 
         String paperUrl,
+        long amount,
         long remainingAmount,
         float interestRate,
         double repaymentRate,
@@ -23,6 +24,7 @@ public record PaperDetailResponse(
     public PaperDetailResponse(PromissoryPaper promissoryPaper, double repaymentRate) {
         this(
                 promissoryPaper.getStorageUrl(),
+                promissoryPaper.getAmount(),
                 promissoryPaper.getRemainingAmount(),
                 promissoryPaper.getInterestRate(),
                 repaymentRate,

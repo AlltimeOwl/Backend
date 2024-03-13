@@ -57,10 +57,11 @@ public class PromissoryPaperService {
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
         long amount = paperWriteRequest.amount();
+        long calcAmount = amount + calcInterest(amount, paperWriteRequest.interestRate());
 
         PromissoryPaper paper = PromissoryPaper.builder()
-                .amount(amount)
-                .remainingAmount(amount + calcInterest(amount, paperWriteRequest.interestRate()))
+                .amount(calcAmount)
+                .remainingAmount(calcAmount)
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
                 .repaymentEndDate(paperWriteRequest.repaymentEndDate())
