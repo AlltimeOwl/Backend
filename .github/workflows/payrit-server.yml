@@ -51,11 +51,11 @@ jobs:
             fi
             sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
-            sudo docker run -p ${{ secrets.SERVER_PORT }}:${{ secrets.SERVER_PORT }} \
-              --name ${{ secrets.PROJECT_NAME }} \
-              -e MARIADB_ENDPOINT=db \
-              -e MARIADB_USER=${{ secrets.DB_USERNAME }} \
-              -e MARIADB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+            docker-compose up -d \
+              -e SPRING_DATASOURCE_URL=jdbc:mariadb://${{ secrets.MARIADB_ENDPOINT }}/payrit_prod?useSSL=false&useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true \
+              -e SPRING_DATASOURCE_USERNAME=${{ secrets.MARIADB_USER }} \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.MARIADB_PASSWORD }} \
               -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+
