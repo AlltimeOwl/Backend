@@ -27,7 +27,7 @@ public class AuthController implements AuthApiDocs{
     @Override
     @PostMapping("/{oauthProvider}")
     public ResponseEntity<TokenResponse> login(@PathVariable OauthProvider oauthProvider, @RequestBody LoginTokenRequest loginTokenRequest) {
-        log.debug("login request {}", oauthProvider);
+        log.info("login request {}", oauthProvider);
         TokenResponse tokenResponse = authService.login(oauthProvider, loginTokenRequest.accessToken());
         return ResponseEntity.ok().body(tokenResponse);
     }
@@ -42,7 +42,7 @@ public class AuthController implements AuthApiDocs{
     @Override
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal LoginUser loginUser) {
-        log.debug("'{}' member request logout", loginUser.oauthInformation().getOauthProviderId());
+        log.info("'{}' member request logout", loginUser.oauthInformation().getOauthProviderId());
         authService.logout(loginUser);
         return ResponseEntity.noContent().build();
     }
@@ -50,7 +50,7 @@ public class AuthController implements AuthApiDocs{
     @Override
     @GetMapping("/leave")
     public ResponseEntity<Void> leave(@AuthenticationPrincipal LoginUser loginUser) {
-        log.debug("'{}' member request leave paylit", loginUser.oauthInformation().getOauthProviderId());
+        log.info("'{}' member request leave paylit", loginUser.oauthInformation().getOauthProviderId());
         authService.leave(loginUser);
         return ResponseEntity.noContent().build();
     }
@@ -58,7 +58,7 @@ public class AuthController implements AuthApiDocs{
     @Override
     @GetMapping("/check")
     public ResponseEntity<Void> checkAuthenticationStatus(@AuthenticationPrincipal LoginUser loginUser) {
-        log.debug("check '{}' user authenticationStatus", loginUser.oauthInformation().getOauthProviderId());
+        log.info("check '{}' user authenticationStatus", loginUser.oauthInformation().getOauthProviderId());
         boolean status = authService.checkAuthentication(loginUser);
         return ResponseEntity.noContent().build();
     }
