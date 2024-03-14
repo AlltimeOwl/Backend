@@ -13,13 +13,13 @@ public class FakeKakaoMemberClient implements OauthClient {
 
     @Override
     public OauthProvider oauthProvider() {
-        return OauthProvider.KAKAO;
+        return OauthProvider.FAKE_KAKAO;
     }
 
     @Override
     public Member fetch(String accessToken) {
         // 가짜 유저 정보를 생성하여 반환
-        OauthInformation fakeOauthInformation = new OauthInformation("fake_oauth_provider_id", OauthProvider.KAKAO);
+        OauthInformation fakeOauthInformation = new OauthInformation("fake_oauth_provider_id", OauthProvider.FAKE_KAKAO);
         return new Member(fakeOauthInformation, "fake_email@example.com", "fake_phone_number", LocalDate.now(),"test",true, true, "fake_firebase_token", "fake_address", Role.MEMBER);
     }
 }
