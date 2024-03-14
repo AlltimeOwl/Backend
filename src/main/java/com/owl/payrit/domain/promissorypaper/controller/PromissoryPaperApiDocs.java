@@ -1,11 +1,9 @@
 package com.owl.payrit.domain.promissorypaper.controller;
 
-import com.owl.payrit.domain.auth.domain.OauthProvider;
-import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
-import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
-import com.owl.payrit.global.exception.ErrorCode;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
+import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,11 +20,22 @@ public interface PromissoryPaperApiDocs {
 
     @Operation(summary = "차용증 작성 API", description = "차용증 관련 데이터를 입력해 request 하면, 차용증 작성이 완료됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공적으로 처리되었습니다."),
-            @ApiResponse(responseCode = "400", description = "차용증 정보가 유효하지 않거나, 회원의 정보와 일치하지 않습니다.\n" +
-                    "이자율 20% 제한, 작성 시기, 작성자 역할 등")
+            @ApiResponse(responseCode = "200", description = "성공적으로 작성되었습니다."),
+            @ApiResponse(responseCode = "400", description = "차용증 데이터가 올바르지 않습니다.")
     })
     ResponseEntity<String> write(@AuthenticationPrincipal LoginUser loginUser,
                                  @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest
+    );
+
+    @Operation(summary = "차용증 상세 조회 API", description = "차용증 id를 파라미터로 입력하여 상세 조회가 가능합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회되었습니다.",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = PaperDetailResponse.class))
+                    }),
+            @ApiResponse(responseCode = "403", description = "차용증 접근 권한이 없습니다."),
+    })
+    ResponseEntity<PaperDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
+                                               @Parameter(description = "차용증 id", required = true) Long id
     );
 }

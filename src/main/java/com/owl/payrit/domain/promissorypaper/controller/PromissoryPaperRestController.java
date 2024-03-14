@@ -36,6 +36,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
         return ResponseEntity.ok().body("write");
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<PaperDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
                                                       @PathVariable(value = "id") Long id) {
