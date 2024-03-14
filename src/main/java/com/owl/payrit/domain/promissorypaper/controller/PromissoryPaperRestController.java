@@ -48,8 +48,9 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
         return ResponseEntity.ok().body(paperDetailResponse);
     }
 
+    @Override
     @GetMapping("/list")
-    public ResponseEntity<List<PaperListResponse>> creditorList(@AuthenticationPrincipal LoginUser loginUser) {
+    public ResponseEntity<List<PaperListResponse>> list(@AuthenticationPrincipal LoginUser loginUser) {
 
         log.info("request user id : " + loginUser.id());
 

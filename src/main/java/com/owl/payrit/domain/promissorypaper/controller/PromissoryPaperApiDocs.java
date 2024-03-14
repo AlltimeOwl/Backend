@@ -38,4 +38,15 @@ public interface PromissoryPaperApiDocs {
     ResponseEntity<PaperDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
                                                @Parameter(description = "차용증 id", required = true) Long id
     );
+
+    @Operation(summary = "차용증 목록 조회 API", description = "로그인한 회원의 정보를 기반으로 연관 차용증을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회되었습니다.",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = PaperDetailResponse.class))
+                    })
+    })
+    ResponseEntity<PaperDetailResponse> list(@AuthenticationPrincipal LoginUser loginUser);
+
+
 }
