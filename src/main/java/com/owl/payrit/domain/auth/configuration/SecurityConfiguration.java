@@ -33,6 +33,9 @@ public class SecurityConfiguration {
                            .authorizeHttpRequests(
                                authorize -> authorize.requestMatchers(
                                                          antMatcher("/api/v1/oauth/**")
+                                                        ,antMatcher("/swagger-ui/**")
+                                                        ,antMatcher("/swagger-resources/**")
+                                                        ,antMatcher("/v3/api-docs/**")
                                                         ,antMatcher("/h2-console/**")
                                                         ,antMatcher("/")
                                                      )

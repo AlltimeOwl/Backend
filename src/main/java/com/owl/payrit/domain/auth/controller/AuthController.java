@@ -20,10 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/oauth")
 @RestController
-public class AuthController {
+public class AuthController implements AuthApiDocs{
 
     private final AuthService authService;
 
+    @Override
     @PostMapping("/{oauthProvider}")
     public ResponseEntity<TokenResponse> login(@PathVariable OauthProvider oauthProvider, @RequestBody LoginTokenRequest loginTokenRequest) {
         log.debug("login request {}", oauthProvider);
@@ -31,12 +32,14 @@ public class AuthController {
         return ResponseEntity.ok().body(tokenResponse);
     }
 
+    @Override
     @GetMapping("/test/{email}")
     public ResponseEntity<TokenResponse> testLogin(@PathVariable(name = "email") String email) {
         TokenResponse tokenResponse = authService.createTokenForTest(email);
         return ResponseEntity.ok().body(tokenResponse);
     }
 
+    @Override
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal LoginUser loginUser) {
         log.debug("'{}' member request logout", loginUser.oauthInformation().getOauthProviderId());
@@ -44,6 +47,7 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @GetMapping("/leave")
     public ResponseEntity<Void> leave(@AuthenticationPrincipal LoginUser loginUser) {
         log.debug("'{}' member request leave paylit", loginUser.oauthInformation().getOauthProviderId());
@@ -51,6 +55,7 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @GetMapping("/check")
     public ResponseEntity<Void> checkAuthenticationStatus(@AuthenticationPrincipal LoginUser loginUser) {
         log.debug("check '{}' user authenticationStatus", loginUser.oauthInformation().getOauthProviderId());
