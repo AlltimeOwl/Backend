@@ -15,12 +15,12 @@ spring:
 
   data:
     redis:
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
       password: ${REDIS_PASSWORD}
 
   cache:
-    type: ${REDIS_HOST}
+    type: redis
     redis:
       time-to-live: 3600
       cache-null-values: false
