@@ -3,6 +3,7 @@ package com.owl.payrit.domain.promissorypaper.controller;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 @Tag(name = "차용증 관련 API", description = "차용증 서비스 API 입니다.")
 public interface PromissoryPaperApiDocs {
@@ -43,10 +46,10 @@ public interface PromissoryPaperApiDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공적으로 조회되었습니다.",
                     content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = PaperDetailResponse.class))
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = PaperListResponse.class))
                     })
     })
-    ResponseEntity<PaperDetailResponse> list(@AuthenticationPrincipal LoginUser loginUser);
+    ResponseEntity<List<PaperListResponse>> list(@AuthenticationPrincipal LoginUser loginUser);
 
 
 }
