@@ -84,6 +84,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
         return ResponseEntity.ok().body("modify request : %s".formatted(paperModifyRequest.contents()));
     }
 
+    @Override
     @PutMapping("/modify/accept/{id}")
     public ResponseEntity<String> modifying(@AuthenticationPrincipal LoginUser loginUser,
                                             @PathVariable(value = "id") Long id,
@@ -95,6 +96,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
         return ResponseEntity.ok().body("modify success");
     }
 
+    @Override
     @PostMapping("/repayment/request")
     public ResponseEntity<String> repaymentRequest(@AuthenticationPrincipal LoginUser loginUser,
                                                    @RequestBody RepaymentRequest repaymentRequest) {

@@ -6,6 +6,7 @@ import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -82,4 +83,16 @@ public interface PromissoryPaperApiDocs {
     ResponseEntity<String> modifying(@AuthenticationPrincipal LoginUser loginUser,
                                      @Parameter(description = "차용증 id", required = true) Long id,
                                      @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest);
+
+    @Operation(summary = "일부 상환 내역기록 API", description = "채권자가 일부 상환 내용을 작성합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 작성이 완료 되었습니다."),
+            @ApiResponse(responseCode = "400", description = "1. 작성이 완료된 차용증만 일부 상환이 가능합니다. \n" +
+                    "2. 일부 상환 일자가 차용증의 내용과 일치하지 않습니다.\n" +
+                    "3. 상환 기록 요청액이 남은 금액을 초과합니다."),
+            @ApiResponse(responseCode = "403", description = "일부 상환은 채권자만 기록할 수 있습니다.")
+    })
+    ResponseEntity<String> repaymentRequest(@AuthenticationPrincipal LoginUser loginUser,
+                                     @RequestBody @Schema(implementation = RepaymentRequest.class) RepaymentRequest repaymentRequest);
+
 }
