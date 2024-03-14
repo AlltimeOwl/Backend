@@ -5,7 +5,7 @@ import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
-import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
+import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -94,5 +94,13 @@ public interface PromissoryPaperApiDocs {
     })
     ResponseEntity<String> repaymentRequest(@AuthenticationPrincipal LoginUser loginUser,
                                      @RequestBody @Schema(implementation = RepaymentRequest.class) RepaymentRequest repaymentRequest);
+
+    @Operation(summary = "일부 상환 내역 삭제 API", description = "채권자가 이전에 기록한 일부 상환 내역을 삭제합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 삭제 처리가 완료 되었습니다."),
+            @ApiResponse(responseCode = "403", description = "상환 내역 삭제는 채권자만 할 수 있습니다.")
+    })
+    ResponseEntity<String> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
+                                            @RequestBody @Schema(implementation = RepaymentCancelRequest.class) RepaymentCancelRequest repaymentCancelRequest);
 
 }
