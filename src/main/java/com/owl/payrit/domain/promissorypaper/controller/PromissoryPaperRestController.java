@@ -86,11 +86,11 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
 
     @PutMapping("/modify/accept/{id}")
     public ResponseEntity<String> modifying(@AuthenticationPrincipal LoginUser loginUser,
-                                            @PathVariable(value = "id") Long paperId,
+                                            @PathVariable(value = "id") Long id,
                                             @RequestBody PaperWriteRequest paperWriteRequest) {
 
         //FIXME: 수정시에도 PaperWriteRequest를 요청?
-        promissoryPaperService.modifyingPaper(loginUser, paperId, paperWriteRequest);
+        promissoryPaperService.modifyingPaper(loginUser, id, paperWriteRequest);
 
         return ResponseEntity.ok().body("modify success");
     }

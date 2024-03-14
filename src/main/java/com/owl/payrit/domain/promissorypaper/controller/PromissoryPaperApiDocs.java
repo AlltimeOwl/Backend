@@ -70,4 +70,16 @@ public interface PromissoryPaperApiDocs {
     })
     ResponseEntity<String> requestModify(@AuthenticationPrincipal LoginUser loginUser,
                                          @RequestBody @Schema(implementation = PaperModifyRequest.class) PaperModifyRequest paperModifyRequest);
+
+    @Operation(summary = "차용증 수정 승인 및 적용 API", description = "수정 요청을 받은 차용증의 수정을 진행합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 요청이 완료 되었습니다."),
+            @ApiResponse(responseCode = "400", description = "1. 수정이 요청된 상태가 아니기 때문에 수정이 불가합니다. \n" +
+                    "2. 차용증의 데이터가 유효하지 않습니다. \n" +
+                    "3. 차용증에 기재된 정보와 회원의 정보가 일치하지 않습니다."),
+            @ApiResponse(responseCode = "403", description = "차용증의 수정은 작성자만 가능합니다.")
+    })
+    ResponseEntity<String> modifying(@AuthenticationPrincipal LoginUser loginUser,
+                                     @Parameter(description = "차용증 id", required = true) Long id,
+                                     @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest);
 }
