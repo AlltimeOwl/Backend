@@ -56,13 +56,13 @@ public record KakaoOauthResponse(
         String ci,
         LocalDateTime ciAuthenticatedAt
     ) {
-        private static final DateTimeFormatter BIRTHDAY_FORMATTER = DateTimeFormatter.ofPattern("MMdd");
+        private static final DateTimeFormatter BIRTHDAY_FORMATTER = DateTimeFormatter.ofPattern("MMddyyyy");
 
         public LocalDate birthConverter() {
 
+            if(birthday == null) return null;
             int year = Integer.parseInt(birthyear);
-            LocalDate birth = LocalDate.parse(birthday, BIRTHDAY_FORMATTER);
-            return birth.withYear(year);
+            return LocalDate.parse(birthday + year, BIRTHDAY_FORMATTER);
 
         }
     }
