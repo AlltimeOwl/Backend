@@ -71,6 +71,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
         return ResponseEntity.ok().body("accept");
     }
 
+    @Override
     @PostMapping("/modify/request")
     public ResponseEntity<String> requestModify(@AuthenticationPrincipal LoginUser loginUser,
                                                 @RequestBody PaperModifyRequest paperModifyRequest) {

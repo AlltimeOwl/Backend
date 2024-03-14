@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.promissorypaper.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
@@ -55,11 +56,18 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "200", description = "성공적으로 승인되었습니다."),
             @ApiResponse(responseCode = "400",
                     description = "1. 자신이 직접 승인하려는 경우\n"
-            + "2. 승인할 수 없는 단계에 있는 경우\n"
-            + "3. 차용증 정보와 로그인한 회원의 정보가 일치하지 않는 경우\n")
+                            + "2. 승인할 수 없는 단계에 있는 경우\n"
+                            + "3. 차용증 정보와 로그인한 회원의 정보가 일치하지 않는 경우\n")
     })
     ResponseEntity<String> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
                                        @Parameter(description = "차용증 id", required = true) Long id);
 
-
+    @Operation(summary = "차용증 수정 요청 API", description = "차용증의 수정을 요청합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 요청이 완료 되었습니다."),
+            @ApiResponse(responseCode = "400", description = "승인 대기 단계가 아니기 때문에 요청이 불가합니다."),
+            @ApiResponse(responseCode = "403", description = "차용증 접근 권한이 없습니다.")
+    })
+    ResponseEntity<String> requestModify(@AuthenticationPrincipal LoginUser loginUser,
+                                         @RequestBody @Schema(implementation = PaperModifyRequest.class) PaperModifyRequest paperModifyRequest);
 }
