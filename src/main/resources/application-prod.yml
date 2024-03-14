@@ -20,7 +20,7 @@ spring:
       password: ${REDIS_PASSWORD}
 
   cache:
-    type: redis
+    type: ${REDIS_HOST}
     redis:
       time-to-live: 3600
       cache-null-values: false
