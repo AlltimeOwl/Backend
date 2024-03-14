@@ -39,8 +39,7 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "403", description = "차용증 접근 권한이 없습니다."),
     })
     ResponseEntity<PaperDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
-                                               @Parameter(description = "차용증 id", required = true) Long id
-    );
+                                               @Parameter(description = "차용증 id", required = true) Long id);
 
     @Operation(summary = "차용증 목록 조회 API", description = "로그인한 회원의 정보를 기반으로 연관 차용증을 조회합니다.")
     @ApiResponses(value = {
@@ -50,6 +49,17 @@ public interface PromissoryPaperApiDocs {
                     })
     })
     ResponseEntity<List<PaperListResponse>> list(@AuthenticationPrincipal LoginUser loginUser);
+
+    @Operation(summary = "차용증 승인 API", description = "작성 요청을 받은 차용증의 승인을 처리합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 승인되었습니다."),
+            @ApiResponse(responseCode = "400",
+                    description = "1. 자신이 직접 승인하려는 경우\n"
+            + "2. 승인할 수 없는 단계에 있는 경우\n"
+            + "3. 차용증 정보와 로그인한 회원의 정보가 일치하지 않는 경우\n")
+    })
+    ResponseEntity<String> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
+                                       @Parameter(description = "차용증 id", required = true) Long id);
 
 
 }

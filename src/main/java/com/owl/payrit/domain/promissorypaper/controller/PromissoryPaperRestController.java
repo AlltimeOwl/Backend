@@ -59,6 +59,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
         return ResponseEntity.ok().body(allListResponses);
     }
 
+    @Override
     @PutMapping("/approve/accept/{id}")
     public ResponseEntity<String> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
                                               @PathVariable(value = "id") Long paperId) {
