@@ -106,6 +106,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
         return ResponseEntity.ok().body("repayment success");
     }
 
+    @Override
     @PostMapping("/repayment/cancel")
     public ResponseEntity<String> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
                                                   @RequestBody RepaymentCancelRequest repaymentCancelRequest) {
