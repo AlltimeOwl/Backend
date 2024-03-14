@@ -9,7 +9,6 @@ import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,10 +20,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/paper")
-public class PromissoryPaperRestController {
+public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
 
     private final PromissoryPaperService promissoryPaperService;
 
+    @Override
     @PostMapping("/write")
     public ResponseEntity<String> write(@AuthenticationPrincipal LoginUser loginUser,
                                         @RequestBody PaperWriteRequest paperWriteRequest) {
