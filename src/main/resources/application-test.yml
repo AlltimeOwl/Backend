@@ -16,6 +16,7 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      password:
 
   cache:
     type: redis
@@ -26,3 +27,7 @@ spring:
 jwt:
   token:
     secret: testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest
+
+Encrypt:
+  key: this_is_private_
+  algo: AES
