@@ -1,0 +1,43 @@
+
+
+.nav-font {
+    width: 100%;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    text-justify: center;
+}
+
+.main-text {
+    font-size : 2.5vw;
+}
+
+.main-title {
+    font-weight: bold;
+}
+
+.banner-text {
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+@media (max-width: 768px) {
+    .main-text {
+        font-size: 42px;
+    }
+}
+
+@media (max-width: 576px) {
+    .main-text {
+        font-size: 34px;
+    }
+}
+
+.footer-text {
+    font-size: 14px;
+    color : #5E6969;
+}

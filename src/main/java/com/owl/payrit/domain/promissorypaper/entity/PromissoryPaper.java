@@ -3,6 +3,7 @@ package com.owl.payrit.domain.promissorypaper.entity;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
+import com.owl.payrit.global.encryption.PromissoryPaperStringConverter;
 import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -48,10 +49,13 @@ public class PromissoryPaper extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member creditor;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String creditorName;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String creditorPhoneNumber;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String creditorAddress;
 
     private boolean isCreditorAgree;
@@ -59,10 +63,13 @@ public class PromissoryPaper extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member debtor;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String debtorName;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String debtorPhoneNumber;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String debtorAddress;
 
     private boolean isDebtorAgree;
