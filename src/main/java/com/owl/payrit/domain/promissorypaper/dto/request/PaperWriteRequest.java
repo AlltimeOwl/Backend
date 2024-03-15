@@ -1,11 +1,13 @@
 package com.owl.payrit.domain.promissorypaper.dto.request;
 
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 
 public record PaperWriteRequest(
 
+        @Schema(description = "작성자 역할 (CREDITOR or DEBTOR)")
         PaperRole writerRole,                //작성자 역할(CREDITOR or DEBTOR)
         long amount,
         LocalDate transactionDate,          //거래 날짜

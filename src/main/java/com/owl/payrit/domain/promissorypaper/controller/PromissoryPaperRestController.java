@@ -9,7 +9,6 @@ import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,10 +20,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/paper")
-public class PromissoryPaperRestController {
+public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
 
     private final PromissoryPaperService promissoryPaperService;
 
+    @Override
     @PostMapping("/write")
     public ResponseEntity<String> write(@AuthenticationPrincipal LoginUser loginUser,
                                         @RequestBody PaperWriteRequest paperWriteRequest) {
@@ -36,6 +36,7 @@ public class PromissoryPaperRestController {
         return ResponseEntity.ok().body("write");
     }
 
+    @Override
     @GetMapping("/{id}")
     public ResponseEntity<PaperDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
                                                       @PathVariable(value = "id") Long id) {
@@ -47,8 +48,9 @@ public class PromissoryPaperRestController {
         return ResponseEntity.ok().body(paperDetailResponse);
     }
 
+    @Override
     @GetMapping("/list")
-    public ResponseEntity<List<PaperListResponse>> creditorList(@AuthenticationPrincipal LoginUser loginUser) {
+    public ResponseEntity<List<PaperListResponse>> list(@AuthenticationPrincipal LoginUser loginUser) {
 
         log.info("request user id : " + loginUser.id());
 
@@ -57,6 +59,7 @@ public class PromissoryPaperRestController {
         return ResponseEntity.ok().body(allListResponses);
     }
 
+    @Override
     @PutMapping("/approve/accept/{id}")
     public ResponseEntity<String> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
                                               @PathVariable(value = "id") Long paperId) {
@@ -68,6 +71,7 @@ public class PromissoryPaperRestController {
         return ResponseEntity.ok().body("accept");
     }
 
+    @Override
     @PostMapping("/modify/request")
     public ResponseEntity<String> requestModify(@AuthenticationPrincipal LoginUser loginUser,
                                                 @RequestBody PaperModifyRequest paperModifyRequest) {
@@ -80,17 +84,19 @@ public class PromissoryPaperRestController {
         return ResponseEntity.ok().body("modify request : %s".formatted(paperModifyRequest.contents()));
     }
 
+    @Override
     @PutMapping("/modify/accept/{id}")
     public ResponseEntity<String> modifying(@AuthenticationPrincipal LoginUser loginUser,
-                                            @PathVariable(value = "id") Long paperId,
+                                            @PathVariable(value = "id") Long id,
                                             @RequestBody PaperWriteRequest paperWriteRequest) {
 
         //FIXME: 수정시에도 PaperWriteRequest를 요청?
-        promissoryPaperService.modifyingPaper(loginUser, paperId, paperWriteRequest);
+        promissoryPaperService.modifyingPaper(loginUser, id, paperWriteRequest);
 
         return ResponseEntity.ok().body("modify success");
     }
 
+    @Override
     @PostMapping("/repayment/request")
     public ResponseEntity<String> repaymentRequest(@AuthenticationPrincipal LoginUser loginUser,
                                                    @RequestBody RepaymentRequest repaymentRequest) {
@@ -100,6 +106,7 @@ public class PromissoryPaperRestController {
         return ResponseEntity.ok().body("repayment success");
     }
 
+    @Override
     @PostMapping("/repayment/cancel")
     public ResponseEntity<String> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
                                                   @RequestBody RepaymentCancelRequest repaymentCancelRequest) {

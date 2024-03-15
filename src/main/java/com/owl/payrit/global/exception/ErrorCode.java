@@ -22,7 +22,7 @@ public enum ErrorCode {
     PAPER_DATA_BAD_REQUEST(HttpStatus.BAD_REQUEST, "차용증 데이터가 올바르지 않습니다."),
     REPAYMENT_HISTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "상환 기록이 존재하지 않습니다."),
     REPAYMENT_STATUS_ERROR(HttpStatus.BAD_REQUEST, "상환은 차용증 작성이 완료되었을 때만 가능합니다."),
-    REPAYMENT_ONLY_ACCESS_CREDITOR(HttpStatus.BAD_REQUEST, "일부 상환은 채권자만 기록할 수 있습니다."),
+    REPAYMENT_ONLY_ACCESS_CREDITOR(HttpStatus.FORBIDDEN, "일부 상환은 채권자만 기록할 수 있습니다."),
     REPAYMENT_NOT_VALID_DATE(HttpStatus.BAD_REQUEST, "일부 상환 일자가 차용증과 일치하지 않습니다."),
     REPAYMENT_AMOUNT_OVER(HttpStatus.BAD_REQUEST, "상환 기록액이 남은 금액을 초과합니다.");
 
