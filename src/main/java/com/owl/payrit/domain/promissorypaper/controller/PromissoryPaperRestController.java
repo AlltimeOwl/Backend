@@ -26,14 +26,14 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
 
     @Override
     @PostMapping("/write")
-    public ResponseEntity<String> write(@AuthenticationPrincipal LoginUser loginUser,
+    public ResponseEntity<Void> write(@AuthenticationPrincipal LoginUser loginUser,
                                         @RequestBody PaperWriteRequest paperWriteRequest) {
 
         log.info(paperWriteRequest.toString());
 
         promissoryPaperService.writePaper(loginUser, paperWriteRequest);
 
-        return ResponseEntity.ok().body("write");
+        return ResponseEntity.noContent().build();
     }
 
     @Override

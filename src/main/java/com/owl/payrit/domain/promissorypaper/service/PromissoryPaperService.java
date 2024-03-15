@@ -21,12 +21,12 @@ import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
 import com.owl.payrit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.grammars.hql.HqlParser;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -85,7 +85,6 @@ public class PromissoryPaperService {
                 .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
 
-        //REVIEW: 승인, 수정 시에도 호출이 가능하도록 엔티티에 작성자 역할 추가, 검증 순서를 아래로 내림(어떤 것이 더 효율적인가?)
         if (!checkMemberData(loginedMember, paper, paper.getWriterRole())) {
             throw new PromissoryPaperException(ErrorCode.PAPER_MATCHING_FAILED);
         }

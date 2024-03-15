@@ -1,12 +1,15 @@
 package com.owl.payrit.domain.promissorypaper.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
+import com.owl.payrit.global.exception.ErrorCode;
+import com.owl.payrit.global.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,11 +28,14 @@ public interface PromissoryPaperApiDocs {
 
     @Operation(summary = "차용증 작성 API", description = "차용증 관련 데이터를 입력해 request 하면, 차용증 작성이 완료됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공적으로 작성되었습니다."),
-            @ApiResponse(responseCode = "400", description = "차용증 데이터가 올바르지 않습니다.")
+            @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
+            @ApiResponse(responseCode = "400", description = "차용증 데이터가 올바르지 않습니다.",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
+                    })
     })
-    ResponseEntity<String> write(@AuthenticationPrincipal LoginUser loginUser,
-                                 @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest
+    ResponseEntity<Void> write(@AuthenticationPrincipal LoginUser loginUser,
+                               @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest
     );
 
     @Operation(summary = "차용증 상세 조회 API", description = "차용증 id를 파라미터로 입력하여 상세 조회가 가능합니다.")
@@ -93,7 +99,7 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "403", description = "일부 상환은 채권자만 기록할 수 있습니다.")
     })
     ResponseEntity<String> repaymentRequest(@AuthenticationPrincipal LoginUser loginUser,
-                                     @RequestBody @Schema(implementation = RepaymentRequest.class) RepaymentRequest repaymentRequest);
+                                            @RequestBody @Schema(implementation = RepaymentRequest.class) RepaymentRequest repaymentRequest);
 
     @Operation(summary = "일부 상환 내역 삭제 API", description = "채권자가 이전에 기록한 일부 상환 내역을 삭제합니다.")
     @ApiResponses(value = {
@@ -101,6 +107,6 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "403", description = "상환 내역 삭제는 채권자만 할 수 있습니다.")
     })
     ResponseEntity<String> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
-                                            @RequestBody @Schema(implementation = RepaymentCancelRequest.class) RepaymentCancelRequest repaymentCancelRequest);
+                                           @RequestBody @Schema(implementation = RepaymentCancelRequest.class) RepaymentCancelRequest repaymentCancelRequest);
 
 }
