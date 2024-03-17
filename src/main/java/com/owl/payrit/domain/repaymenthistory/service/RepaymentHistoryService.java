@@ -61,7 +61,11 @@ public class RepaymentHistoryService {
     }
 
     @Transactional
-    public void remove(RepaymentHistory repaymentHistory) {
+    public void remove(Member member, PromissoryPaper paper, RepaymentHistory repaymentHistory) {
+
+        if(!member.equals(paper.getCreditor())) {
+            throw new RepaymentException(RepaymentErrorCode.REPAYMENT_ONLY_ACCESS_CREDITOR);
+        }
 
         repaymentHistoryRepository.delete(repaymentHistory);
     }

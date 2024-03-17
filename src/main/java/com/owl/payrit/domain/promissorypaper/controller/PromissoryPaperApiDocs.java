@@ -8,7 +8,6 @@ import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperErrorCode;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
-import com.owl.payrit.global.exception.ErrorResponse;
 import com.owl.payrit.global.swagger.annotation.ApiErrorCodeExample;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

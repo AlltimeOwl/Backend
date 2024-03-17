@@ -15,13 +15,18 @@ import static com.owl.payrit.global.consts.PayritStatic.*;
 @AllArgsConstructor
 public enum RepaymentErrorCode implements BaseErrorCode {
 
-    //Repayment Error
+    //Repayment 400 Error
     REPAYMENT_STATUS_ERROR(BAD_REQUEST, "REPAYMENT_400_1", "상환은 차용증 작성이 완료되었을 때만 가능합니다."),
-    REPAYMENT_NOT_VALID_DATE(BAD_REQUEST, "REPAYMENT_400_2", "일부 상환 일자가 차용증과 일치하지 않습니다."),
-    REPAYMENT_AMOUNT_OVER(BAD_REQUEST, "REPAYMENT_400_3", "상환 기록액이 남은 금액을 초과합니다."),
 
-    REPAYMENT_ONLY_ACCESS_CREDITOR(FORBIDDEN, "REPAYMENT_403_1", "일부 상환은 채권자만 기록할 수 있습니다."),
+    @ExplainError("상환 기록은 차용증에 작성된 상환 시작일과 상환 마감일의 사이에만 작성이 가능합니다.")
+    REPAYMENT_NOT_VALID_DATE(BAD_REQUEST, "REPAYMENT_400_2", "상환 기록 작성일자가 유효하지 않습니다."),
 
+    REPAYMENT_AMOUNT_OVER(BAD_REQUEST, "REPAYMENT_400_3", "상환 기록액이 남은 상환액을 초과합니다."),
+
+    //Repayment 403 Error
+    REPAYMENT_ONLY_ACCESS_CREDITOR(FORBIDDEN, "REPAYMENT_403_1", "상환 기록은 채권자만 작성, 삭제가 가능합니다."),
+
+    //Repayment 404 Error
     REPAYMENT_HISTORY_NOT_FOUND(NOT_FOUND, "REPAYMENT_404_1", "상환 기록이 존재하지 않습니다.");
 
     private Integer status;
