@@ -3,7 +3,6 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
-import com.owl.payrit.domain.notification.service.NotificationService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
@@ -39,7 +38,6 @@ public class PromissoryPaperService {
 
     private final RepaymentHistoryService repaymentHistoryService;
     private final MemberService memberService;
-    private final NotificationService notificationService;
     private final PromissoryPaperRepository promissoryPaperRepository;
 
     @Transactional

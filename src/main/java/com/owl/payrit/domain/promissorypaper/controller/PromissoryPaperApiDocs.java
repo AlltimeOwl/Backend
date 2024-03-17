@@ -8,6 +8,7 @@ import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperErrorCode;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
+import com.owl.payrit.domain.repaymenthistory.exception.RepaymentErrorCode;
 import com.owl.payrit.global.swagger.annotation.ApiErrorCodeExample;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -79,7 +80,7 @@ public interface PromissoryPaperApiDocs {
                                    @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest);
 
     @Operation(summary = "일부 상환 내역기록 API", description = "채권자가 일부 상환 내용을 작성합니다.")
-    @ApiErrorCodeExample(PromissoryPaperErrorCode.class)
+    @ApiErrorCodeExample(RepaymentErrorCode.class)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
     })
@@ -87,7 +88,7 @@ public interface PromissoryPaperApiDocs {
                                           @RequestBody @Schema(implementation = RepaymentRequest.class) RepaymentRequest repaymentRequest);
 
     @Operation(summary = "일부 상환 내역 삭제 API", description = "채권자가 이전에 기록한 일부 상환 내역을 삭제합니다.")
-    @ApiErrorCodeExample(PromissoryPaperErrorCode.class)
+    @ApiErrorCodeExample(RepaymentErrorCode.class)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
     })
