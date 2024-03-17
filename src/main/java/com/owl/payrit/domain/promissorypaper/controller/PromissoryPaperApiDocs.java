@@ -5,9 +5,11 @@ import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
+import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperErrorCode;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import com.owl.payrit.global.exception.ErrorResponse;
+import com.owl.payrit.global.swagger.annotation.ApiErrorCodeExample;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,12 +27,9 @@ import java.util.List;
 public interface PromissoryPaperApiDocs {
 
     @Operation(summary = "차용증 작성 API", description = "차용증 관련 데이터를 입력해 request 하면, 차용증 작성이 완료됩니다.")
+    @ApiErrorCodeExample(PromissoryPaperErrorCode.class)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
-            @ApiResponse(responseCode = "400", description = "차용증 데이터가 올바르지 않습니다.",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))
-                    })
     })
     ResponseEntity<Void> write(@AuthenticationPrincipal LoginUser loginUser,
                                @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest

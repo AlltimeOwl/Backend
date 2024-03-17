@@ -22,10 +22,10 @@ public enum PromissoryPaperErrorCode implements BaseErrorCode {
     PAPER_MATCHING_FAILED(BAD_REQUEST, "PAPER_400_4", "차용증 정보와 회원의 정보가 일치하지 않습니다."),
     PAPER_DATA_BAD_REQUEST(BAD_REQUEST, "PAPER_400_5", "차용증 데이터가 올바르지 않습니다."),
 
-    PAPER_NOT_FOUND(UNAUTHORIZED, "PAPER_404_1", "차용증 정보가 존재하지 않습니다."),
-
     PAPER_IS_NOT_MINE(FORBIDDEN, "PAPER_403_1", "차용증 접근 권한이 없습니다."),
-    PAPER_WRITER_CAN_MODIFY(FORBIDDEN, "PAPER_403_2", "첫 작성자만 수정이 가능합니다.");
+    PAPER_WRITER_CAN_MODIFY(FORBIDDEN, "PAPER_403_2", "첫 작성자만 수정이 가능합니다."),
+
+    PAPER_NOT_FOUND(NOT_FOUND, "PAPER_404_1", "차용증 정보가 존재하지 않습니다.");
 
     private Integer status;
     private String code;
