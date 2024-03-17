@@ -2,12 +2,13 @@ package com.owl.payrit.domain.auth.provider;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.member.entity.Member;
+import org.springframework.stereotype.Component;
+
 import java.util.EnumMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
 
 @Component
 public class OauthClientComposite {

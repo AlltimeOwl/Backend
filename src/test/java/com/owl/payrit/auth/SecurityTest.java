@@ -1,7 +1,5 @@
 package com.owl.payrit.auth;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.provider.OauthClientComposite;
 import com.owl.payrit.domain.auth.util.JwtProvider;
@@ -12,9 +10,6 @@ import com.owl.payrit.util.AbstractContainerTest;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +18,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest
