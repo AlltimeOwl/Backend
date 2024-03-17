@@ -3,7 +3,6 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
-import com.owl.payrit.domain.notification.entity.NotificationType;
 import com.owl.payrit.domain.notification.service.NotificationService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
@@ -18,7 +17,6 @@ import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepositor
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
-import com.owl.payrit.domain.repaymenthistory.exception.RepaymentErrorCode;
 import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +67,7 @@ public class PromissoryPaperService {
                 .repaymentEndDate(paperWriteRequest.repaymentEndDate())
                 .specialConditions(paperWriteRequest.specialConditions())
                 .interestRate(paperWriteRequest.interestRate())
+                .interestPaymentDate(paperWriteRequest.interestPaymentDate())
                 .writer(loginedMember)
                 .writerRole(paperWriteRequest.writerRole())
                 .creditor(creditor)
@@ -221,17 +220,22 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperId);
+        long amount = paperWriteRequest.amount();
+        long calcAmount = amount + calcInterest(amount, paperWriteRequest.interestRate());
 
         checkPaperBeforeModify(loginedMember, paper);
 
         //TODO: 더 좋은 방법 고려 필요. 수정할 부분이 어딘지 명시된다면?
         PromissoryPaper modifiedPaper = paper.toBuilder()
+                .amount(calcAmount)
+                .remainingAmount(calcAmount)
                 .amount(paperWriteRequest.amount())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
                 .repaymentEndDate(paperWriteRequest.repaymentEndDate())
                 .specialConditions(paperWriteRequest.specialConditions())
                 .interestRate(paperWriteRequest.interestRate())
+                .interestPaymentDate(paperWriteRequest.interestPaymentDate())
                 .creditorName(paperWriteRequest.creditorName())
                 .creditorPhoneNumber(paperWriteRequest.creditorPhoneNumber())
                 .creditorAddress(paperWriteRequest.creditorAddress())
