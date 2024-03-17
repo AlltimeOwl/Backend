@@ -1,0 +1,19 @@
+footer {
+    height : 368px;
+}
+
+.footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top : 15px;
+}
+
+#footer-img {
+    height: 60px;
+}
+
+.footer-sub {
+    padding-top : 15px;
+}

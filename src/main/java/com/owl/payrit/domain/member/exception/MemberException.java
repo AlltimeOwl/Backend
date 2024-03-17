@@ -7,4 +7,5 @@ public class MemberException extends PayritCodeException {
     public MemberException(MemberErrorCode errorCode) {
         super(errorCode);
     }
+
 }

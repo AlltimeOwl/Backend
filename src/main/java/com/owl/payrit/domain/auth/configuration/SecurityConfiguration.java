@@ -37,6 +37,8 @@ public class SecurityConfiguration {
                                                         ,antMatcher("/swagger-resources/**")
                                                         ,antMatcher("/v3/api-docs/**")
                                                         ,antMatcher("/h2-console/**")
+                                                        ,antMatcher("/img/**")
+                                                        ,antMatcher("/css/**")
                                                         ,antMatcher("/")
                                                      )
                                                      .permitAll()

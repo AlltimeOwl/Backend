@@ -1,3 +1,7 @@
 spring:
   thymeleaf:
     prefix: classpath:/static/
+
+Encrypt:
+  key: ${ENCRYPT_KEY}
+  algo: ${ENCRYPT_ALGO}
