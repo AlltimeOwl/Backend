@@ -1,9 +1,9 @@
 package com.owl.payrit.global.configuration;
 
-import com.owl.payrit.global.swagger.ExampleHolder;
 import com.owl.payrit.global.exception.BaseErrorCode;
 import com.owl.payrit.global.exception.ErrorReason;
 import com.owl.payrit.global.exception.ErrorResponse;
+import com.owl.payrit.global.swagger.ExampleHolder;
 import com.owl.payrit.global.swagger.annotation.ApiErrorCodeExample;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

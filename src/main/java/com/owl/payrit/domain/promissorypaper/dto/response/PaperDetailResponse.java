@@ -2,7 +2,6 @@ package com.owl.payrit.domain.promissorypaper.dto.response;
 
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.repaymenthistory.dto.RepaymentHistoryDto;
-import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 
 import java.time.LocalDate;
 import java.util.List;
