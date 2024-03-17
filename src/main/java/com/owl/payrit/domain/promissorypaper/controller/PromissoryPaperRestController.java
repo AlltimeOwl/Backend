@@ -61,19 +61,19 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
 
     @Override
     @PutMapping("/approve/accept/{id}")
-    public ResponseEntity<String> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
+    public ResponseEntity<Void> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
                                               @PathVariable(value = "id") Long paperId) {
 
         log.info("request user id : " + loginUser.id());
 
         promissoryPaperService.acceptPaper(loginUser, paperId);
 
-        return ResponseEntity.ok().body("accept");
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     @PostMapping("/modify/request")
-    public ResponseEntity<String> requestModify(@AuthenticationPrincipal LoginUser loginUser,
+    public ResponseEntity<Void> requestModify(@AuthenticationPrincipal LoginUser loginUser,
                                                 @RequestBody PaperModifyRequest paperModifyRequest) {
 
         log.info("request user id : " + loginUser.id());
@@ -81,38 +81,37 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs{
 
         promissoryPaperService.sendModifyRequest(loginUser, paperModifyRequest);
 
-        return ResponseEntity.ok().body("modify request : %s".formatted(paperModifyRequest.contents()));
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     @PutMapping("/modify/accept/{id}")
-    public ResponseEntity<String> modifying(@AuthenticationPrincipal LoginUser loginUser,
+    public ResponseEntity<Void> modifying(@AuthenticationPrincipal LoginUser loginUser,
                                             @PathVariable(value = "id") Long id,
                                             @RequestBody PaperWriteRequest paperWriteRequest) {
 
-        //FIXME: 수정시에도 PaperWriteRequest를 요청?
         promissoryPaperService.modifyingPaper(loginUser, id, paperWriteRequest);
 
-        return ResponseEntity.ok().body("modify success");
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     @PostMapping("/repayment/request")
-    public ResponseEntity<String> repaymentRequest(@AuthenticationPrincipal LoginUser loginUser,
+    public ResponseEntity<Void> repaymentRequest(@AuthenticationPrincipal LoginUser loginUser,
                                                    @RequestBody RepaymentRequest repaymentRequest) {
 
         promissoryPaperService.repayment(loginUser, repaymentRequest);
 
-        return ResponseEntity.ok().body("repayment success");
+        return ResponseEntity.noContent().build();
     }
 
     @Override
     @PostMapping("/repayment/cancel")
-    public ResponseEntity<String> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
+    public ResponseEntity<Void> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
                                                   @RequestBody RepaymentCancelRequest repaymentCancelRequest) {
 
         promissoryPaperService.cancelRepayment(loginUser, repaymentCancelRequest);
 
-        return ResponseEntity.ok().body("repayment canceled");
+        return ResponseEntity.noContent().build();
     }
 }
