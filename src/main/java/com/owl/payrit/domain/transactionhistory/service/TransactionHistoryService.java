@@ -52,11 +52,11 @@ public class TransactionHistoryService {
 
     public TransactionHistoryDetailResponse getDetail(LoginUser loginUser, Long historyId) {
 
+        //TODO: 조회 조건 체크 필요
+        
         TransactionHistory history = getById(historyId);
-
-        TransactionHistoryDetailResponse detailResponse = new TransactionHistoryDetailResponse();
-
-        return detailResponse;
+        
+        return new TransactionHistoryDetailResponse(history);
     }
 
     public TransactionHistory getById(Long historyId) {
