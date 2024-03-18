@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @RestController
@@ -19,9 +19,9 @@ public class TransactionHistoryRestController {
 
     private final TransactionHistoryService transactionHistoryService;
 
-    @PostMapping("/transaction/save")
+    @PostMapping("/save")
     public ResponseEntity<Void> save(@AuthenticationPrincipal LoginUser loginUser,
-                                     TransactionHistorySaveRequest transactionHistorySaveRequest) {
+                                     @RequestBody TransactionHistorySaveRequest transactionHistorySaveRequest) {
 
         log.info(transactionHistorySaveRequest.toString());
 

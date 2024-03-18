@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.transactionhistory.entity;
 
 import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,6 +24,9 @@ public class TransactionHistory extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member paidMember;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private PromissoryPaper linkedPaper;
 
     private LocalDateTime transactionDate;
 

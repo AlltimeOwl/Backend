@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public record TransactionHistorySaveRequest(
 
+        Long paperId,
         LocalDateTime transactionDate,
         long amount,
         String contents,
