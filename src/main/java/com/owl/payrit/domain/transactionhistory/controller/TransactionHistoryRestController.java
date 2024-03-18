@@ -3,12 +3,15 @@ package com.owl.payrit.domain.transactionhistory.controller;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
+import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
 import com.owl.payrit.domain.transactionhistory.service.TransactionHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -38,6 +41,16 @@ public class TransactionHistoryRestController {
         TransactionHistoryDetailResponse detailResponse = transactionHistoryService.getDetail(loginUser, id);
 
         return ResponseEntity.ok().body(detailResponse);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<TransactionHistoryListResponse>> list(@AuthenticationPrincipal LoginUser loginUser) {
+
+        log.info("{user id : %d }".formatted(loginUser.id()));
+
+        List<TransactionHistoryListResponse> listResponses = transactionHistoryService.getListResponses(loginUser);
+
+        return ResponseEntity.ok().body(listResponses);
     }
 
 }

@@ -3,10 +3,13 @@ package com.owl.payrit.domain.transactionhistory.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
+import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
+import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionHistory;
 import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryErrorCode;
 import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryException;
@@ -15,6 +18,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -63,6 +72,29 @@ public class TransactionHistoryService {
 
         return transactionHistoryRepository.findById(historyId).orElseThrow(
                 () -> new TransactionHistoryException(TransactionHistoryErrorCode.HISTORY_NOT_FOUND));
+    }
+
+    public List<TransactionHistoryListResponse> getListResponses(LoginUser loginUser) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        List<TransactionHistory> histories = getAllByPaidMember(loginedMember);
+
+        List<TransactionHistoryListResponse> historyListResponses = new ArrayList<>();
+
+        for(TransactionHistory history : histories) {
+
+            LocalDate transactionDate = history.getTransactionDate().toLocalDate();
+
+            historyListResponses.add(new TransactionHistoryListResponse(history, transactionDate));
+        }
+
+        return historyListResponses;
+    }
+
+    public List<TransactionHistory> getAllByPaidMember(Member member) {
+
+        return transactionHistoryRepository.findAllByPaidMember(member);
     }
 
 }
