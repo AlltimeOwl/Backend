@@ -3,14 +3,14 @@ package com.owl.payrit.domain.member.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
+import com.owl.payrit.domain.member.exception.MemberErrorCode;
 import com.owl.payrit.domain.member.exception.MemberException;
 import com.owl.payrit.domain.member.repository.MemberRepository;
-import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
-import com.owl.payrit.global.exception.ErrorCode;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -23,18 +23,18 @@ public class MemberService {
 
         return memberRepository.findById(id)
                                .orElseThrow(() -> new MemberException(
-                                   ErrorCode.MEMBER_NOT_FOUND));
+                                   MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     public Member findByPhoneNumber(String phoneNumber) {
 
         return memberRepository.findByPhoneNumber(phoneNumber)
-                               .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+                               .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email)
-                               .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+                               .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     /*
@@ -46,7 +46,7 @@ public class MemberService {
 
     public Member findByOauthInformation(OauthInformation oauthInformation) {
         return memberRepository.findByOauthInformation(oauthInformation)
-                               .orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
+                               .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     public Member findByOauthInformationOrSave(Member member) {
