@@ -3,6 +3,7 @@ package com.owl.payrit.domain.repaymenthistory.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.global.entity.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -25,6 +26,6 @@ public class RepaymentHistory extends BaseEntity {
 
     private LocalDate repaymentDate;
 
-    @Builder.Default
-    private Long repaymentAmount = 0L;
+    @Column(nullable = true, columnDefinition = "bigint default NULL")
+    private Long repaymentAmount;
 }
