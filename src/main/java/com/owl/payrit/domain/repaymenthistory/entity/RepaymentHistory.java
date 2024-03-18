@@ -25,5 +25,6 @@ public class RepaymentHistory extends BaseEntity {
 
     private LocalDate repaymentDate;
 
-    private Long repaymentAmount;
+    @Builder.Default
+    private Long repaymentAmount = 0L;
 }
