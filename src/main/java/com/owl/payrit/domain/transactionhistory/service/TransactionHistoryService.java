@@ -6,7 +6,10 @@ import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
+import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionHistory;
+import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryErrorCode;
+import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryException;
 import com.owl.payrit.domain.transactionhistory.repository.TransactionHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +48,21 @@ public class TransactionHistoryService {
                 .build();
 
         transactionHistoryRepository.save(history);
+    }
+
+    public TransactionHistoryDetailResponse getDetail(LoginUser loginUser, Long historyId) {
+
+        TransactionHistory history = getById(historyId);
+
+        TransactionHistoryDetailResponse detailResponse = new TransactionHistoryDetailResponse();
+
+        return detailResponse;
+    }
+
+    public TransactionHistory getById(Long historyId) {
+
+        return transactionHistoryRepository.findById(historyId).orElseThrow(
+                () -> new TransactionHistoryException(TransactionHistoryErrorCode.HISTORY_NOT_FOUND));
     }
 
 }
