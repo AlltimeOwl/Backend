@@ -60,6 +60,7 @@ public class PromissoryPaperService {
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(calcAmount)
                 .remainingAmount(calcAmount)
+                .repaymentHistory(null)
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
                 .repaymentEndDate(paperWriteRequest.repaymentEndDate())
