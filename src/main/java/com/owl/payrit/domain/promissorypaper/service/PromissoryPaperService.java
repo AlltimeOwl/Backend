@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -60,7 +61,7 @@ public class PromissoryPaperService {
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(calcAmount)
                 .remainingAmount(calcAmount)
-                .repaymentHistory(null)
+                .repaymentHistory(new ArrayList<>())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
                 .repaymentEndDate(paperWriteRequest.repaymentEndDate())
