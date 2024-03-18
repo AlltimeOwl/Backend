@@ -40,6 +40,7 @@ public class PromissoryPaperServiceTest {
                 LocalDate.now().plusDays(7),
                 "특약 사항은 없습니다.",
                 12,
+                10,
                 "name00",
                 "010-1234-0000",
                 "(12345) 서울시 종로구 광화문로 1234",
