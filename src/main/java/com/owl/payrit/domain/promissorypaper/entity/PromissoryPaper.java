@@ -40,6 +40,8 @@ public class PromissoryPaper extends BaseEntity {
 
     private float interestRate;
 
+    private long interestPaymentDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;
 

@@ -1,7 +1,8 @@
 package com.owl.payrit.domain.auth.provider.apple;
 
+import com.owl.payrit.domain.auth.exception.AuthErrorCode;
 import com.owl.payrit.domain.auth.exception.AuthException;
-import com.owl.payrit.global.exception.ErrorCode;
+
 import java.util.List;
 
 public record ApplePublicKeyResponse(
@@ -12,6 +13,6 @@ public record ApplePublicKeyResponse(
         return publicKeys.stream()
             .filter(key -> key.kid().equals(kid) && key.alg().equals(alg))
             .findFirst()
-            .orElseThrow(() -> new AuthException(ErrorCode.IMPROPER_OAUTH_INFORMATION));
+            .orElseThrow(() -> new AuthException(AuthErrorCode.IMPROPER_OAUTH_INFORMATION));
     }
 }

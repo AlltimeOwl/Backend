@@ -1,7 +1,9 @@
 package com.owl.payrit.domain.auth.provider.apple;
 
+import com.owl.payrit.domain.auth.exception.AuthErrorCode;
 import com.owl.payrit.domain.auth.exception.AuthException;
-import com.owl.payrit.global.exception.ErrorCode;
+import org.springframework.stereotype.Component;
+
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -10,7 +12,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Map;
-import org.springframework.stereotype.Component;
 
 @Component
 public class ApplePublicKeyGenerator {
@@ -29,7 +30,7 @@ public class ApplePublicKeyGenerator {
             KeyFactory keyFactory = KeyFactory.getInstance(applePublicKey.kty());
             return keyFactory.generatePublic(publicKeySpec);
         } catch(NoSuchAlgorithmException | InvalidKeySpecException exception) {
-            throw new AuthException(ErrorCode.IMPROPER_OAUTH_INFORMATION);
+            throw new AuthException(AuthErrorCode.IMPROPER_OAUTH_INFORMATION);
         }
     }
 }
