@@ -65,4 +65,11 @@ public class MemoService {
     private Memo findById(Long id) {
         return memoRepository.findById(id).orElseThrow(() -> new MemoException(MemoErrorCode.MEMO_NOT_FOUND));
     }
+
+    @Transactional
+    public void delete(LoginUser loginUser, Long memoId) {
+        Memo memo = findById(memoId);
+        checkMemoPermission(loginUser.id(), memo.getMemberId());
+        memoRepository.delete(memo);
+    }
 }

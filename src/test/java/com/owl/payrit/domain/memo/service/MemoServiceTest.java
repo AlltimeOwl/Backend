@@ -44,23 +44,30 @@ class MemoServiceTest extends ServiceTest {
         setUp();
     }
 
-    @Test
-    @Transactional
-    @DisplayName("메모 작성된다")
-    void memoShouldBeWritten() throws Exception {
-        // Given
-        Member member1 = findByEmail("test00");
-        LoginUser loginUser = new LoginUser(member1.getId(), member1.getOauthInformation());
+    // 공통 메소드
 
+    private LoginUser prepareLoginUser() {
+        Member member = findByEmail("test00");
+        return new LoginUser(member.getId(), member.getOauthInformation());
+    }
+
+    private Long preparePromissoryPaper(LoginUser loginUser) {
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(PaperRole.CREDITOR, 3000000,
             LocalDate.now(), LocalDate.now(), LocalDate.now(), "내용", 20.0f, 28, "name00",
             "010-1234-5670", "광화문", "name01", "010-1234-5671", "중구");
+        return promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+    }
 
-        Long paperId = promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+    @Test
+    @Transactional
+    @DisplayName("메모가 작성되어야 함")
+    void memoShouldBeWritten() throws Exception {
+        // Given
+        LoginUser loginUser = prepareLoginUser();
+        Long paperId = preparePromissoryPaper(loginUser);
 
         // When
-        MemoWriteRequest memoWriteRequest = new MemoWriteRequest("내용");
-        Long memoId = memoService.write(loginUser, paperId, memoWriteRequest);
+        Long memoId = memoService.write(loginUser, paperId, new MemoWriteRequest("내용"));
 
         // Then
         Memo memo = memoRepository.findById(memoId).orElse(null);
@@ -70,84 +77,55 @@ class MemoServiceTest extends ServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("메모목록 조회된다.")
+    @DisplayName("메모 목록이 올바르게 조회되어야 함")
     void memoListShouldBeRetrieved() throws Exception {
         // Given
-        Member member1 = findByEmail("test00");
-        LoginUser loginUser = new LoginUser(member1.getId(), member1.getOauthInformation());
-
-        PaperWriteRequest paperWriteRequest = new PaperWriteRequest(PaperRole.CREDITOR, 3000000,
-            LocalDate.now(), LocalDate.now(), LocalDate.now(), "내용", 20.0f, 28, "name00",
-            "010-1234-5670", "광화문", "name01", "010-1234-5671", "중구");
-
-        Long paperId = promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+        LoginUser loginUser = prepareLoginUser();
+        Long paperId = preparePromissoryPaper(loginUser);
 
         // When
-        MemoWriteRequest memoWriteRequest = new MemoWriteRequest("내용");
-        Long memoId = memoService.write(loginUser, paperId, memoWriteRequest);
-        Long memoId2 = memoService.write(loginUser, paperId, memoWriteRequest);
-        Long memoId3 = memoService.write(loginUser, paperId, memoWriteRequest);
+        memoService.write(loginUser, paperId, new MemoWriteRequest("내용1"));
+        memoService.write(loginUser, paperId, new MemoWriteRequest("내용2"));
+        memoService.write(loginUser, paperId, new MemoWriteRequest("내용3"));
 
         // Then
         List<MemoListResponse> memoList = memoService.findAllByPaperIdAndMemberId(loginUser, paperId);
-        assertThat(memoList).satisfies(
-            list -> assertThat(list.size()).isEqualTo(3),
-            list -> assertThat(list.get(0).content()).isEqualTo("내용")
-        );
+        assertThat(memoList).hasSize(3);
+        assertThat(memoList.get(0).content()).isEqualTo("내용1");
     }
 
     @Test
     @Transactional
-    @DisplayName("메모 수정된다.")
-    void memoListShouldBeModified() throws Exception {
+    @DisplayName("메모가 수정되어야 함")
+    void memoShouldBeModified() throws Exception {
         // Given
-        Member member1 = findByEmail("test00");
-        LoginUser loginUser = new LoginUser(member1.getId(), member1.getOauthInformation());
-
-        PaperWriteRequest paperWriteRequest = new PaperWriteRequest(PaperRole.CREDITOR, 3000000,
-            LocalDate.now(), LocalDate.now(), LocalDate.now(), "내용", 20.0f, 28, "name00",
-            "010-1234-5670", "광화문", "name01", "010-1234-5671", "중구");
-
-        Long paperId = promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+        LoginUser loginUser = prepareLoginUser();
+        Long paperId = preparePromissoryPaper(loginUser);
+        Long memoId = memoService.write(loginUser, paperId, new MemoWriteRequest("내용"));
 
         // When
-        MemoWriteRequest memoWriteRequest = new MemoWriteRequest("내용");
-        Long memoId = memoService.write(loginUser, paperId, memoWriteRequest);
+        memoService.modify(loginUser, memoId, new MemoWriteRequest("수정"));
 
         // Then
-        MemoWriteRequest modifyRequest = new MemoWriteRequest("수정");;
         Memo memo = memoRepository.findById(memoId).orElse(null);
-        memoService.modify(loginUser, memoId, modifyRequest);
         assertNotNull(memo);
         assertEquals("수정", memo.getContent());
     }
 
     @Test
     @Transactional
-    @DisplayName("권한이 없을 시 MemoException 던진다.")
-    void t5() throws Exception {
+    @DisplayName("권한이 없을 시 MemoException 발생")
+    void unauthorizedUserShouldThrowMemoException() throws Exception {
         // Given
-        Member member1 = findByEmail("test00");
-        LoginUser loginUser = new LoginUser(member1.getId(), member1.getOauthInformation());
-
-        PaperWriteRequest paperWriteRequest = new PaperWriteRequest(PaperRole.CREDITOR, 3000000,
-            LocalDate.now(), LocalDate.now(), LocalDate.now(), "내용", 20.0f, 28, "name00",
-            "010-1234-5670", "광화문", "name01", "010-1234-5671", "중구");
-
-        Long paperId = promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+        LoginUser loginUser = prepareLoginUser();
+        Long paperId = preparePromissoryPaper(loginUser);
+        Long memoId = memoService.write(loginUser, paperId, new MemoWriteRequest("내용"));
 
         // When
-        MemoWriteRequest memoWriteRequest = new MemoWriteRequest("내용");
-        Long memoId = memoService.write(loginUser, paperId, memoWriteRequest);
+        LoginUser unauthorizedUser = new LoginUser(3L, loginUser.oauthInformation());
 
-
-        MemoWriteRequest modifyRequest = new MemoWriteRequest("수정");
-        LoginUser unAuthorizedUser = new LoginUser(3L, member1.getOauthInformation());
-        Memo memo = memoRepository.findById(memoId).orElse(null);
-
+        // Then
         assertThatExceptionOfType(MemoException.class)
-            .isThrownBy(() -> {
-                memoService.modify(unAuthorizedUser, memoId, modifyRequest);
-            });
+            .isThrownBy(() -> memoService.modify(unauthorizedUser, memoId, new MemoWriteRequest("수정")));
     }
 }

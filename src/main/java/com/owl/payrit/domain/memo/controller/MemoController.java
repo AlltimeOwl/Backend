@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +44,13 @@ public class MemoController {
     public ResponseEntity<Void> modifyMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long memoId, MemoWriteRequest memoWriteRequest) {
         log.info("'{}' member requests modify memo : {}", loginUser.id(), memoId);
         memoService.modify(loginUser, memoId, memoWriteRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{memoId}")
+    public ResponseEntity<Void> deleteMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long memoId) {
+        log.info("'{}' member requests delete memo : {}", loginUser.id(), memoId);
+        memoService.delete(loginUser, memoId);
         return ResponseEntity.noContent().build();
     }
 }
