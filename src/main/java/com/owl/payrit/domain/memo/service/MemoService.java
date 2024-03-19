@@ -40,10 +40,10 @@ public class MemoService {
     }
 
     @Transactional
-    public void write(LoginUser loginUser, Long paperId, MemoWriteRequest memoWriteRequest) {
+    public long write(LoginUser loginUser, Long paperId, MemoWriteRequest memoWriteRequest) {
         PromissoryPaper promissoryPaper = promissoryPaperService.getById(paperId);
         checkPermission(loginUser.id(), paperId);
         Memo memo = memoWriteRequest.toEntity(promissoryPaper, loginUser.id());
-        memoRepository.save(memo);
+        return memoRepository.save(memo).getId();
     }
 }

@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,10 +19,13 @@ public class ServiceTest{
 
     @Autowired MemberRepository memberRepository;
 
-    @BeforeEach
-    void setUp() throws Exception {
+    protected void setUp() {
         List<Member> testMemberList = getTestMembers();
         memberRepository.saveAll(testMemberList);
+    }
+
+    protected Member findByEmail(String email) {
+        return memberRepository.findByEmail(email).orElseThrow();
     }
 
     private List<Member> getTestMembers() {
