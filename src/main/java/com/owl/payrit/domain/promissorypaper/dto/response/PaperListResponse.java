@@ -7,6 +7,8 @@ import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import java.time.LocalDate;
 
 public record PaperListResponse(
+
+        Long paperId,
         PaperRole paperRole,
         LocalDate transactionDate,
         LocalDate repaymentStartDate,
@@ -20,6 +22,7 @@ public record PaperListResponse(
     public PaperListResponse(PromissoryPaper promissoryPaper, PaperRole paperRole,
                              String peerName, long dueDate, double repaymentRate) {
         this(
+                promissoryPaper.getId(),
                 paperRole,
                 promissoryPaper.getTransactionDate(),
                 promissoryPaper.getRepaymentStartDate(),
