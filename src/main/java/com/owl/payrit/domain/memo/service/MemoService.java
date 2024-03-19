@@ -1,7 +1,9 @@
 package com.owl.payrit.domain.memo.service;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.memo.dto.request.MemoWriteRequest;
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
+import com.owl.payrit.domain.memo.entity.Memo;
 import com.owl.payrit.domain.memo.repository.MemoRepository;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperErrorCode;
@@ -37,4 +39,11 @@ public class MemoService {
         }
     }
 
+    @Transactional
+    public void write(LoginUser loginUser, Long paperId, MemoWriteRequest memoWriteRequest) {
+        PromissoryPaper promissoryPaper = promissoryPaperService.getById(paperId);
+        checkPermission(loginUser.id(), paperId);
+        Memo memo = memoWriteRequest.toEntity(promissoryPaper, loginUser.id());
+        memoRepository.save(memo);
+    }
 }

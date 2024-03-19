@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.memo.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.memo.dto.request.MemoWriteRequest;
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
 import com.owl.payrit.domain.memo.service.MemoService;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,8 +27,14 @@ public class MemoController {
     @GetMapping("/{paperId}")
     public ResponseEntity<List<MemoListResponse>> getMemoListByPaperId(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long paperId) {
         log.info("'{}' member requests memos on '{} paper'", loginUser.id(), paperId);
-
         List<MemoListResponse> memoList = memoService.findAllByPaperIdAndMemberId(loginUser, paperId);
         return ResponseEntity.ok().body(memoList);
+    }
+
+    @PostMapping("/{paperId}")
+    public ResponseEntity<Void> createMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long paperId, MemoWriteRequest memoWriteRequest) {
+        log.info("'{}' member requests create memo", loginUser.id());
+        memoService.write(loginUser, paperId, memoWriteRequest);
+        return ResponseEntity.noContent().build();
     }
 }
