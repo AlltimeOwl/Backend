@@ -21,34 +21,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/memo")
 @RestController
-public class MemoController {
+public class MemoController implements MemoApiDocs{
 
     private final MemoService memoService;
 
     //TODO : 메모 작성, 메모 조회, 메모 수정?
     @GetMapping("/{paperId}")
-    public ResponseEntity<List<MemoListResponse>> getMemoListByPaperId(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long paperId) {
+    public ResponseEntity<List<MemoListResponse>> getMemoListByPaperId(@AuthenticationPrincipal LoginUser loginUser, @PathVariable(value = "paperId") Long paperId) {
         log.info("'{}' member requests memos on '{} paper'", loginUser.id(), paperId);
         List<MemoListResponse> memoList = memoService.findAllByPaperIdAndMemberId(loginUser, paperId);
         return ResponseEntity.ok().body(memoList);
     }
 
     @PostMapping("/{paperId}")
-    public ResponseEntity<Void> createMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long paperId, MemoWriteRequest memoWriteRequest) {
+    public ResponseEntity<Void> createMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable(value = "paperId") Long paperId, MemoWriteRequest memoWriteRequest) {
         log.info("'{}' member requests create memo", loginUser.id());
         memoService.write(loginUser, paperId, memoWriteRequest);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{memoId}")
-    public ResponseEntity<Void> modifyMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long memoId, MemoWriteRequest memoWriteRequest) {
+    public ResponseEntity<Void> modifyMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable(value = "memoId") Long memoId, MemoWriteRequest memoWriteRequest) {
         log.info("'{}' member requests modify memo : {}", loginUser.id(), memoId);
         memoService.modify(loginUser, memoId, memoWriteRequest);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{memoId}")
-    public ResponseEntity<Void> deleteMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long memoId) {
+    public ResponseEntity<Void> deleteMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable(value = "memoId") Long memoId) {
         log.info("'{}' member requests delete memo : {}", loginUser.id(), memoId);
         memoService.delete(loginUser, memoId);
         return ResponseEntity.noContent().build();
