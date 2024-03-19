@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.memo.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -9,6 +10,7 @@ import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.memo.dto.request.MemoWriteRequest;
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
 import com.owl.payrit.domain.memo.entity.Memo;
+import com.owl.payrit.domain.memo.exception.MemoException;
 import com.owl.payrit.domain.memo.repository.MemoRepository;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
@@ -92,5 +94,60 @@ class MemoServiceTest extends ServiceTest {
             list -> assertThat(list.size()).isEqualTo(3),
             list -> assertThat(list.get(0).content()).isEqualTo("내용")
         );
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메모 수정된다.")
+    void memoListShouldBeModified() throws Exception {
+        // Given
+        Member member1 = findByEmail("test00");
+        LoginUser loginUser = new LoginUser(member1.getId(), member1.getOauthInformation());
+
+        PaperWriteRequest paperWriteRequest = new PaperWriteRequest(PaperRole.CREDITOR, 3000000,
+            LocalDate.now(), LocalDate.now(), LocalDate.now(), "내용", 20.0f, 28, "name00",
+            "010-1234-5670", "광화문", "name01", "010-1234-5671", "중구");
+
+        Long paperId = promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+
+        // When
+        MemoWriteRequest memoWriteRequest = new MemoWriteRequest("내용");
+        Long memoId = memoService.write(loginUser, paperId, memoWriteRequest);
+
+        // Then
+        MemoWriteRequest modifyRequest = new MemoWriteRequest("수정");;
+        Memo memo = memoRepository.findById(memoId).orElse(null);
+        memoService.modify(loginUser, memoId, modifyRequest);
+        assertNotNull(memo);
+        assertEquals("수정", memo.getContent());
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("권한이 없을 시 MemoException 던진다.")
+    void t5() throws Exception {
+        // Given
+        Member member1 = findByEmail("test00");
+        LoginUser loginUser = new LoginUser(member1.getId(), member1.getOauthInformation());
+
+        PaperWriteRequest paperWriteRequest = new PaperWriteRequest(PaperRole.CREDITOR, 3000000,
+            LocalDate.now(), LocalDate.now(), LocalDate.now(), "내용", 20.0f, 28, "name00",
+            "010-1234-5670", "광화문", "name01", "010-1234-5671", "중구");
+
+        Long paperId = promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+
+        // When
+        MemoWriteRequest memoWriteRequest = new MemoWriteRequest("내용");
+        Long memoId = memoService.write(loginUser, paperId, memoWriteRequest);
+
+
+        MemoWriteRequest modifyRequest = new MemoWriteRequest("수정");
+        LoginUser unAuthorizedUser = new LoginUser(3L, member1.getOauthInformation());
+        Memo memo = memoRepository.findById(memoId).orElse(null);
+
+        assertThatExceptionOfType(MemoException.class)
+            .isThrownBy(() -> {
+                memoService.modify(unAuthorizedUser, memoId, modifyRequest);
+            });
     }
 }
