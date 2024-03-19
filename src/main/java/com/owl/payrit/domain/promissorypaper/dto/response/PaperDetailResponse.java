@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 public record PaperDetailResponse(
 
+        Long paperId,
         String paperUrl,
         long amount,
         long remainingAmount,
@@ -27,6 +28,7 @@ public record PaperDetailResponse(
 ) {
     public PaperDetailResponse(PromissoryPaper promissoryPaper, double repaymentRate) {
         this(
+                promissoryPaper.getId(),
                 promissoryPaper.getStorageUrl(),
                 promissoryPaper.getAmount(),
                 promissoryPaper.getRemainingAmount(),
