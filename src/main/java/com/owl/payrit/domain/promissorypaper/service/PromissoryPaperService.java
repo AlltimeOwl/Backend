@@ -25,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -119,8 +117,16 @@ public class PromissoryPaperService {
         List<PaperListResponse> debtorList =
                 getListResponsesByRole(loginUser, PaperRole.DEBTOR);
 
-        return Stream.concat(creditorList.stream(), debtorList.stream())
+        List<PaperListResponse> paperListResponses = Stream.concat(creditorList.stream(), debtorList.stream())
                 .collect(Collectors.toList());
+
+        sortByTransactionDate(paperListResponses);
+
+        return paperListResponses;
+    }
+
+    public void sortByTransactionDate(List<PaperListResponse> paperListResponses) {
+        paperListResponses.sort(Comparator.comparing(PaperListResponse::transactionDate));
     }
 
     public List<PaperListResponse> getListResponsesByRole(LoginUser loginUser, PaperRole role) {

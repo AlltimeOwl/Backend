@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 public record PaperListResponse(
         PaperRole paperRole,
+        LocalDate transactionDate,
         LocalDate repaymentStartDate,
         LocalDate repaymentEndDate,
         long amount,
@@ -20,6 +21,7 @@ public record PaperListResponse(
                              String peerName, long dueDate, double repaymentRate) {
         this(
                 paperRole,
+                promissoryPaper.getTransactionDate(),
                 promissoryPaper.getRepaymentStartDate(),
                 promissoryPaper.getRepaymentEndDate(),
                 promissoryPaper.getAmount(),
