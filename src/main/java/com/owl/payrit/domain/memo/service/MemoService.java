@@ -21,15 +21,20 @@ public class MemoService {
     private final PromissoryPaperService promissoryPaperService;
 
     public List<MemoListResponse> findAllByPaperIdAndMemberId(LoginUser loginUser, Long paperId) {
-        PromissoryPaper promissoryPaper = promissoryPaperService.getById(paperId);
-        boolean checkPermission = promissoryPaperService.isMine(loginUser.id(), promissoryPaper);
-        if (!checkPermission) {
-            throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_IS_NOT_MINE);
-        }
+
+        checkPermission(loginUser.id(), paperId);
         return memoRepository.findAllByMemberIdAndPromissoryPaperIdOrderByCreatedAt(loginUser.id(), paperId)
                              .stream()
                              .map(MemoListResponse::new)
                              .toList();
+    }
+
+    private void checkPermission(Long memberId, Long paperId) {
+        PromissoryPaper promissoryPaper = promissoryPaperService.getById(paperId);
+        boolean checkPermission = promissoryPaperService.isMine(memberId, promissoryPaper);
+        if (!checkPermission) {
+            throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_IS_NOT_MINE);
+        }
     }
 
 }
