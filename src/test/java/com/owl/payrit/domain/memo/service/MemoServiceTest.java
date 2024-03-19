@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
@@ -60,7 +61,7 @@ class MemoServiceTest extends ServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("메모가 작성되어야 함")
+    @DisplayName("메모 작성된다")
     void memoShouldBeWritten() throws Exception {
         // Given
         LoginUser loginUser = prepareLoginUser();
@@ -77,7 +78,7 @@ class MemoServiceTest extends ServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("메모 목록이 올바르게 조회되어야 함")
+    @DisplayName("메모 목록 조회된다")
     void memoListShouldBeRetrieved() throws Exception {
         // Given
         LoginUser loginUser = prepareLoginUser();
@@ -96,7 +97,7 @@ class MemoServiceTest extends ServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("메모가 수정되어야 함")
+    @DisplayName("메모 수정된다")
     void memoShouldBeModified() throws Exception {
         // Given
         LoginUser loginUser = prepareLoginUser();
@@ -114,7 +115,7 @@ class MemoServiceTest extends ServiceTest {
 
     @Test
     @Transactional
-    @DisplayName("권한이 없을 시 MemoException 발생")
+    @DisplayName("권한이 없을 시 MemoException 발생한다")
     void unauthorizedUserShouldThrowMemoException() throws Exception {
         // Given
         LoginUser loginUser = prepareLoginUser();
@@ -127,5 +128,24 @@ class MemoServiceTest extends ServiceTest {
         // Then
         assertThatExceptionOfType(MemoException.class)
             .isThrownBy(() -> memoService.modify(unauthorizedUser, memoId, new MemoWriteRequest("수정")));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("메모 삭제된다")
+    void memoShouldBeDeleted() throws Exception {
+        // Given
+        LoginUser loginUser = prepareLoginUser();
+        Long paperId = preparePromissoryPaper(loginUser);
+        Long memoId = memoService.write(loginUser, paperId, new MemoWriteRequest("내용"));
+
+        // When
+        memoService.delete(loginUser, memoId);
+
+        // Then
+        Memo memo = memoRepository.findById(memoId).orElse(null);
+        assertNull(memo);
+        assertThatExceptionOfType(MemoException.class)
+            .isThrownBy(() -> memoService.delete(loginUser, memoId));
     }
 }
