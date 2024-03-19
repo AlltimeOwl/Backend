@@ -27,4 +27,7 @@ public class Memo extends BaseEntity {
 
     private String content;
 
+    public void update(String content) {
+        this.content = content;
+    }
 }

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,13 @@ public class MemoController {
     public ResponseEntity<Void> createMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long paperId, MemoWriteRequest memoWriteRequest) {
         log.info("'{}' member requests create memo", loginUser.id());
         memoService.write(loginUser, paperId, memoWriteRequest);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{memoId}")
+    public ResponseEntity<Void> modifyMemo(@AuthenticationPrincipal LoginUser loginUser, @PathVariable Long memoId, MemoWriteRequest memoWriteRequest) {
+        log.info("'{}' member requests modify memo : {}", loginUser.id(), memoId);
+        memoService.modify(loginUser, memoId, memoWriteRequest);
         return ResponseEntity.noContent().build();
     }
 }

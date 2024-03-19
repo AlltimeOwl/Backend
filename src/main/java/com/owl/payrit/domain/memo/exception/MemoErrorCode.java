@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.memo.exception;
 
+import static com.owl.payrit.global.consts.PayritStatic.NOT_FOUND;
 import static com.owl.payrit.global.consts.PayritStatic.UNAUTHORIZED;
 
 import com.owl.payrit.global.exception.BaseErrorCode;
@@ -13,7 +14,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum MemoErrorCode implements BaseErrorCode {
-    PAPER_LIST_EXCEPTION(UNAUTHORIZED, "MEMO_401_1", "차용증 작성자만 메모를 작성할 수 있습니다."),;
+    MEMO_NOT_FOUND(NOT_FOUND, "MEMO_404_1", "메모가 존재하지 않습니다."),
+    UNAUTHORIZED_MODIFY_MEMO(UNAUTHORIZED, "MEMO_401_1", "메모 수정 권한이 없습니다.")
+    ;
 
     private Integer status;
     private String code;
