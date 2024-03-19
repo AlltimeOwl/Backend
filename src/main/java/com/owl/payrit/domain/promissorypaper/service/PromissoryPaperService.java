@@ -120,13 +120,7 @@ public class PromissoryPaperService {
         List<PaperListResponse> paperListResponses = Stream.concat(creditorList.stream(), debtorList.stream())
                 .collect(Collectors.toList());
 
-        sortByTransactionDate(paperListResponses);
-
         return paperListResponses;
-    }
-
-    public void sortByTransactionDate(List<PaperListResponse> paperListResponses) {
-        paperListResponses.sort(Comparator.comparing(PaperListResponse::transactionDate));
     }
 
     public List<PaperListResponse> getListResponsesByRole(LoginUser loginUser, PaperRole role) {
