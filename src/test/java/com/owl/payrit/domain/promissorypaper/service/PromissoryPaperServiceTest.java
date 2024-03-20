@@ -96,6 +96,15 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 빌린 상황을 선택했다면, Debtor의 데이터에 회원의 정보가 입력되어야 함.")
     void t003() {
 
+        LoginUser loginUser = prepareLoginUser();
+
+        Long paperId = promissoryPaperService.writePaper(loginUser, debtorWriteRequest);
+
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        assertThat(paper.getDebtor()).isEqualTo(loginedMember);
+        assertThat(paper.getDebtorPhoneNumber()).isEqualTo(loginedMember.getPhoneNumber());
     }
 
     @Test
