@@ -1,5 +1,7 @@
 package com.owl.payrit.domain.promissorypaper.dto.response;
 
+import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
+import com.owl.payrit.domain.memo.entity.Memo;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.repaymenthistory.dto.RepaymentHistoryDto;
@@ -65,11 +67,15 @@ public record PaperDetailResponse(
         @Schema(description = "특약사항")
         String specialConditions,
 
+        @Schema(description = "해당 차용증에 내가 작성한 메모들")
+        List<MemoListResponse> memoListResponses,
+
         @Schema(description = "상환내역 객체 리스트")
         List<RepaymentHistoryDto> repaymentHistories
+
 ) {
     public PaperDetailResponse(PromissoryPaper promissoryPaper, PaperRole memberRole,
-                               double repaymentRate, long dueDate) {
+                               double repaymentRate, long dueDate, List<MemoListResponse> memoListResponses) {
         this(
                 promissoryPaper.getId(),
                 promissoryPaper.getStorageUrl(),
@@ -89,7 +95,9 @@ public record PaperDetailResponse(
                 promissoryPaper.getDebtorPhoneNumber(),
                 promissoryPaper.getDebtorAddress(),
                 promissoryPaper.getSpecialConditions(),
-                promissoryPaper.getRepaymentHistory().stream()
+                memoListResponses,
+                promissoryPaper.getRepaymentHistory()
+                        .stream()
                         .map(history -> new RepaymentHistoryDto(history.getId(), history.getRepaymentDate(),
                                 history.getRepaymentAmount()))
                         .collect(Collectors.toList())
