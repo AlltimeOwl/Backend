@@ -28,7 +28,7 @@ public record PaperWriteRequest(
         @Schema(description = "이자율(0~20)", minimum = "0", maximum = "20")
         float interestRate,
 
-        @Schema(description = "이자 지급일 (~28)", maximum = "28")
+        @Schema(description = "이자 지급일", maximum = "31")
         long interestPaymentDate,
 
         @Schema(description = "채권자 이름")

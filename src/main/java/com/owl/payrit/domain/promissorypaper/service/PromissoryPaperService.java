@@ -94,13 +94,13 @@ public class PromissoryPaperService {
 
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
 
-        PromissoryPaper promissoryPaper = getById(paperId);
+        PromissoryPaper paper = getById(paperId);
 
-        if (!isMine(loginUser.id(), promissoryPaper)) {
+        if (!isMine(loginUser.id(), paper)) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_IS_NOT_MINE);
         }
 
-        return new PaperDetailResponse(promissoryPaper, calcRepaymentRate(promissoryPaper));
+        return new PaperDetailResponse(paper, calcRepaymentRate(paper), calcDueDate(paper));
     }
 
     public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {

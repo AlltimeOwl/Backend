@@ -25,6 +25,9 @@ public record PaperDetailResponse(
         @Schema(description = "이자율")
         float interestRate,
 
+        @Schema(description = "이자 지급일")
+        long interestPaymentDate,
+
         @Schema(description = "상환 진행률")
         double repaymentRate,
 
@@ -33,6 +36,9 @@ public record PaperDetailResponse(
 
         @Schema(description = "상환 마감일")
         LocalDate repaymentEndDate,
+
+        @Schema(description = "남은 일 수")
+        long dueDate,
 
         @Schema(description = "채권자 이름")
         String creditorName,
@@ -58,16 +64,18 @@ public record PaperDetailResponse(
         @Schema(description = "상환내역 객체 리스트")
         List<RepaymentHistoryDto> repaymentHistories
 ) {
-    public PaperDetailResponse(PromissoryPaper promissoryPaper, double repaymentRate) {
+    public PaperDetailResponse(PromissoryPaper promissoryPaper, double repaymentRate, long dueDate) {
         this(
                 promissoryPaper.getId(),
                 promissoryPaper.getStorageUrl(),
                 promissoryPaper.getAmount(),
                 promissoryPaper.getRemainingAmount(),
                 promissoryPaper.getInterestRate(),
+                promissoryPaper.getInterestPaymentDate(),
                 repaymentRate,
                 promissoryPaper.getRepaymentStartDate(),
                 promissoryPaper.getRepaymentEndDate(),
+                dueDate,
                 promissoryPaper.getCreditor().getName(),
                 promissoryPaper.getCreditorPhoneNumber(),
                 promissoryPaper.getCreditorAddress(),
