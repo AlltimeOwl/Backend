@@ -5,10 +5,11 @@ import com.owl.payrit.domain.auth.dto.response.AppleUser;
 import com.owl.payrit.domain.auth.provider.OauthClient;
 import com.owl.payrit.domain.member.entity.Member;
 import io.jsonwebtoken.Claims;
-import java.security.PublicKey;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.security.PublicKey;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Component

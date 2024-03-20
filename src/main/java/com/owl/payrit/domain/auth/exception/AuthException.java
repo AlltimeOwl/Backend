@@ -1,11 +1,10 @@
 package com.owl.payrit.domain.auth.exception;
 
-import com.owl.payrit.global.exception.BaseException;
-import com.owl.payrit.global.exception.ErrorCode;
+import com.owl.payrit.global.exception.PayritCodeException;
 
-public class AuthException extends BaseException {
+public class AuthException extends PayritCodeException {
 
-    public AuthException(ErrorCode errorCode) {
+    public AuthException(AuthErrorCode errorCode) {
         super(errorCode);
     }
 }

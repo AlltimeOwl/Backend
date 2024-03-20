@@ -1,11 +1,9 @@
 package com.owl.payrit.domain.promissorypaper.exception;
 
-import com.owl.payrit.global.exception.BaseException;
-import com.owl.payrit.global.exception.ErrorCode;
+import com.owl.payrit.global.exception.PayritCodeException;
 
-public class PromissoryPaperException extends BaseException {
-
-    public PromissoryPaperException(ErrorCode errorCode) {
+public class PromissoryPaperException extends PayritCodeException {
+    public PromissoryPaperException(PromissoryPaperErrorCode errorCode) {
         super(errorCode);
     }
 }
