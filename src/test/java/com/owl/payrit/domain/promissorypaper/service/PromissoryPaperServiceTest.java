@@ -34,28 +34,26 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @Autowired
     PromissoryPaperService promissoryPaperService;
 
-    PaperWriteRequest testWriteRequest;
+    PaperWriteRequest creditorWriteRequest;
+    PaperWriteRequest debtorWriteRequest;
 
     private final static String TEST_CONTENT = "테스트용 내용입니다.";
 
     @BeforeEach
     void setting() {
 
-        testWriteRequest = new PaperWriteRequest(
-                PaperRole.CREDITOR,
-                3000,
-                LocalDate.now(),
-                LocalDate.now(),
-                LocalDate.now().plusDays(7),
-                TEST_CONTENT,
-                12,
-                10,
-                "name00",
-                "010-1234-5670",
-                "(12345) 서울시 종로구 광화문로 1234",
-                "name01",
-                "010-1234-5671",
-                "(67890) 경기도 고양시 일산서로 5678"
+        creditorWriteRequest = new PaperWriteRequest(
+                PaperRole.CREDITOR, 3000, LocalDate.now(), LocalDate.now(),
+                LocalDate.now().plusDays(7), TEST_CONTENT, 12, 10,
+                "name00", "010-1234-5670", "(12345) 서울시 종로구 광화문로 1234",
+                "name01", "010-1234-5671", "(67890) 경기도 고양시 일산서로 5678"
+        );
+
+        debtorWriteRequest = new PaperWriteRequest(
+                PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
+                LocalDate.now().plusDays(7), TEST_CONTENT, 20, 5,
+                "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
+                "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
         );
 
         setUp();
@@ -72,7 +70,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
 
         LoginUser loginUser = prepareLoginUser();
 
-        Long paperId = promissoryPaperService.writePaper(loginUser, testWriteRequest);
+        Long paperId = promissoryPaperService.writePaper(loginUser, creditorWriteRequest);
 
         PromissoryPaper paper = promissoryPaperService.getById(paperId);
 
@@ -83,6 +81,15 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 빌려준 상황을 선택했다면, Creditor의 데이터에 회원의 정보가 입력되어야 함.")
     void t002() {
 
+        LoginUser loginUser = prepareLoginUser();
+
+        Long paperId = promissoryPaperService.writePaper(loginUser, creditorWriteRequest);
+
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        assertThat(paper.getCreditor()).isEqualTo(loginedMember);
+        assertThat(paper.getCreditorPhoneNumber()).isEqualTo(loginedMember.getPhoneNumber());
     }
 
     @Test
