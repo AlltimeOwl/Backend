@@ -3,6 +3,7 @@ package com.owl.payrit.domain.auth.controller;
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,14 @@ public class AuthController implements AuthApiDocs{
         log.info("check '{}' user authenticationStatus", loginUser.oauthInformation().getOauthProviderId());
         boolean status = authService.checkAuthentication(loginUser);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenRefreshResponse> refreshAccessToken(@RequestBody LoginTokenRequest loginTokenRequest) {
+        log.info("user request refresh AccessToken");
+        TokenRefreshResponse tokenResponse = authService.refreshAccessToken(loginTokenRequest);
+        return null;
     }
 
 

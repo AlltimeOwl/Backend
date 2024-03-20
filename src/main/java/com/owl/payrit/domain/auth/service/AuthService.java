@@ -1,7 +1,9 @@
 package com.owl.payrit.domain.auth.service;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.auth.exception.AuthErrorCode;
 import com.owl.payrit.domain.auth.exception.AuthException;
@@ -77,5 +79,10 @@ public class AuthService {
             throw new AuthException(AuthErrorCode.NOT_AUTHORIZED_MEMBER);
         }
         return true;
+    }
+
+    public TokenRefreshResponse refreshAccessToken(LoginTokenRequest loginTokenRequest) {
+        String accessToken = jwtProvider.refreshAccessToken(loginTokenRequest.refreshToken(),secretKey);
+        return new TokenRefreshResponse(accessToken, loginTokenRequest.refreshToken());
     }
 }
