@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.promissorypaper.dto.response;
 
+import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.repaymenthistory.dto.RepaymentHistoryDto;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +16,9 @@ public record PaperDetailResponse(
 
         @Schema(description = "저장소 URL")
         String paperUrl,
+
+        @Schema(description = "나의 역할")
+        PaperRole memberRole,
 
         @Schema(description = "총액(원금 + 이자)")
         long amount,
@@ -64,10 +68,12 @@ public record PaperDetailResponse(
         @Schema(description = "상환내역 객체 리스트")
         List<RepaymentHistoryDto> repaymentHistories
 ) {
-    public PaperDetailResponse(PromissoryPaper promissoryPaper, double repaymentRate, long dueDate) {
+    public PaperDetailResponse(PromissoryPaper promissoryPaper, PaperRole memberRole,
+                               double repaymentRate, long dueDate) {
         this(
                 promissoryPaper.getId(),
                 promissoryPaper.getStorageUrl(),
+                memberRole,
                 promissoryPaper.getAmount(),
                 promissoryPaper.getRemainingAmount(),
                 promissoryPaper.getInterestRate(),

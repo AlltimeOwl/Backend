@@ -95,12 +95,21 @@ public class PromissoryPaperService {
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
 
         PromissoryPaper paper = getById(paperId);
+        Member loginedMember = memberService.findById(loginUser.id());
+        PaperRole memberRole;
 
         if (!isMine(loginUser.id(), paper)) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_IS_NOT_MINE);
         }
 
-        return new PaperDetailResponse(paper, calcRepaymentRate(paper), calcDueDate(paper));
+
+        if(paper.getCreditor().equals(loginedMember)) {
+            memberRole = PaperRole.CREDITOR;
+        } else {
+            memberRole = PaperRole.DEBTOR;
+        }
+
+        return new PaperDetailResponse(paper, memberRole, calcRepaymentRate(paper), calcDueDate(paper));
     }
 
     public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
