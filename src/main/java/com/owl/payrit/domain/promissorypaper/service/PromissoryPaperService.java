@@ -3,6 +3,8 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
+import com.owl.payrit.domain.memo.entity.Memo;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
@@ -94,13 +96,33 @@ public class PromissoryPaperService {
 
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
 
-        PromissoryPaper promissoryPaper = getById(paperId);
+        PromissoryPaper paper = getById(paperId);
+        Member loginedMember = memberService.findById(loginUser.id());
+        PaperRole memberRole;
 
-        if (!isMine(loginUser.id(), promissoryPaper)) {
+        List<Memo> memos = paper.getMemos();
+        List<MemoListResponse> memoResponses = new ArrayList<>();
+
+        for(Memo memo : memos) {
+            Long memberId = memo.getMemberId();
+
+            if(memberId.equals(loginUser.id())) {
+                memoResponses.add(new MemoListResponse(memo));
+            }
+        }
+
+        if (!isMine(loginUser.id(), paper)) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_IS_NOT_MINE);
         }
 
-        return new PaperDetailResponse(promissoryPaper, calcRepaymentRate(promissoryPaper));
+        if(paper.getCreditor().equals(loginedMember)) {
+            memberRole = PaperRole.CREDITOR;
+        } else {
+            memberRole = PaperRole.DEBTOR;
+        }
+
+        return new PaperDetailResponse(paper, memberRole, calcRepaymentRate(paper), calcDueDate(paper),
+                memoResponses);
     }
 
     public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
