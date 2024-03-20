@@ -4,6 +4,7 @@ import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
@@ -58,8 +59,8 @@ public class PromissoryPaperServiceTest extends ServiceTest {
         setUp();
     }
 
-    private LoginUser prepareLoginUser() {
-        Member member = findByEmail("test00");
+    private LoginUser prepareLoginUserByEmail(String email) {
+        Member member = findByEmail(email);
         return new LoginUser(member.getId(), member.getOauthInformation());
     }
 
@@ -67,7 +68,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("차용증을 작성할 수 있다.")
     void t001() {
 
-        LoginUser loginUser = prepareLoginUser();
+        LoginUser loginUser = prepareLoginUserByEmail("test00");
 
         Long paperId = promissoryPaperService.writePaper(loginUser, creditorWriteRequest);
 
@@ -80,7 +81,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 빌려준 상황을 선택했다면, Creditor의 데이터에 회원의 정보가 입력되어야 함.")
     void t002() {
 
-        LoginUser loginUser = prepareLoginUser();
+        LoginUser loginUser = prepareLoginUserByEmail("test00");
 
         Long paperId = promissoryPaperService.writePaper(loginUser, creditorWriteRequest);
 
@@ -95,7 +96,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 빌린 상황을 선택했다면, Debtor의 데이터에 회원의 정보가 입력되어야 함.")
     void t003() {
 
-        LoginUser loginUser = prepareLoginUser();
+        LoginUser loginUser = prepareLoginUserByEmail("test00");
 
         Long paperId = promissoryPaperService.writePaper(loginUser, debtorWriteRequest);
 
@@ -110,7 +111,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 이자율은 20%를 초과할 수 없다.")
     void t004() {
 
-        LoginUser loginUser = prepareLoginUser();
+        LoginUser loginUser = prepareLoginUserByEmail("test00");
 
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
                 PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
@@ -128,7 +129,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 상환 시작일은 과거로 설정할 수 없음.")
     void t005() {
 
-        LoginUser loginUser = prepareLoginUser();
+        LoginUser loginUser = prepareLoginUserByEmail("test00");
 
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
                 PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now().minusDays(3),
@@ -146,7 +147,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 상환 마감일은 상환 시작일보다 과거일 수 없음.")
     void t006() {
 
-        LoginUser loginUser = prepareLoginUser();
+        LoginUser loginUser = prepareLoginUserByEmail("test00");
 
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
                 PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
@@ -161,9 +162,34 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("상세 조회시, 채권자 혹은 채무자만 열람할 수 있음.")
-    void t007() {
+    @DisplayName("상세 조회시, 채권자 혹은 채무자만 열람할 수 있음. (조회 성공)")
+    void t007_1() {
 
+        LoginUser loginUser = prepareLoginUserByEmail("test00");
+
+        Long paperId = promissoryPaperService.writePaper(loginUser, debtorWriteRequest);
+
+        PaperDetailResponse detail = promissoryPaperService.getDetail(loginUser, paperId);
+
+        assertThat(detail.specialConditions()).isEqualTo(TEST_CONTENT);
+
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.getDetail(loginUser, paperId);
+        });
+    }
+
+    @Test
+    @DisplayName("상세 조회시, 채권자 혹은 채무자만 열람할 수 있음. (조회 불가)")
+    void t007_2() {
+
+        LoginUser writerUser = prepareLoginUserByEmail("test00");
+        LoginUser loginUser = prepareLoginUserByEmail("test02");
+
+        Long paperId = promissoryPaperService.writePaper(writerUser, creditorWriteRequest);
+
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.getDetail(loginUser, paperId);
+        });
     }
 
     @Test

@@ -81,6 +81,7 @@ public class PromissoryPaperService {
                 .debtorAddress(paperWriteRequest.debtorAddress())
                 .isDebtorAgree(loginedMember.equals(debtor))
                 .paperKey(getRandomKey())
+                .memos(new ArrayList<>())
                 .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
 
@@ -112,6 +113,7 @@ public class PromissoryPaperService {
     }
 
     public List<MemoListResponse> getMemoListResponsesByPaper(PromissoryPaper paper, LoginUser loginUser) {
+
         List<Memo> memos = paper.getMemos();
 
         return memos.stream()
