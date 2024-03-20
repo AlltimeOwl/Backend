@@ -146,6 +146,18 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 상환 마감일은 상환 시작일보다 과거일 수 없음.")
     void t006() {
 
+        LoginUser loginUser = prepareLoginUser();
+
+        PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
+                PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
+                LocalDate.now().minusDays(3), TEST_CONTENT, 30, 5,
+                "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
+                "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
+        );
+
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+        });
     }
 
     @Test
