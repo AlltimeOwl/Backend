@@ -2,14 +2,12 @@ package com.owl.payrit.domain.promissorypaper.service;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
-import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
-import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
+import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.util.ServiceTest;
-import org.apache.juli.logging.Log;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,8 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-import static com.owl.payrit.domain.auth.domain.OauthProvider.FAKE_KAKAO;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -108,9 +107,21 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("작성시, 이자율은 0% 부터 20% 까지만 설정할 수 있음.")
+    @DisplayName("작성시, 이자율은 20%를 초과할 수 없다.")
     void t004() {
 
+        LoginUser loginUser = prepareLoginUser();
+
+        PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
+                PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
+                LocalDate.now().plusDays(7), TEST_CONTENT, 30, 5,
+                "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
+                "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
+        );
+
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+        });
     }
 
     @Test
