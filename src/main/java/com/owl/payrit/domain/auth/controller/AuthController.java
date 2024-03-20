@@ -64,7 +64,7 @@ public class AuthController implements AuthApiDocs{
     public ResponseEntity<TokenRefreshResponse> refreshAccessToken(@RequestBody LoginTokenRequest loginTokenRequest) {
         log.info("user request refresh AccessToken");
         TokenRefreshResponse tokenResponse = authService.refreshAccessToken(loginTokenRequest);
-        return null;
+        return ResponseEntity.ok().body(tokenResponse);
     }
 
 
