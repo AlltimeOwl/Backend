@@ -3,6 +3,8 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
+import com.owl.payrit.domain.memo.entity.Memo;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
@@ -25,8 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,7 +42,7 @@ public class PromissoryPaperService {
     private final PromissoryPaperRepository promissoryPaperRepository;
 
     @Transactional
-    public void writePaper(LoginUser loginUser, PaperWriteRequest paperWriteRequest) {
+    public Long writePaper(LoginUser loginUser, PaperWriteRequest paperWriteRequest) {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
@@ -60,6 +61,7 @@ public class PromissoryPaperService {
         PromissoryPaper paper = PromissoryPaper.builder()
                 .amount(calcAmount)
                 .remainingAmount(calcAmount)
+                .repaymentHistory(new ArrayList<>())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
                 .repaymentEndDate(paperWriteRequest.repaymentEndDate())
@@ -84,7 +86,7 @@ public class PromissoryPaperService {
 
         checkPaperData(loginedMember, paper);
 
-        promissoryPaperRepository.save(paper);
+        return promissoryPaperRepository.save(paper).getId();
     }
 
     private String getRandomKey() {
@@ -94,16 +96,36 @@ public class PromissoryPaperService {
 
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
 
-        PromissoryPaper promissoryPaper = getById(paperId);
+        PromissoryPaper paper = getById(paperId);
+        Member loginedMember = memberService.findById(loginUser.id());
+        PaperRole memberRole;
 
-        if (!isMine(loginUser.id(), promissoryPaper)) {
+        List<Memo> memos = paper.getMemos();
+        List<MemoListResponse> memoResponses = new ArrayList<>();
+
+        for(Memo memo : memos) {
+            Long memberId = memo.getMemberId();
+
+            if(memberId.equals(loginUser.id())) {
+                memoResponses.add(new MemoListResponse(memo));
+            }
+        }
+
+        if (!isMine(loginUser.id(), paper)) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_IS_NOT_MINE);
         }
 
-        return new PaperDetailResponse(promissoryPaper, calcRepaymentRate(promissoryPaper));
+        if(paper.getCreditor().equals(loginedMember)) {
+            memberRole = PaperRole.CREDITOR;
+        } else {
+            memberRole = PaperRole.DEBTOR;
+        }
+
+        return new PaperDetailResponse(paper, memberRole, calcRepaymentRate(paper), calcDueDate(paper),
+                memoResponses);
     }
 
-    private boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
+    public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
 
         return promissoryPaper.getCreditor().getId().equals(memberId)
                 || promissoryPaper.getDebtor().getId().equals(memberId);
@@ -117,8 +139,10 @@ public class PromissoryPaperService {
         List<PaperListResponse> debtorList =
                 getListResponsesByRole(loginUser, PaperRole.DEBTOR);
 
-        return Stream.concat(creditorList.stream(), debtorList.stream())
+        List<PaperListResponse> paperListResponses = Stream.concat(creditorList.stream(), debtorList.stream())
                 .collect(Collectors.toList());
+
+        return paperListResponses;
     }
 
     public List<PaperListResponse> getListResponsesByRole(LoginUser loginUser, PaperRole role) {
