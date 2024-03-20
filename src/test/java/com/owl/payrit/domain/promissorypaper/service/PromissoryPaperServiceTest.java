@@ -3,8 +3,10 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
+import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
+import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
 import com.owl.payrit.util.ServiceTest;
 import org.apache.juli.logging.Log;
@@ -27,12 +29,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PromissoryPaperServiceTest extends ServiceTest {
 
     @Autowired
-    PromissoryPaperService promissoryPaperService;
+    MemberService memberService;
 
     @Autowired
-    PromissoryPaperRepository promissoryPaperRepository;
+    PromissoryPaperService promissoryPaperService;
 
     PaperWriteRequest testWriteRequest;
+
+    private final static String TEST_CONTENT = "테스트용 내용입니다.";
 
     @BeforeEach
     void setting() {
@@ -43,14 +47,14 @@ public class PromissoryPaperServiceTest extends ServiceTest {
                 LocalDate.now(),
                 LocalDate.now(),
                 LocalDate.now().plusDays(7),
-                "특약 사항은 없습니다.",
+                TEST_CONTENT,
                 12,
                 10,
                 "name00",
-                "010-1234-0000",
+                "010-1234-5670",
                 "(12345) 서울시 종로구 광화문로 1234",
                 "name01",
-                "010-1234-0001",
+                "010-1234-5671",
                 "(67890) 경기도 고양시 일산서로 5678"
         );
 
@@ -67,7 +71,12 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     void t001() {
 
         LoginUser loginUser = prepareLoginUser();
-        promissoryPaperService.writePaper(loginUser, testWriteRequest);
+
+        Long paperId = promissoryPaperService.writePaper(loginUser, testWriteRequest);
+
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
+
+        assertThat(paper.getSpecialConditions()).isEqualTo(TEST_CONTENT);
     }
 
     @Test
