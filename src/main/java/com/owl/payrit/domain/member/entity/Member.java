@@ -45,7 +45,7 @@ public class Member extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = false, name = "phone_number")
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     @Column

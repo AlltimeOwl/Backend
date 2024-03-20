@@ -40,7 +40,7 @@ public class PromissoryPaperService {
     private final PromissoryPaperRepository promissoryPaperRepository;
 
     @Transactional
-    public void writePaper(LoginUser loginUser, PaperWriteRequest paperWriteRequest) {
+    public Long writePaper(LoginUser loginUser, PaperWriteRequest paperWriteRequest) {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
@@ -84,7 +84,7 @@ public class PromissoryPaperService {
 
         checkPaperData(loginedMember, paper);
 
-        promissoryPaperRepository.save(paper);
+        return promissoryPaperRepository.save(paper).getId();
     }
 
     private String getRandomKey() {
@@ -103,7 +103,7 @@ public class PromissoryPaperService {
         return new PaperDetailResponse(promissoryPaper, calcRepaymentRate(promissoryPaper));
     }
 
-    private boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
+    public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
 
         return promissoryPaper.getCreditor().getId().equals(memberId)
                 || promissoryPaper.getDebtor().getId().equals(memberId);

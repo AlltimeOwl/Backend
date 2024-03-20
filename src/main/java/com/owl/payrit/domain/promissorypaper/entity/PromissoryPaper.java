@@ -2,16 +2,28 @@ package com.owl.payrit.domain.promissorypaper.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.memo.entity.Memo;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.global.encryption.PromissoryPaperStringConverter;
 import com.owl.payrit.global.entity.BaseEntity;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Getter
@@ -88,6 +100,9 @@ public class PromissoryPaper extends BaseEntity {
 
     //저장소 URL
     private String storageUrl;
+
+    @OneToMany(mappedBy = "promissoryPaper", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Memo> memos = new ArrayList<>();
 
     public void modifyPaperStatus(PaperStatus status) {
         this.paperStatus = status;
