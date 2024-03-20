@@ -162,10 +162,11 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("상세 조회시, 채권자 혹은 채무자만 열람할 수 있음. (조회 성공)")
-    void t007_1() {
+    @DisplayName("상세 조회시, 채권자 혹은 채무자만 열람할 수 있음")
+    void t007() {
 
         LoginUser loginUser = prepareLoginUserByEmail("test00");
+        LoginUser otherUser = prepareLoginUserByEmail("test02");
 
         Long paperId = promissoryPaperService.writePaper(loginUser, debtorWriteRequest);
 
@@ -176,19 +177,9 @@ public class PromissoryPaperServiceTest extends ServiceTest {
         assertDoesNotThrow(() -> {
             promissoryPaperService.getDetail(loginUser, paperId);
         });
-    }
-
-    @Test
-    @DisplayName("상세 조회시, 채권자 혹은 채무자만 열람할 수 있음. (조회 불가)")
-    void t007_2() {
-
-        LoginUser writerUser = prepareLoginUserByEmail("test00");
-        LoginUser loginUser = prepareLoginUserByEmail("test02");
-
-        Long paperId = promissoryPaperService.writePaper(writerUser, creditorWriteRequest);
 
         assertThrows(PromissoryPaperException.class, () -> {
-            promissoryPaperService.getDetail(loginUser, paperId);
+            promissoryPaperService.getDetail(otherUser, paperId);
         });
     }
 
