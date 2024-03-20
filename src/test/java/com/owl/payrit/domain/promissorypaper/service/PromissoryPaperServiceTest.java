@@ -1,9 +1,12 @@
 package com.owl.payrit.domain.promissorypaper.service;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
+import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
+import com.owl.payrit.util.ServiceTest;
 import org.apache.juli.logging.Log;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,16 +24,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-public class PromissoryPaperServiceTest {
+public class PromissoryPaperServiceTest extends ServiceTest {
 
     @Autowired
-    private PromissoryPaperService promissoryPaperService;
+    PromissoryPaperService promissoryPaperService;
 
-    private LoginUser testUser;
-    private PaperWriteRequest testWriteRequest;
+    @Autowired
+    PromissoryPaperRepository promissoryPaperRepository;
+
+    PaperWriteRequest testWriteRequest;
 
     @BeforeEach
-    void setUp() {
+    void setting() {
 
         testWriteRequest = new PaperWriteRequest(
                 PaperRole.CREDITOR,
@@ -40,6 +45,7 @@ public class PromissoryPaperServiceTest {
                 LocalDate.now().plusDays(7),
                 "특약 사항은 없습니다.",
                 12,
+                20,
                 "name00",
                 "010-1234-0000",
                 "(12345) 서울시 종로구 광화문로 1234",
@@ -48,15 +54,20 @@ public class PromissoryPaperServiceTest {
                 "(67890) 경기도 고양시 일산서로 5678"
         );
 
-        OauthInformation testInfo = new OauthInformation("0", FAKE_KAKAO);
-        testUser = new LoginUser(1L, testInfo);
+        setUp();
+    }
+
+    private LoginUser prepareLoginUser() {
+        Member member = findByEmail("test00");
+        return new LoginUser(member.getId(), member.getOauthInformation());
     }
 
     @Test
     @DisplayName("차용증을 작성할 수 있다.")
     void t001() {
 
-
+        LoginUser loginUser = prepareLoginUser();
+        promissoryPaperService.writePaper(loginUser, testWriteRequest);
     }
 
     @Test
