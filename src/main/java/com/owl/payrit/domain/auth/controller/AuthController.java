@@ -23,7 +23,7 @@ public class AuthController implements AuthApiDocs{
 
     @Override
     @PostMapping("/{oauthProvider}")
-    public ResponseEntity<TokenResponse> login(@PathVariable OauthProvider oauthProvider, @RequestBody LoginTokenRequest loginTokenRequest) {
+    public ResponseEntity<TokenResponse> login(@PathVariable("oauthProvider") OauthProvider oauthProvider, @RequestBody LoginTokenRequest loginTokenRequest) {
         log.info("login request {}", oauthProvider);
         TokenResponse tokenResponse = authService.login(oauthProvider, loginTokenRequest.accessToken());
         return ResponseEntity.ok().body(tokenResponse);
@@ -46,7 +46,7 @@ public class AuthController implements AuthApiDocs{
 
     @Override
     @PostMapping("/revoke")
-    public ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser , @RequestBody RevokeRequest revokeRequest) {
+    public ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser, @RequestBody RevokeRequest revokeRequest) {
         log.info("'{}' member requests revoke payrit", loginUser.oauthInformation().getOauthProviderId());
         authService.revoke(loginUser, revokeRequest);
         return ResponseEntity.noContent().build();
