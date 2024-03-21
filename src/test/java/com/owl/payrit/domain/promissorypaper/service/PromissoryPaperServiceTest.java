@@ -199,7 +199,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
 
         //승인 완료 상태이기 때문에 승인이 불가능
         assertThrows(PromissoryPaperException.class, () -> {
-           promissoryPaperService.acceptPaper(debtorUser, paperId);
+            promissoryPaperService.acceptPaper(debtorUser, paperId);
         });
     }
 
@@ -207,6 +207,29 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("승인시, 작성자가 Creditor 였다면 회원은 Debtor의 데이터와 일치해야함.")
     void t009() {
 
+        LoginUser creditorUser = prepareLoginUserByEmail("test00");
+        LoginUser debtorUser = prepareLoginUserByEmail("test01");
+        LoginUser otherUser = prepareLoginUserByEmail("test02");
+
+        Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
+
+        //작성자와 승인자가 일치할 수 없음.
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.acceptPaper(creditorUser, paperId);
+        });
+
+        //차용증과 관계되지 않은 사람(채권자, 채무자가 아닌 사람) 은 승인할 수 없음.
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.acceptPaper(otherUser, paperId);
+        });
+
+        //작성자가 아닌 연관있는 사람만 승인할 수 있음.
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.acceptPaper(debtorUser, paperId);
+        });
+
+        assertThat(paper.getDebtor().getId()).isEqualTo(debtorUser.id());
     }
 
     @Test
