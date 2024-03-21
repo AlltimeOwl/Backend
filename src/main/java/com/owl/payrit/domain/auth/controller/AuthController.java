@@ -45,9 +45,9 @@ public class AuthController implements AuthApiDocs{
     }
 
     @Override
-    @GetMapping("/revoke")
+    @PostMapping("/revoke")
     public ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser , @RequestBody RevokeRequest revokeRequest) {
-        log.info("'{}' member requests revoke paylit", loginUser.oauthInformation().getOauthProviderId());
+        log.info("'{}' member requests revoke payrit", loginUser.oauthInformation().getOauthProviderId());
         authService.revoke(loginUser, revokeRequest);
         return ResponseEntity.noContent().build();
     }
