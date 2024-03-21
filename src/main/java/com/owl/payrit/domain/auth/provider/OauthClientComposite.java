@@ -36,7 +36,7 @@ public class OauthClientComposite {
             .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 소셜 로그인입니다."));
     }
 
-    public void revoke(OauthProvider oauthProvider) {
-
+    public void revoke(OauthProvider oauthProvider, String oauthCode) {
+        getProvider(oauthProvider).revoke(oauthCode);
     }
 }

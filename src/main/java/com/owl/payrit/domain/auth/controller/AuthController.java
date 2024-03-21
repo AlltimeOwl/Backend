@@ -2,6 +2,7 @@ package com.owl.payrit.domain.auth.controller;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
+import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
@@ -45,9 +46,9 @@ public class AuthController implements AuthApiDocs{
 
     @Override
     @GetMapping("/leave")
-    public ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser) {
+    public ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser , @RequestBody RevokeRequest revokeRequest) {
         log.info("'{}' member requests revoke paylit", loginUser.oauthInformation().getOauthProviderId());
-        authService.revoke(loginUser);
+        authService.revoke(loginUser, revokeRequest);
         return ResponseEntity.noContent().build();
     }
 

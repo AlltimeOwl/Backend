@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.auth.provider.apple;
 
+import com.owl.payrit.domain.auth.dto.request.AppleRevokeRequest;
 import com.owl.payrit.domain.auth.dto.request.AppleTokenGenerateRequest;
 import com.owl.payrit.domain.auth.dto.response.AppleTokenResponse;
 import org.springframework.web.service.annotation.GetExchange;
@@ -14,6 +15,6 @@ public interface AppleApiClient {
     AppleTokenResponse generateAppleToken(AppleTokenGenerateRequest appleTokenGenerateRequest);
 
     @PostExchange("https://appleid.apple.com/auth/revoke")
-    void revokeAppleToken();
+    void revokeAppleToken(AppleRevokeRequest appleRevokeRequest);
 
 }

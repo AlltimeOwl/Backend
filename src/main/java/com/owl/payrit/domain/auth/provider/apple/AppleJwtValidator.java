@@ -2,6 +2,10 @@ package com.owl.payrit.domain.auth.provider.apple;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.owl.payrit.domain.auth.dto.request.AppleRevokeRequest;
+import com.owl.payrit.domain.auth.dto.request.AppleTokenGenerateRequest;
+import com.owl.payrit.domain.auth.exception.AuthErrorCode;
+import com.owl.payrit.domain.auth.exception.AuthException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -83,11 +87,32 @@ public class AppleJwtValidator {
     private PrivateKey generatePrivateKey() throws IOException {
         ClassPathResource resource = new ClassPathResource(keyClassPath);
         String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-
         Reader pemReader = new StringReader(privateKey);
         PEMParser pemParser = new PEMParser(pemReader);
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
         return converter.getPrivateKey(object);
+    }
+
+    public AppleTokenGenerateRequest generateAppleToken(String authorizationCode) {
+        AppleTokenGenerateRequest appleTokenGenerateRequest = null;
+        try {
+            String clientSecret = createClientSecret();
+            appleTokenGenerateRequest = new AppleTokenGenerateRequest(appleBundleId, clientSecret, authorizationCode);
+        } catch (Exception e) {
+            throw new AuthException(AuthErrorCode.FILE_PATH_ERROR);
+        }
+        return appleTokenGenerateRequest;
+    }
+
+    public AppleRevokeRequest generateAppleRevokeRequest(String accessToken) {
+        AppleRevokeRequest appleRevokeRequest = null;
+        try {
+            String clientSecret = createClientSecret();
+            appleRevokeRequest = new AppleRevokeRequest(appleBundleId, clientSecret, accessToken);
+        } catch (Exception e) {
+            throw new AuthException(AuthErrorCode.FILE_PATH_ERROR);
+        }
+        return appleRevokeRequest;
     }
 }

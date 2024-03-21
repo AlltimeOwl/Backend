@@ -1,6 +1,9 @@
 package com.owl.payrit.domain.auth.provider.apple;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.request.AppleRevokeRequest;
+import com.owl.payrit.domain.auth.dto.request.AppleTokenGenerateRequest;
+import com.owl.payrit.domain.auth.dto.response.AppleTokenResponse;
 import com.owl.payrit.domain.auth.dto.response.AppleUser;
 import com.owl.payrit.domain.auth.provider.OauthClient;
 import com.owl.payrit.domain.member.entity.Member;
@@ -35,6 +38,10 @@ public class AppleMemberClient implements OauthClient {
 
     @Override
     public void revoke(String authorizationCode) {
+        AppleTokenGenerateRequest appleTokenGenerateRequest = appleJwtValidator.generateAppleToken(authorizationCode);
+        AppleTokenResponse appleTokenResponse = appleApiClient.generateAppleToken(appleTokenGenerateRequest);
+        AppleRevokeRequest appleRevokeRequest = appleJwtValidator.generateAppleRevokeRequest(appleTokenResponse.accessToken());
+        appleApiClient.revokeAppleToken(appleRevokeRequest);
 
     }
 
@@ -48,5 +55,6 @@ public class AppleMemberClient implements OauthClient {
         AppleUser appleUser = new AppleUser(appleId, appleEmail);
         return appleUser.toEntity();
     }
+
 
 }

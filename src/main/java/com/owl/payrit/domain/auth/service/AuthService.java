@@ -2,6 +2,7 @@ package com.owl.payrit.domain.auth.service;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
+import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
@@ -54,8 +55,9 @@ public class AuthService {
     }
 
     @Transactional
-    public void revoke(LoginUser loginUser) {
+    public void revoke(LoginUser loginUser, RevokeRequest revokeRequest) {;
         Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
+        oauthClientComposite.revoke(member.getOauthInformation().getOauthProvider(), revokeRequest.oauthCode());
         memberService.delete(member);
     }
 
