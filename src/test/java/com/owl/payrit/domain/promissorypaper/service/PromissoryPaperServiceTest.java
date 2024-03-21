@@ -3,6 +3,7 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
@@ -257,6 +258,22 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("수정 요청시, 승인 대기 단계에서만 수정 요청이 가능함.")
     void t013() {
 
+        LoginUser creditorUser = prepareLoginUserByEmail("test00");
+        LoginUser debtorUser = prepareLoginUserByEmail("test01");
+
+        Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
+
+        PaperModifyRequest modifyRequest = new PaperModifyRequest(paperId, "테스트용 수정 요청");
+
+        //승인 대기 상태이기 떄문에 수정 요청이 가능
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.sendModifyRequest(debtorUser, modifyRequest);
+        });
+
+        //수정 요청이 이미 보내져 상태가 변경되었기 떄문에 수정 요청이 불가
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.sendModifyRequest(debtorUser, modifyRequest);
+        });
     }
 
     @Test
