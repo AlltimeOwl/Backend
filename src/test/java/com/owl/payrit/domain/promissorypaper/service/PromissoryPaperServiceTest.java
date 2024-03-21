@@ -3,6 +3,7 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
@@ -36,8 +37,12 @@ public class PromissoryPaperServiceTest extends ServiceTest {
 
     PaperWriteRequest creditorWriteRequest;
     PaperWriteRequest debtorWriteRequest;
+    PaperWriteRequest modifyWriteRequest;
 
     private final static String TEST_CONTENT = "테스트용 내용입니다.";
+    private final static String WRITER_CREDITOR_EMAIL = "test00";
+    private final static String PEER_DEBTOR_EMAIL = "test01";
+    private final static String OTHER_USER_EMAIL = "test08";
 
     @BeforeEach
     void setting() {
@@ -56,6 +61,13 @@ public class PromissoryPaperServiceTest extends ServiceTest {
                 "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
         );
 
+        modifyWriteRequest = new PaperWriteRequest(
+                PaperRole.CREDITOR, 3000, LocalDate.now(), LocalDate.now(),
+                LocalDate.now().plusDays(7), TEST_CONTENT.concat("(수정 완료)"), 12, 10,
+                "name00", "010-1234-5670", "(12345) 서울시 종로구 광화문로 1234",
+                "name01", "010-1234-5671", "(67890) 경기도 고양시 일산서로 5678"
+        );
+
         setUp();
     }
 
@@ -68,7 +80,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("차용증을 작성할 수 있다.")
     void t001() {
 
-        LoginUser loginUser = prepareLoginUserByEmail("test00");
+        LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         Long paperId = promissoryPaperService.writePaper(loginUser, creditorWriteRequest);
 
@@ -81,7 +93,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 빌려준 상황을 선택했다면, Creditor의 데이터에 회원의 정보가 입력되어야 함.")
     void t002() {
 
-        LoginUser loginUser = prepareLoginUserByEmail("test00");
+        LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         Long paperId = promissoryPaperService.writePaper(loginUser, creditorWriteRequest);
 
@@ -96,7 +108,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 빌린 상황을 선택했다면, Debtor의 데이터에 회원의 정보가 입력되어야 함.")
     void t003() {
 
-        LoginUser loginUser = prepareLoginUserByEmail("test00");
+        LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         Long paperId = promissoryPaperService.writePaper(loginUser, debtorWriteRequest);
 
@@ -111,7 +123,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 이자율은 20%를 초과할 수 없다.")
     void t004() {
 
-        LoginUser loginUser = prepareLoginUserByEmail("test00");
+        LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
                 PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
@@ -129,7 +141,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 상환 시작일은 과거로 설정할 수 없음.")
     void t005() {
 
-        LoginUser loginUser = prepareLoginUserByEmail("test00");
+        LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
                 PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now().minusDays(3),
@@ -147,7 +159,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("작성시, 상환 마감일은 상환 시작일보다 과거일 수 없음.")
     void t006() {
 
-        LoginUser loginUser = prepareLoginUserByEmail("test00");
+        LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
                 PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
@@ -165,8 +177,8 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("상세 조회시, 채권자 혹은 채무자만 열람할 수 있음")
     void t007() {
 
-        LoginUser loginUser = prepareLoginUserByEmail("test00");
-        LoginUser otherUser = prepareLoginUserByEmail("test02");
+        LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser otherUser = prepareLoginUserByEmail(OTHER_USER_EMAIL);
 
         Long paperId = promissoryPaperService.writePaper(loginUser, debtorWriteRequest);
 
@@ -187,8 +199,8 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("승인시, 승인 대기 단계에서만 승인이 가능함.")
     void t008() {
 
-        LoginUser creditorUser = prepareLoginUserByEmail("test00");
-        LoginUser debtorUser = prepareLoginUserByEmail("test01");
+        LoginUser creditorUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser debtorUser = prepareLoginUserByEmail(PEER_DEBTOR_EMAIL);
 
         Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
 
@@ -204,31 +216,32 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("승인시, 작성자가 Creditor 였다면 회원은 Debtor의 데이터와 일치해야함.")
+    @DisplayName("승인시, 작성자가 Creditor 였다면 Debtor, Debtor 였다면 Creditor 의 데이터와 일치해야함.")
     void t009() {
 
-//        LoginUser requester = prepareLoginUserByEmail("test00");
-//        LoginUser accepter = prepareLoginUserByEmail("test01");
-//
-//        Long paperId = promissoryPaperService.writePaper(requester, creditorWriteRequest);
-//        PromissoryPaper paper = promissoryPaperService.getById(paperId);
-//        Member creditor = memberService.findById(requester.id());
-//        Member debtor = memberService.findById(accepter.id());
+        LoginUser requesteUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser accepteUser = prepareLoginUserByEmail(PEER_DEBTOR_EMAIL);
+
+        Member accepter = memberService.findById(accepteUser.id());
+
+        Long paperId = promissoryPaperService.writePaper(requesteUser, creditorWriteRequest);
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
 
 
-    }
-
-    @Test
-    @DisplayName("승인시, 작성자가 Debtor 였다면 회원은 Creditor 데이터와 일치해야함.")
-    void t010() {
-
+        if (paper.getWriterRole().equals(PaperRole.CREDITOR)) {
+            assertThat(accepter).isEqualTo(paper.getDebtor());
+            assertThat(accepter.getPhoneNumber()).isEqualTo(paper.getDebtorPhoneNumber());
+        } else if (paper.getWriterRole().equals(PaperRole.DEBTOR)) {
+            assertThat(accepter).isEqualTo(paper.getCreditor());
+            assertThat(accepter.getPhoneNumber()).isEqualTo(paper.getCreditorPhoneNumber());
+        }
     }
 
     @Test
     @DisplayName("승인시, 자신이 작성할 차용증을 자신이 승인할 수는 없음.")
     void t011() {
 
-        LoginUser creditorUser = prepareLoginUserByEmail("test00");
+        LoginUser creditorUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
 
@@ -239,26 +252,115 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("수정 요청시, 승인 대기 단계에서만 수정 요청이 가능함.")
+    @DisplayName("승인시, 외부인이 차용증을 승인할 수는 없음.")
     void t012() {
 
+        LoginUser creditorUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser otherUser = prepareLoginUserByEmail(OTHER_USER_EMAIL);
+
+        Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
+
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.acceptPaper(otherUser, paperId);
+        });
+    }
+
+    @Test
+    @DisplayName("수정 요청시, 승인 대기 단계에서만 수정 요청이 가능함.")
+    void t013() {
+
+        LoginUser creditorUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser debtorUser = prepareLoginUserByEmail(PEER_DEBTOR_EMAIL);
+
+        Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
+
+        PaperModifyRequest modifyRequest = new PaperModifyRequest(paperId, "테스트용 수정 요청");
+
+        //승인 대기 상태이기 떄문에 수정 요청이 가능
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.sendModifyRequest(debtorUser, modifyRequest);
+        });
+
+        //수정 요청이 이미 보내져 상태가 변경되었기 떄문에 수정 요청이 불가
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.sendModifyRequest(debtorUser, modifyRequest);
+        });
     }
 
     @Test
     @DisplayName("수정 요청시, 승인 요청을 받은 상대방만 수정 요청이 가능함.")
-    void t013() {
+    void t014() {
 
+        LoginUser writerUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser peerUser = prepareLoginUserByEmail(PEER_DEBTOR_EMAIL);
+        LoginUser otherUser = prepareLoginUserByEmail(OTHER_USER_EMAIL);
+
+        Long paperId = promissoryPaperService.writePaper(writerUser, creditorWriteRequest);
+        PaperModifyRequest modifyRequest = new PaperModifyRequest(paperId, "테스트용 수정 요청");
+
+        //외부인은 수정 요청이 불가
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.sendModifyRequest(otherUser, modifyRequest);
+        });
+
+        //상대방만 수정 요청이 가능
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.sendModifyRequest(peerUser, modifyRequest);
+        });
     }
 
     @Test
     @DisplayName("수정 진행시, 수정을 요청받은 상태일 경우에만 수정이 가능함.")
-    void t014() {
+    void t015() {
 
+        LoginUser writerUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser peerUser = prepareLoginUserByEmail(PEER_DEBTOR_EMAIL);
+
+        Long paperId = promissoryPaperService.writePaper(writerUser, creditorWriteRequest);
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
+
+        //수정 요청을 아직 받지 않아 수정이 불가능
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.modifyingPaper(writerUser, paperId, creditorWriteRequest);
+        });
+
+        assertThat(paper.getSpecialConditions().contains("(수정 완료)")).isFalse();
+
+        //수정 요청을 보냄
+        PaperModifyRequest modifyRequest = new PaperModifyRequest(paperId, "테스트용 수정 요청");
+        promissoryPaperService.sendModifyRequest(peerUser, modifyRequest);
+
+        //수정 요청을 받은 후이기에 수정이 가능
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.modifyingPaper(writerUser, paperId, modifyWriteRequest);
+        });
+
+        assertThat(paper.getSpecialConditions().contains("(수정 완료)")).isTrue();
     }
 
     @Test
     @DisplayName("수정 진행시, 첫 작성자만 수정 진행이 가능함.")
-    void t015() {
+    void t016() {
 
+        LoginUser writerUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser peerUser = prepareLoginUserByEmail(PEER_DEBTOR_EMAIL);
+
+        Long paperId = promissoryPaperService.writePaper(writerUser, creditorWriteRequest);
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
+
+        PaperModifyRequest modifyRequest = new PaperModifyRequest(paperId, "테스트용 수정 요청");
+        promissoryPaperService.sendModifyRequest(peerUser, modifyRequest);
+
+        //상대방은 첫 작성자가 아니기 때문에 수정이 불가능
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.modifyingPaper(peerUser, paperId, creditorWriteRequest);
+        });
+
+        //첫 작성자는 수정이 가능
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.modifyingPaper(writerUser, paperId, modifyWriteRequest);
+        });
+
+        assertThat(paper.getSpecialConditions().contains("(수정 완료)")).isTrue();
     }
 }
