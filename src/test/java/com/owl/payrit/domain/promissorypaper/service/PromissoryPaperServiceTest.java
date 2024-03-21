@@ -37,6 +37,7 @@ public class PromissoryPaperServiceTest extends ServiceTest {
 
     PaperWriteRequest creditorWriteRequest;
     PaperWriteRequest debtorWriteRequest;
+    PaperWriteRequest modifyWriteRequest;
 
     private final static String TEST_CONTENT = "테스트용 내용입니다.";
     private final static String WRITER_CREDITOR_EMAIL = "test00";
@@ -58,6 +59,13 @@ public class PromissoryPaperServiceTest extends ServiceTest {
                 LocalDate.now().plusDays(7), TEST_CONTENT, 20, 5,
                 "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
                 "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
+        );
+
+        modifyWriteRequest = new PaperWriteRequest(
+                PaperRole.CREDITOR, 3000, LocalDate.now(), LocalDate.now(),
+                LocalDate.now().plusDays(7), TEST_CONTENT.concat("(수정 완료)"), 12, 10,
+                "name00", "010-1234-5670", "(12345) 서울시 종로구 광화문로 1234",
+                "name01", "010-1234-5671", "(67890) 경기도 고양시 일산서로 5678"
         );
 
         setUp();
@@ -220,10 +228,10 @@ public class PromissoryPaperServiceTest extends ServiceTest {
         PromissoryPaper paper = promissoryPaperService.getById(paperId);
 
 
-        if(paper.getWriterRole().equals(PaperRole.CREDITOR)){
+        if (paper.getWriterRole().equals(PaperRole.CREDITOR)) {
             assertThat(accepter).isEqualTo(paper.getDebtor());
             assertThat(accepter.getPhoneNumber()).isEqualTo(paper.getDebtorPhoneNumber());
-        } else if(paper.getWriterRole().equals(PaperRole.DEBTOR)) {
+        } else if (paper.getWriterRole().equals(PaperRole.DEBTOR)) {
             assertThat(accepter).isEqualTo(paper.getCreditor());
             assertThat(accepter.getPhoneNumber()).isEqualTo(paper.getCreditorPhoneNumber());
         }
@@ -305,6 +313,29 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("수정 진행시, 수정을 요청받은 상태일 경우에만 수정이 가능함.")
     void t015() {
 
+        LoginUser writerUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser peerUser = prepareLoginUserByEmail(PEER_DEBTOR_EMAIL);
+
+        Long paperId = promissoryPaperService.writePaper(writerUser, creditorWriteRequest);
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
+
+        //수정 요청을 아직 받지 않아 수정이 불가능
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.modifyingPaper(writerUser, paperId, creditorWriteRequest);
+        });
+
+        assertThat(paper.getSpecialConditions().contains("(수정 완료)")).isFalse();
+
+        //수정 요청을 보냄
+        PaperModifyRequest modifyRequest = new PaperModifyRequest(paperId, "테스트용 수정 요청");
+        promissoryPaperService.sendModifyRequest(peerUser, modifyRequest);
+
+        //수정 요청을 받은 후이기에 수정이 가능
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.modifyingPaper(writerUser, paperId, modifyWriteRequest);
+        });
+
+        assertThat(paper.getSpecialConditions().contains("(수정 완료)")).isTrue();
     }
 
     @Test
