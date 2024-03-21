@@ -55,12 +55,9 @@ public class PromissoryPaperService {
         Member debtor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
-        long amount = paperWriteRequest.amount();
-        long calcAmount = amount + calcInterest(amount, paperWriteRequest.interestRate());
-
         PromissoryPaper paper = PromissoryPaper.builder()
-                .amount(calcAmount)
-                .remainingAmount(calcAmount)
+                .amount(paperWriteRequest.calcedAmount())
+                .remainingAmount(paperWriteRequest.calcedAmount())
                 .repaymentHistory(new ArrayList<>())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
@@ -81,6 +78,7 @@ public class PromissoryPaperService {
                 .debtorAddress(paperWriteRequest.debtorAddress())
                 .isDebtorAgree(loginedMember.equals(debtor))
                 .paperKey(getRandomKey())
+                .memos(new ArrayList<>())
                 .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
 
@@ -98,31 +96,32 @@ public class PromissoryPaperService {
 
         PromissoryPaper paper = getById(paperId);
         Member loginedMember = memberService.findById(loginUser.id());
-        PaperRole memberRole;
 
-        List<Memo> memos = paper.getMemos();
-        List<MemoListResponse> memoResponses = new ArrayList<>();
+        List<MemoListResponse> memoListResponsesByPaper = getMemoListResponsesByPaper(paper, loginUser);
 
-        for(Memo memo : memos) {
-            Long memberId = memo.getMemberId();
-
-            if(memberId.equals(loginUser.id())) {
-                memoResponses.add(new MemoListResponse(memo));
-            }
-        }
+        PaperRole memberRole = isWriter(paper, loginedMember) ? paper.getWriterRole() : paper.getWriterRole().getReverse();
 
         if (!isMine(loginUser.id(), paper)) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_IS_NOT_MINE);
         }
 
-        if(paper.getCreditor().equals(loginedMember)) {
-            memberRole = PaperRole.CREDITOR;
-        } else {
-            memberRole = PaperRole.DEBTOR;
-        }
-
         return new PaperDetailResponse(paper, memberRole, calcRepaymentRate(paper), calcDueDate(paper),
-                memoResponses);
+                memoListResponsesByPaper);
+    }
+
+    public List<MemoListResponse> getMemoListResponsesByPaper(PromissoryPaper paper, LoginUser loginUser) {
+
+        List<Memo> memos = paper.getMemos();
+
+        return memos.stream()
+                .filter(memo -> memo.getMemberId().equals(loginUser.id()))
+                .map(MemoListResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public boolean isWriter(PromissoryPaper paper, Member member) {
+
+        return paper.getWriter().equals(member);
     }
 
     public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
@@ -242,15 +241,13 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperId);
-        long amount = paperWriteRequest.amount();
-        long calcAmount = amount + calcInterest(amount, paperWriteRequest.interestRate());
 
         checkPaperBeforeModify(loginedMember, paper);
 
         //TODO: 더 좋은 방법 고려 필요. 수정할 부분이 어딘지 명시된다면?
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .amount(calcAmount)
-                .remainingAmount(calcAmount)
+                .amount(paperWriteRequest.calcedAmount())
+                .remainingAmount(paperWriteRequest.calcedAmount())
                 .amount(paperWriteRequest.amount())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
