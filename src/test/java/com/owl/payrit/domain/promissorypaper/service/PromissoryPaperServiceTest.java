@@ -204,24 +204,27 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("승인시, 작성자가 Creditor 였다면 회원은 Debtor의 데이터와 일치해야함.")
+    @DisplayName("승인시, 작성자가 Creditor 였다면 Debtor, Debtor 였다면 Creditor 의 데이터와 일치해야함.")
     void t009() {
 
-//        LoginUser requester = prepareLoginUserByEmail("test00");
-//        LoginUser accepter = prepareLoginUserByEmail("test01");
-//
-//        Long paperId = promissoryPaperService.writePaper(requester, creditorWriteRequest);
-//        PromissoryPaper paper = promissoryPaperService.getById(paperId);
-//        Member creditor = memberService.findById(requester.id());
-//        Member debtor = memberService.findById(accepter.id());
+        LoginUser requesteUser = prepareLoginUserByEmail("test00");
+        LoginUser accepteUser = prepareLoginUserByEmail("test01");
+
+        Member accepter = memberService.findById(accepteUser.id());
+
+        Long paperId = promissoryPaperService.writePaper(requesteUser, creditorWriteRequest);
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
 
 
-    }
+        if(paper.getWriterRole().equals(PaperRole.CREDITOR)){
 
-    @Test
-    @DisplayName("승인시, 작성자가 Debtor 였다면 회원은 Creditor 데이터와 일치해야함.")
-    void t010() {
+            assertThat(accepter).isEqualTo(paper.getDebtor());
+            assertThat(accepter.getPhoneNumber()).isEqualTo(paper.getDebtorPhoneNumber());
+        } else if(paper.getWriterRole().equals(PaperRole.DEBTOR)) {
 
+            assertThat(accepter).isEqualTo(paper.getCreditor());
+            assertThat(accepter.getPhoneNumber()).isEqualTo(paper.getCreditorPhoneNumber());
+        }
     }
 
     @Test
@@ -239,26 +242,40 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("수정 요청시, 승인 대기 단계에서만 수정 요청이 가능함.")
+    @DisplayName("승인시, 외부인이 차용증을 승인할 수는 없음.")
     void t012() {
 
+        LoginUser creditorUser = prepareLoginUserByEmail("test00");
+
+        Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
+
+        //작성자와 승인자가 일치할 수 없음.
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.acceptPaper(creditorUser, paperId);
+        });
     }
 
     @Test
-    @DisplayName("수정 요청시, 승인 요청을 받은 상대방만 수정 요청이 가능함.")
+    @DisplayName("수정 요청시, 승인 대기 단계에서만 수정 요청이 가능함.")
     void t013() {
 
     }
 
     @Test
-    @DisplayName("수정 진행시, 수정을 요청받은 상태일 경우에만 수정이 가능함.")
+    @DisplayName("수정 요청시, 승인 요청을 받은 상대방만 수정 요청이 가능함.")
     void t014() {
 
     }
 
     @Test
-    @DisplayName("수정 진행시, 첫 작성자만 수정 진행이 가능함.")
+    @DisplayName("수정 진행시, 수정을 요청받은 상태일 경우에만 수정이 가능함.")
     void t015() {
+
+    }
+
+    @Test
+    @DisplayName("수정 진행시, 첫 작성자만 수정 진행이 가능함.")
+    void t016() {
 
     }
 }
