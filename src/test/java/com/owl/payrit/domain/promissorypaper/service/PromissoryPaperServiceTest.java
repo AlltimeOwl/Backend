@@ -187,6 +187,20 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("승인시, 승인 대기 단계에서만 승인이 가능함.")
     void t008() {
 
+        LoginUser creditorUser = prepareLoginUserByEmail("test00");
+        LoginUser debtorUser = prepareLoginUserByEmail("test01");
+
+        Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
+
+        //승인 대기 상태이기 떄문에 승인이 가능
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.acceptPaper(debtorUser, paperId);
+        });
+
+        //승인 완료 상태이기 때문에 승인이 불가능
+        assertThrows(PromissoryPaperException.class, () -> {
+           promissoryPaperService.acceptPaper(debtorUser, paperId);
+        });
     }
 
     @Test
