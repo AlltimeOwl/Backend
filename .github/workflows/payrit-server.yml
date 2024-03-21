@@ -31,7 +31,7 @@ jobs:
       - name: List files in resources folder
         run: |
           ls src/main/resources/apple
-          ls src/main/resources/ssl
+          ls src/main/resources/
 
       - name: DockerHub Login
         uses: docker/login-action@v3
