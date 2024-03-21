@@ -8,4 +8,6 @@ public interface OauthClient {
     OauthProvider oauthProvider();
 
     Member fetch(String accessToken);
+
+    void revoke(String authorizationCode );
 }

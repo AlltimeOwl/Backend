@@ -1,7 +1,10 @@
 package com.owl.payrit.domain.auth.service;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
+import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.auth.exception.AuthErrorCode;
 import com.owl.payrit.domain.auth.exception.AuthException;
@@ -40,19 +43,6 @@ public class AuthService {
         return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getOauthInformation(), savedMember.getRole(), secretKey);
     }
 
-
-    private void verifyDuplicated(Member kakaoMemberInformation) {
-        /*
-        1. 회원가입이 되어있는가?
-        2. 되어있다면 -> 그 아이디로 로그인
-        3. 안 되어 있다면
-        3-1. -> 같은 이름, 핸드폰 번호로 가입한 아이디가 있는가?
-        -> 있다면, 그 아이디로 로그인? 알려주기?
-        -> 없다면, 회원가입 시키고 로그인
-         */
-
-    }
-
     public TokenResponse createTokenForTest(String email) {
         Member member = memberService.findByEmail(email);
         return jwtProvider.createTokenResponse(member.getId(), member.getOauthInformation(), member.getRole(), secretKey);
@@ -65,8 +55,9 @@ public class AuthService {
     }
 
     @Transactional
-    public void leave(LoginUser loginUser) {
+    public void revoke(LoginUser loginUser, RevokeRequest revokeRequest) {;
         Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
+        oauthClientComposite.revoke(member.getOauthInformation().getOauthProvider(), revokeRequest.oauthCode());
         memberService.delete(member);
     }
 
@@ -77,5 +68,10 @@ public class AuthService {
             throw new AuthException(AuthErrorCode.NOT_AUTHORIZED_MEMBER);
         }
         return true;
+    }
+
+    public TokenRefreshResponse refreshAccessToken(LoginTokenRequest loginTokenRequest) {
+        String accessToken = jwtProvider.refreshAccessToken(loginTokenRequest.refreshToken(),secretKey);
+        return new TokenRefreshResponse(accessToken, loginTokenRequest.refreshToken());
     }
 }

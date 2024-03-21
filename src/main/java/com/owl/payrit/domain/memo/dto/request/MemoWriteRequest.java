@@ -6,7 +6,6 @@ import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 public record MemoWriteRequest(
     String content
 ) {
-
     public Memo toEntity(PromissoryPaper promissoryPaper, Long memberId) {
         return Memo.builder()
                    .promissoryPaper(promissoryPaper)

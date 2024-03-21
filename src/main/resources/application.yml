@@ -5,3 +5,10 @@ spring:
 Encrypt:
   key: ${ENCRYPT_KEY}
   algo: ${ENCRYPT_ALGO}
+
+oauth:
+  apple:
+    appleKeyId: ${APPLE_KEY_ID}
+    appleTeamId: ${APPLE_TEAM_ID}
+    appleBundleId: ${APPLE_BUNDLE_ID}
+    classpath: ${APPLE_KEY_CLASSPATH}
