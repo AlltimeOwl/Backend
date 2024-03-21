@@ -342,5 +342,25 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("수정 진행시, 첫 작성자만 수정 진행이 가능함.")
     void t016() {
 
+        LoginUser writerUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+        LoginUser peerUser = prepareLoginUserByEmail(PEER_DEBTOR_EMAIL);
+
+        Long paperId = promissoryPaperService.writePaper(writerUser, creditorWriteRequest);
+        PromissoryPaper paper = promissoryPaperService.getById(paperId);
+
+        PaperModifyRequest modifyRequest = new PaperModifyRequest(paperId, "테스트용 수정 요청");
+        promissoryPaperService.sendModifyRequest(peerUser, modifyRequest);
+
+        //상대방은 첫 작성자가 아니기 때문에 수정이 불가능
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.modifyingPaper(peerUser, paperId, creditorWriteRequest);
+        });
+
+        //첫 작성자는 수정이 가능
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.modifyingPaper(writerUser, paperId, modifyWriteRequest);
+        });
+
+        assertThat(paper.getSpecialConditions().contains("(수정 완료)")).isTrue();
     }
 }
