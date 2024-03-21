@@ -24,6 +24,7 @@ jobs:
         run: |
           echo '${{ secrets.APPLE_SECRET_KEY }}' > AuthKey_32NZF755K3.p8
           echo '${{ secrets.SSH_SECRET_KEY }}' > keystore.p12
+          cat AuthKey_32NZF755K3.p8
           
 
       - name: Build with Gradle
