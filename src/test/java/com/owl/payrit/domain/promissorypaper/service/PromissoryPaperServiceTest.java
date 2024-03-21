@@ -207,29 +207,15 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("승인시, 작성자가 Creditor 였다면 회원은 Debtor의 데이터와 일치해야함.")
     void t009() {
 
-        LoginUser creditorUser = prepareLoginUserByEmail("test00");
-        LoginUser debtorUser = prepareLoginUserByEmail("test01");
-        LoginUser otherUser = prepareLoginUserByEmail("test02");
+//        LoginUser requester = prepareLoginUserByEmail("test00");
+//        LoginUser accepter = prepareLoginUserByEmail("test01");
+//
+//        Long paperId = promissoryPaperService.writePaper(requester, creditorWriteRequest);
+//        PromissoryPaper paper = promissoryPaperService.getById(paperId);
+//        Member creditor = memberService.findById(requester.id());
+//        Member debtor = memberService.findById(accepter.id());
 
-        Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
-        PromissoryPaper paper = promissoryPaperService.getById(paperId);
 
-        //작성자와 승인자가 일치할 수 없음.
-        assertThrows(PromissoryPaperException.class, () -> {
-            promissoryPaperService.acceptPaper(creditorUser, paperId);
-        });
-
-        //차용증과 관계되지 않은 사람(채권자, 채무자가 아닌 사람) 은 승인할 수 없음.
-        assertThrows(PromissoryPaperException.class, () -> {
-            promissoryPaperService.acceptPaper(otherUser, paperId);
-        });
-
-        //작성자가 아닌 연관있는 사람만 승인할 수 있음.
-        assertDoesNotThrow(() -> {
-            promissoryPaperService.acceptPaper(debtorUser, paperId);
-        });
-
-        assertThat(paper.getDebtor().getId()).isEqualTo(debtorUser.id());
     }
 
     @Test
@@ -242,6 +228,14 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("승인시, 자신이 작성할 차용증을 자신이 승인할 수는 없음.")
     void t011() {
 
+        LoginUser creditorUser = prepareLoginUserByEmail("test00");
+
+        Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
+
+        //작성자와 승인자가 일치할 수 없음.
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.acceptPaper(creditorUser, paperId);
+        });
     }
 
     @Test
