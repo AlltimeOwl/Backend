@@ -26,7 +26,7 @@ jobs:
       - name: Create secret-key file
         run: |
           echo '${{ secrets.APPLE_SECRET_KEY }}' > src/main/resources/apple/AuthKey_32NZF755K3.p8
-          echo '${{ secrets.SSH_SECRET_KEY }}' | base64 --decode -i > src/main/resources/apple/ssl/keystore.p12
+          echo '${{ secrets.SSH_SECRET_KEY }}' | base64 --decode -i > src/main/resources/ssl/keystore.p12
 
       - name: DockerHub Login
         uses: docker/login-action@v3
