@@ -20,15 +20,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Create secret-key file
-        run: |
-          echo '${{ secrets.APPLE_SECRET_KEY }}' > AuthKey_32NZF755K3.p8
-          echo '${{ secrets.SSH_SECRET_KEY }}' > keystore.p12
-          cat AuthKey_32NZF755K3.p8
-          
-
       - name: Build with Gradle
         run: ./gradlew clean build --exclude-task test
+
+      - name: Create secret-key file
+        run: |
+          echo '${{ secrets.APPLE_SECRET_KEY }}' > src/main/resources/apple/AuthKey_32NZF755K3.p8
+          echo '${{ secrets.SSH_SECRET_KEY }}' | base64 --decode -i > src/main/resources/apple/ssl/keystore.p12
 
       - name: DockerHub Login
         uses: docker/login-action@v3
