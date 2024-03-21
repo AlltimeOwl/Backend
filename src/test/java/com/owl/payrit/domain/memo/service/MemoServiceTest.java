@@ -53,7 +53,7 @@ class MemoServiceTest extends ServiceTest {
     }
 
     private Long preparePromissoryPaper(LoginUser loginUser) {
-        PaperWriteRequest paperWriteRequest = new PaperWriteRequest(PaperRole.CREDITOR, 3000000,
+        PaperWriteRequest paperWriteRequest = new PaperWriteRequest(PaperRole.CREDITOR, 3000000, 3100000,
             LocalDate.now(), LocalDate.now(), LocalDate.now(), "내용", 20.0f, 28, "name00",
             "010-1234-5670", "광화문", "name01", "010-1234-5671", "중구");
         return promissoryPaperService.writePaper(loginUser, paperWriteRequest);
