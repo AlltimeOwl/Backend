@@ -55,12 +55,9 @@ public class PromissoryPaperService {
         Member debtor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
-        long amount = paperWriteRequest.amount();
-        long calcAmount = amount + calcInterest(amount, paperWriteRequest.interestRate());
-
         PromissoryPaper paper = PromissoryPaper.builder()
-                .amount(calcAmount)
-                .remainingAmount(calcAmount)
+                .amount(paperWriteRequest.calcedAmount())
+                .remainingAmount(paperWriteRequest.calcedAmount())
                 .repaymentHistory(new ArrayList<>())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
@@ -244,15 +241,13 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperId);
-        long amount = paperWriteRequest.amount();
-        long calcAmount = amount + calcInterest(amount, paperWriteRequest.interestRate());
 
         checkPaperBeforeModify(loginedMember, paper);
 
         //TODO: 더 좋은 방법 고려 필요. 수정할 부분이 어딘지 명시된다면?
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .amount(calcAmount)
-                .remainingAmount(calcAmount)
+                .amount(paperWriteRequest.calcedAmount())
+                .remainingAmount(paperWriteRequest.calcedAmount())
                 .amount(paperWriteRequest.amount())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
