@@ -42,19 +42,6 @@ public class AuthService {
         return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getOauthInformation(), savedMember.getRole(), secretKey);
     }
 
-
-    private void verifyDuplicated(Member kakaoMemberInformation) {
-        /*
-        1. 회원가입이 되어있는가?
-        2. 되어있다면 -> 그 아이디로 로그인
-        3. 안 되어 있다면
-        3-1. -> 같은 이름, 핸드폰 번호로 가입한 아이디가 있는가?
-        -> 있다면, 그 아이디로 로그인? 알려주기?
-        -> 없다면, 회원가입 시키고 로그인
-         */
-
-    }
-
     public TokenResponse createTokenForTest(String email) {
         Member member = memberService.findByEmail(email);
         return jwtProvider.createTokenResponse(member.getId(), member.getOauthInformation(), member.getRole(), secretKey);
