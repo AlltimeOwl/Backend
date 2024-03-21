@@ -11,4 +11,4 @@ oauth:
     appleKeyId: ${APPLE_KEY_ID}
     appleTeamId: ${APPLE_TEAM_ID}
     appleBundleId: ${APPLE_BUNDLE_ID}
-    classpath: ${APPLE_KEY_CLASSAPATH}
+    classpath: ${APPLE_KEY_CLASSPATH}
