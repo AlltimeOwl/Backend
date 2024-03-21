@@ -33,6 +33,11 @@ public class AppleMemberClient implements OauthClient {
         return mapClaimToMember(claims);
     }
 
+    @Override
+    public void revoke(String authorizationCode) {
+
+    }
+
     public Member mapClaimToMember(Claims claims) {
         final String SUB = "sub";
         final String EMAIL = "email";
@@ -43,4 +48,5 @@ public class AppleMemberClient implements OauthClient {
         AppleUser appleUser = new AppleUser(appleId, appleEmail);
         return appleUser.toEntity();
     }
+
 }

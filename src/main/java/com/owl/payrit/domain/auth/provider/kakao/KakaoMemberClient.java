@@ -23,4 +23,9 @@ public class KakaoMemberClient implements OauthClient {
         KakaoOauthResponse kakaoOauthResponse = kakaoApiClient.fetchMember("Bearer " + accessToken);
         return kakaoOauthResponse.toEntity();
     }
+
+    @Override
+    public void revoke(String authorizationCode) {
+
+    }
 }

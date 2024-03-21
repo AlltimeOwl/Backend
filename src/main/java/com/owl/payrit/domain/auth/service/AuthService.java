@@ -54,7 +54,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void leave(LoginUser loginUser) {
+    public void revoke(LoginUser loginUser) {
         Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
         memberService.delete(member);
     }

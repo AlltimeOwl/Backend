@@ -45,9 +45,9 @@ public class AuthController implements AuthApiDocs{
 
     @Override
     @GetMapping("/leave")
-    public ResponseEntity<Void> leave(@AuthenticationPrincipal LoginUser loginUser) {
-        log.info("'{}' member request leave paylit", loginUser.oauthInformation().getOauthProviderId());
-        authService.leave(loginUser);
+    public ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser) {
+        log.info("'{}' member requests revoke paylit", loginUser.oauthInformation().getOauthProviderId());
+        authService.revoke(loginUser);
         return ResponseEntity.noContent().build();
     }
 
