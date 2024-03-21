@@ -21,6 +21,7 @@ public class TransactionHistoryRestController {
 
     private final TransactionHistoryService transactionHistoryService;
 
+    @Override
     @PostMapping("/save")
     public ResponseEntity<Void> save(@AuthenticationPrincipal LoginUser loginUser,
                                      @RequestBody TransactionHistorySaveRequest transactionHistorySaveRequest) {
@@ -32,6 +33,7 @@ public class TransactionHistoryRestController {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @GetMapping("/detail/{id}")
     public ResponseEntity<TransactionHistoryDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
                                                                    @PathVariable(value = "id") Long id) {
@@ -43,6 +45,7 @@ public class TransactionHistoryRestController {
         return ResponseEntity.ok().body(detailResponse);
     }
 
+    @Override
     @GetMapping("/list")
     public ResponseEntity<List<TransactionHistoryListResponse>> list(@AuthenticationPrincipal LoginUser loginUser) {
 
