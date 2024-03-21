@@ -280,6 +280,22 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @DisplayName("수정 요청시, 승인 요청을 받은 상대방만 수정 요청이 가능함.")
     void t014() {
 
+        LoginUser writerUser = prepareLoginUserByEmail("test00");
+        LoginUser peerUser = prepareLoginUserByEmail("test01");
+        LoginUser otherUser = prepareLoginUserByEmail("test08");
+
+        Long paperId = promissoryPaperService.writePaper(writerUser, creditorWriteRequest);
+        PaperModifyRequest modifyRequest = new PaperModifyRequest(paperId, "테스트용 수정 요청");
+
+        //외부인은 수정 요청이 불가
+        assertThrows(PromissoryPaperException.class, () -> {
+            promissoryPaperService.sendModifyRequest(otherUser, modifyRequest);
+        });
+
+        //상대방만 수정 요청이 가능
+        assertDoesNotThrow(() -> {
+            promissoryPaperService.sendModifyRequest(peerUser, modifyRequest);
+        });
     }
 
     @Test
