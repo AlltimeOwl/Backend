@@ -217,11 +217,9 @@ public class PromissoryPaperServiceTest extends ServiceTest {
 
 
         if(paper.getWriterRole().equals(PaperRole.CREDITOR)){
-
             assertThat(accepter).isEqualTo(paper.getDebtor());
             assertThat(accepter.getPhoneNumber()).isEqualTo(paper.getDebtorPhoneNumber());
         } else if(paper.getWriterRole().equals(PaperRole.DEBTOR)) {
-
             assertThat(accepter).isEqualTo(paper.getCreditor());
             assertThat(accepter.getPhoneNumber()).isEqualTo(paper.getCreditorPhoneNumber());
         }
@@ -246,12 +244,12 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     void t012() {
 
         LoginUser creditorUser = prepareLoginUserByEmail("test00");
+        LoginUser otherUser = prepareLoginUserByEmail("test08");
 
         Long paperId = promissoryPaperService.writePaper(creditorUser, creditorWriteRequest);
 
-        //작성자와 승인자가 일치할 수 없음.
         assertThrows(PromissoryPaperException.class, () -> {
-            promissoryPaperService.acceptPaper(creditorUser, paperId);
+            promissoryPaperService.acceptPaper(otherUser, paperId);
         });
     }
 
