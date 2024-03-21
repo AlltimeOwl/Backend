@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface TransactionHistoryApiDocs {
 
     @Operation(summary = "결제 내역 저장 API", description = "")
+    @ApiErrorCodeExample(TransactionHistoryErrorCode.class)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "성공적으로 결제 내역이 저장되었습니다."),
     })
