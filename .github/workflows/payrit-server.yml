@@ -20,6 +20,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Create secret-key file
+        run: |
+          echo '${{ secrets.APPLE_SECRET_KEY }}' > AuthKey_32NZF755K3.p8
+          echo '${{ secrets.SSH_SECRET_KEY }}' > keystore.p12
+          
+
       - name: Build with Gradle
         run: ./gradlew clean build --exclude-task test
 
