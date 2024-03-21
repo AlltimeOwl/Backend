@@ -28,10 +28,3 @@ spring:
 jwt:
   token:
     secret: ${JWT_SECRET}
-
-server:
-  ssl:
-    key-store: classpath:keystore.p12
-    key-store-type: PKCS12
-    key-store-password: ${KEY_STORE_PASSWORD}
-    enabled: true
