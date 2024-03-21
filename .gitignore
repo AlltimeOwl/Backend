@@ -170,4 +170,4 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,gradle
 
-src/main/resources/apple
+src/main/resources/apple/AuthKey_32NZF755K3.p8
