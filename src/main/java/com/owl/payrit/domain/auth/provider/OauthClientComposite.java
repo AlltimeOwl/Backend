@@ -35,4 +35,8 @@ public class OauthClientComposite {
         return Optional.ofNullable(mapping.get(oauthProvider))
             .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 소셜 로그인입니다."));
     }
+
+    public void revoke(OauthProvider oauthProvider, String oauthCode) {
+        getProvider(oauthProvider).revoke(oauthCode);
+    }
 }

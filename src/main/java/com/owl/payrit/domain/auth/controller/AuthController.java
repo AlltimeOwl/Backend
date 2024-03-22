@@ -2,7 +2,9 @@ package com.owl.payrit.domain.auth.controller;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
+import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,7 @@ public class AuthController implements AuthApiDocs{
 
     @Override
     @PostMapping("/{oauthProvider}")
-    public ResponseEntity<TokenResponse> login(@PathVariable OauthProvider oauthProvider, @RequestBody LoginTokenRequest loginTokenRequest) {
+    public ResponseEntity<TokenResponse> login(@PathVariable("oauthProvider") OauthProvider oauthProvider, @RequestBody LoginTokenRequest loginTokenRequest) {
         log.info("login request {}", oauthProvider);
         TokenResponse tokenResponse = authService.login(oauthProvider, loginTokenRequest.accessToken());
         return ResponseEntity.ok().body(tokenResponse);
@@ -43,10 +45,10 @@ public class AuthController implements AuthApiDocs{
     }
 
     @Override
-    @GetMapping("/leave")
-    public ResponseEntity<Void> leave(@AuthenticationPrincipal LoginUser loginUser) {
-        log.info("'{}' member request leave paylit", loginUser.oauthInformation().getOauthProviderId());
-        authService.leave(loginUser);
+    @PostMapping("/revoke")
+    public ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser, @RequestBody RevokeRequest revokeRequest) {
+        log.info("'{}' member requests revoke payrit", loginUser.oauthInformation().getOauthProviderId());
+        authService.revoke(loginUser, revokeRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -56,6 +58,14 @@ public class AuthController implements AuthApiDocs{
         log.info("check '{}' user authenticationStatus", loginUser.oauthInformation().getOauthProviderId());
         boolean status = authService.checkAuthentication(loginUser);
         return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenRefreshResponse> refreshAccessToken(@RequestBody LoginTokenRequest loginTokenRequest) {
+        log.info("user request refresh AccessToken");
+        TokenRefreshResponse tokenResponse = authService.refreshAccessToken(loginTokenRequest);
+        return ResponseEntity.ok().body(tokenResponse);
     }
 
 

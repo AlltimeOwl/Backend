@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${jwt.token.secret}")
     private String secretKey;
-    private static final Pattern PUBLIC_ENDPOINTS = Pattern.compile("/api/v1/oauth/.*|/h2-console/.*|/swagger-ui/.*|/");
+    private static final Pattern PUBLIC_ENDPOINTS = Pattern.compile("/api/v1/oauth/login|/h2-console/.*|/swagger-ui/.*|/");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {

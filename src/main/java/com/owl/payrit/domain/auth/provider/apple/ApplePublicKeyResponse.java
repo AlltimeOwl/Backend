@@ -1,12 +1,12 @@
 package com.owl.payrit.domain.auth.provider.apple;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.owl.payrit.domain.auth.exception.AuthErrorCode;
 import com.owl.payrit.domain.auth.exception.AuthException;
-
 import java.util.List;
 
 public record ApplePublicKeyResponse(
-    List<ApplePublicKey> publicKeys
+    @JsonProperty("keys") List<ApplePublicKey> publicKeys
 ) {
 
     public ApplePublicKey getProperKey(String kid, String alg) {

@@ -31,3 +31,9 @@ jwt:
 Encrypt:
   key: this_is_private_
   algo: AES
+
+oauth:
+  apple:
+    appleKeyId: apple_key
+    appleTeamId: apple_team
+    appleBundleId: apple_bundle

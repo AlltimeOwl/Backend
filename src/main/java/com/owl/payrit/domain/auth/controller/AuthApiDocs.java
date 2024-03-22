@@ -2,7 +2,9 @@ package com.owl.payrit.domain.auth.controller;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
+import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,9 +38,16 @@ public interface AuthApiDocs {
 
     @Operation(summary = "회원탈퇴 API", description = "서버에서 유저에 대한 정보를 삭제합니다. 이후에 디바이스에서도 저장된 Token을 삭제해야 합니다.")
     @ApiResponse(responseCode = "204")
-    ResponseEntity<Void> leave(@AuthenticationPrincipal LoginUser loginUser);
+    ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser, @Schema(implementation = RevokeRequest.class) RevokeRequest revokeRequest);
 
     @Operation(summary = "본인 인증 여부 확인 API", description = "본인인증이 완료된 유저인지 확인합니다.")
     @ApiResponse(responseCode = "204")
     ResponseEntity<Void> checkAuthenticationStatus(@AuthenticationPrincipal LoginUser loginUser);
+
+    @Operation(summary = "RefreshToken으로 AccessToken을 재발급합니다.")
+    @ApiResponse(responseCode = "200",
+        content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponse.class))
+        })
+    ResponseEntity<TokenRefreshResponse> refreshAccessToken(LoginTokenRequest loginTokenRequest);
 }

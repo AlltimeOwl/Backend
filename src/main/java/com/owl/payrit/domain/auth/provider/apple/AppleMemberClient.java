@@ -1,15 +1,27 @@
 package com.owl.payrit.domain.auth.provider.apple;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.request.AppleRevokeRequest;
+import com.owl.payrit.domain.auth.dto.request.AppleTokenGenerateRequest;
+import com.owl.payrit.domain.auth.dto.response.AppleTokenResponse;
 import com.owl.payrit.domain.auth.dto.response.AppleUser;
+import com.owl.payrit.domain.auth.exception.AuthErrorCode;
+import com.owl.payrit.domain.auth.exception.AuthException;
 import com.owl.payrit.domain.auth.provider.OauthClient;
 import com.owl.payrit.domain.member.entity.Member;
 import io.jsonwebtoken.Claims;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.security.PublicKey;
+import java.util.Collections;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Component
@@ -33,6 +45,15 @@ public class AppleMemberClient implements OauthClient {
         return mapClaimToMember(claims);
     }
 
+    @Override
+    public void revoke(String authorizationCode) {
+        AppleTokenGenerateRequest appleTokenGenerateRequest = appleJwtValidator.generateAppleToken(authorizationCode);
+        AppleTokenResponse appleTokenResponse = generateAppleToken(appleTokenGenerateRequest.toRequestBody());
+        AppleRevokeRequest appleRevokeRequest = appleJwtValidator.generateAppleRevokeRequest(appleTokenResponse.accessToken());
+        revokeAppleToken(appleRevokeRequest.toRequestBody());
+
+    }
+
     public Member mapClaimToMember(Claims claims) {
         final String SUB = "sub";
         final String EMAIL = "email";
@@ -43,4 +64,36 @@ public class AppleMemberClient implements OauthClient {
         AppleUser appleUser = new AppleUser(appleId, appleEmail);
         return appleUser.toEntity();
     }
+
+    public AppleTokenResponse generateAppleToken(MultiValueMap<String, String> requestBody) {
+        RestTemplate restTemplate = new RestTemplateBuilder().build();
+        String authUrl = "https://appleid.apple.com/auth/token";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(requestBody, headers);
+
+        try {
+            ResponseEntity<AppleTokenResponse> response = restTemplate.postForEntity(authUrl, httpEntity, AppleTokenResponse.class);
+            return response.getBody();
+        } catch (Exception e) {
+            throw new AuthException(AuthErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void revokeAppleToken(MultiValueMap<String, String> requestBody) {
+        if (requestBody.get("token") != null) {
+            RestTemplate restTemplate = new RestTemplateBuilder().build();
+            String revokeUrl = "https://appleid.apple.com/auth/revoke";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(requestBody, headers);
+
+            restTemplate.postForEntity(revokeUrl, httpEntity, String.class);
+        }
+    }
+
+
 }

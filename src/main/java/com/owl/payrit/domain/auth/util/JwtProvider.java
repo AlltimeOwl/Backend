@@ -24,7 +24,7 @@ public class JwtProvider {
     private final ObjectMapper objectMapper;
     private final RedisTemplate<OauthInformation, String> redisTemplate;
     private final long accessTokenExpireTimeMs = 604800000L; // 1주일
-    private final long refreshTokenExpireTimeMs = 1209600000L; // 2주일
+    private final long refreshTokenExpireTimeMs = 15552000000L; // 6개월
 
     public Long getId(String token, String secretKey) {
         return Jwts.parserBuilder()
