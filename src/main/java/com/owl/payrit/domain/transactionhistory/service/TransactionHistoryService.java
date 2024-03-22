@@ -121,7 +121,6 @@ public class TransactionHistoryService {
         if (transactionHistoryRepository.findByApprovalNumber(request.approvalNumber()).isPresent()) {
             throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_APPROVAL_NUM_CONFLICT);
         }
-
     }
 
 }

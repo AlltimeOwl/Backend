@@ -18,14 +18,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Tag(name = "결제 내역 관련 API", description = "결제 내역 API 입니다.")
 public interface TransactionHistoryApiDocs {
 
-    @Operation(summary = "결제 내역 저장 API", description = "")
+    @Operation(summary = "결제 내역 저장 API", description = "차용증 결제 내역을 저장합니다.")
     @ApiErrorCodeExample(TransactionHistoryErrorCode.class)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "성공적으로 결제 내역이 저장되었습니다."),
     })
     ResponseEntity<Void> save(@AuthenticationPrincipal LoginUser loginUser,
                               @RequestBody @Schema(implementation = TransactionHistorySaveRequest.class)
-                              TransactionHistorySaveRequest transactionHistorySaveRequest);
+                              TransactionHistorySaveRequest transactionHistorySaveRequest
+    );
 
 
 }

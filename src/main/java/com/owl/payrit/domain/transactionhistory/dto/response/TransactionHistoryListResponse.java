@@ -6,6 +6,7 @@ import java.time.LocalDate;
 
 public record TransactionHistoryListResponse(
 
+        Long historyId,
         LocalDate transactionDate,
         long amount,
         String transactionType,
@@ -14,6 +15,7 @@ public record TransactionHistoryListResponse(
 
     public TransactionHistoryListResponse(TransactionHistory transactionHistory, LocalDate transactionDate) {
         this(
+                transactionHistory.getId(),
                 transactionDate,
                 transactionHistory.getAmount(),
                 transactionHistory.getTransactionType(),
