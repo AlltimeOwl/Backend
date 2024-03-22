@@ -3,6 +3,7 @@ package com.owl.payrit.domain.transactionhistory.controller;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
+import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
 import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryErrorCode;
 import com.owl.payrit.global.swagger.annotation.ApiErrorCodeExample;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +16,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 @Tag(name = "결제 내역 관련 API", description = "결제 내역 API 입니다.")
 public interface TransactionHistoryApiDocs {
@@ -39,6 +42,15 @@ public interface TransactionHistoryApiDocs {
             @ApiResponse(responseCode = "403", description = "결제 내역에 접근할 권한이 없습니다.")
     })
     ResponseEntity<TransactionHistoryDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
-                                                            @Parameter(description = "결제 내역 id", required = true) long id);
+                                                            @Parameter(description = "결제 내역 id", required = true) Long id);
 
+    @Operation(summary = "결제 내역 목록 조회 API", description = "내가 가진 결제 내역을 리스트 형태로 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회에 성공하여 나의 결제 내역 리스트를 받아옵니다.",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = TransactionHistoryListResponse.class))
+                    })
+    })
+    ResponseEntity<List<TransactionHistoryListResponse>> list(@AuthenticationPrincipal LoginUser loginUser);
 }

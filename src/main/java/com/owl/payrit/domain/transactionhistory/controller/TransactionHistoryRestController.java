@@ -45,6 +45,7 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
         return ResponseEntity.ok().body(detailResponse);
     }
 
+    @Override
     @GetMapping("/list")
     public ResponseEntity<List<TransactionHistoryListResponse>> list(@AuthenticationPrincipal LoginUser loginUser) {
 
