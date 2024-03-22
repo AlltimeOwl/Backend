@@ -50,7 +50,7 @@ public record PaperListResponse(
                 promissoryPaper.getTransactionDate(),
                 promissoryPaper.getRepaymentStartDate(),
                 promissoryPaper.getRepaymentEndDate(),
-                promissoryPaper.getAmount(),
+                promissoryPaper.getPaperAmount().getAmount(),
                 promissoryPaper.getPaperStatus(),
                 peerName,
                 dueDate,

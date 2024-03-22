@@ -6,17 +6,12 @@ import com.owl.payrit.domain.memo.entity.Memo;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.global.encryption.PromissoryPaperStringConverter;
 import com.owl.payrit.global.entity.BaseEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,9 +29,8 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 public class PromissoryPaper extends BaseEntity {
 
-    private long amount;
-
-    private long remainingAmount;
+    @Embedded
+    private PaperAmount paperAmount;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "paper", fetch = FetchType.LAZY)
@@ -92,7 +86,7 @@ public class PromissoryPaper extends BaseEntity {
     private boolean isPaid = false;
 
     private String paperKey;    //차용증 고유 값
-    
+
     //차용증 상태
     @Builder.Default
     @Enumerated(EnumType.STRING)
@@ -108,3 +102,5 @@ public class PromissoryPaper extends BaseEntity {
         this.paperStatus = status;
     }
 }
+
+
