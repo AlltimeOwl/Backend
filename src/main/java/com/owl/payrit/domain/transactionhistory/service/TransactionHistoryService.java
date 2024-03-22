@@ -64,9 +64,11 @@ public class TransactionHistoryService {
 
     public TransactionHistoryDetailResponse getDetail(LoginUser loginUser, Long historyId) {
 
-        //TODO: 조회 조건 체크 필요
+        Member loginedMember = memberService.findById(loginUser.id());
 
         TransactionHistory history = getById(historyId);
+
+        checkDetailRequest(loginedMember, history);
 
         return new TransactionHistoryDetailResponse(history);
     }
@@ -121,6 +123,15 @@ public class TransactionHistoryService {
         if (transactionHistoryRepository.findByApprovalNumber(request.approvalNumber()).isPresent()) {
             throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_APPROVAL_NUM_CONFLICT);
         }
+    }
+
+    public void checkDetailRequest(Member loginedMember, TransactionHistory history) {
+
+        if (!history.getPaidMember().equals(loginedMember)) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_FORBIDDEN);
+        }
+
+        //TODO ...
     }
 
 }

@@ -33,6 +33,7 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @GetMapping("/detail/{id}")
     public ResponseEntity<TransactionHistoryDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
                                                                    @PathVariable(value = "id") Long id) {
