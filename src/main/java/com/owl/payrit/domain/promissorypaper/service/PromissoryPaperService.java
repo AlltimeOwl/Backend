@@ -159,10 +159,10 @@ public class PromissoryPaperService {
         return papers.stream().map(paper -> {
             if (role.equals(PaperRole.CREDITOR)) {
                 return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(),
-                        calcDueDate(paper), calcRepaymentRate(paper));
+                        calcDueDate(paper), calcRepaymentRate(paper), isWriter(paper, loginedMember));
             } else {
                 return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName()
-                        , calcDueDate(paper), calcRepaymentRate(paper));
+                        , calcDueDate(paper), calcRepaymentRate(paper), isWriter(paper, loginedMember));
             }
         }).collect(Collectors.toList());
     }
