@@ -55,7 +55,7 @@ public class RepaymentHistoryService {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_NOT_VALID_DATE);
         }
 
-        if(paper.getPaperAmount().getRemainingAmount() < repaymentRequest.repaymentAmount()) {
+        if(paper.getRemainingAmount() < repaymentRequest.repaymentAmount()) {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_AMOUNT_OVER);
         }
     }

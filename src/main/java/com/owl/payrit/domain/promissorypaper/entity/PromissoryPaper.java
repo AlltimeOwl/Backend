@@ -29,8 +29,13 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 public class PromissoryPaper extends BaseEntity {
 
-    @Embedded
-    private PaperAmount paperAmount;
+    private long primeAmount;           //순수 원금
+
+    private long interest;              //이자
+
+    private long amount;                //순수 원금 + 이자 (최종 금액)
+
+    private long remainingAmount;       //남은 금액
 
     @JsonManagedReference
     @OneToMany(mappedBy = "paper", fetch = FetchType.LAZY)

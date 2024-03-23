@@ -9,7 +9,6 @@ import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
-import com.owl.payrit.domain.promissorypaper.entity.PaperAmount;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
@@ -57,7 +56,10 @@ public class PromissoryPaperService {
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
         PromissoryPaper paper = PromissoryPaper.builder()
-                .paperAmount(createPaperAmount(paperWriteRequest.amount(), paperWriteRequest.interest()))
+                .primeAmount(paperWriteRequest.amount())
+                .interest(paperWriteRequest.interest())
+                .amount(paperWriteRequest.amount() + paperWriteRequest.interest())
+                .remainingAmount(paperWriteRequest.amount() + paperWriteRequest.interest())
                 .repaymentHistory(new ArrayList<>())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
@@ -244,9 +246,11 @@ public class PromissoryPaperService {
 
         checkPaperBeforeModify(loginedMember, paper);
 
-        //TODO: 더 좋은 방법 고려 필요. 수정할 부분이 어딘지 명시된다면?
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .paperAmount(createPaperAmount(paperWriteRequest.amount(), paperWriteRequest.interest()))
+                .primeAmount(paperWriteRequest.amount())
+                .interest(paperWriteRequest.interest())
+                .amount(paperWriteRequest.amount() + paperWriteRequest.interest())
+                .remainingAmount(paperWriteRequest.amount() + paperWriteRequest.interest())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
                 .repaymentEndDate(paperWriteRequest.repaymentEndDate())
@@ -316,8 +320,8 @@ public class PromissoryPaperService {
 
     public double calcRepaymentRate(PromissoryPaper paper) {
 
-        long amount = paper.getPaperAmount().getAmount();
-        long needToRepaymentAmount = amount - paper.getPaperAmount().getRemainingAmount();
+        long amount = paper.getAmount();
+        long needToRepaymentAmount = amount - paper.getRemainingAmount();
 
         double repaymentRate = (double) needToRepaymentAmount / amount * 100.0;
 
@@ -344,11 +348,8 @@ public class PromissoryPaperService {
 
         repaymentHistoryService.create(loginedMember, paper, repaymentRequest);
 
-        PaperAmount paperAmount = paper.getPaperAmount();
-        paperAmount.repayment(repaymentRequest.repaymentAmount());
-
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .paperAmount(paperAmount)
+                .remainingAmount(paper.getRemainingAmount() - repaymentRequest.repaymentAmount())
                 .build();
 
         promissoryPaperRepository.save(modifiedPaper);
@@ -362,21 +363,15 @@ public class PromissoryPaperService {
 
         RepaymentHistory history = repaymentHistoryService.getById(repaymentCancelRequest.historyId());
 
-        long repaymentAmount = history.getRepaymentAmount();
+        long needToCancelAmount = history.getRepaymentAmount();
         repaymentHistoryService.remove(loginedMember, paper, history);
 
-        PaperAmount paperAmount = paper.getPaperAmount();
-        paperAmount.repayment(repaymentAmount);
+
 
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .paperAmount(paperAmount)
+                .remainingAmount(paper.getRemainingAmount() + needToCancelAmount)
                 .build();
 
         promissoryPaperRepository.save(modifiedPaper);
-    }
-
-    public PaperAmount createPaperAmount(long amount, long interest) {
-
-        return new PaperAmount(amount, interest, amount + interest, amount + interest);
     }
 }
