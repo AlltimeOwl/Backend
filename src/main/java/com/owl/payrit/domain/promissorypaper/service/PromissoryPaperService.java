@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +37,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PromissoryPaperService {
+
+    private final static Long EXPIRED_STANDARD_DATE = 30L;
 
     private final RepaymentHistoryService repaymentHistoryService;
     private final MemberService memberService;
@@ -331,7 +334,7 @@ public class PromissoryPaperService {
     //NOTE: 기간이 지나더라도 일부 상환, 메모 작성이 가능하도록 주석 처리
 //    @Transactional
 //    @Scheduled(cron = "0 0 0 * * ?")
-//    public void expiring() {
+//    public void expiringByRepaymentEndDate() {
 //
 //        List<PromissoryPaper> expiringTargets = promissoryPaperRepository
 //                .findAllByRepaymentEndDateAndPaperStatus(LocalDate.now(), PaperStatus.COMPLETE_WRITING);
@@ -379,5 +382,26 @@ public class PromissoryPaperService {
                 .build();
 
         promissoryPaperRepository.save(modifiedPaper);
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void expiringForUnusedData() {
+
+        //FIXME: 만료 기준 지정 및 보관
+        LocalDateTime expiredStandardDate = LocalDateTime.now().minusDays(EXPIRED_STANDARD_DATE);
+
+        List<PromissoryPaper> targetPapers = new ArrayList<>();
+
+        List<PromissoryPaper> targetFromWaitingAgree = promissoryPaperRepository
+                .findAllByUpdatedAtBeforeAndPaperStatus(expiredStandardDate, PaperStatus.WAITING_AGREE);
+
+        List<PromissoryPaper> targetFromPaymentRequired = promissoryPaperRepository
+                .findAllByUpdatedAtBeforeAndPaperStatus(expiredStandardDate, PaperStatus.PAYMENT_REQUIRED);
+
+        targetPapers.addAll(targetFromWaitingAgree);
+        targetPapers.addAll(targetFromPaymentRequired);
+
+        promissoryPaperRepository.deleteAll(targetPapers);
     }
 }
