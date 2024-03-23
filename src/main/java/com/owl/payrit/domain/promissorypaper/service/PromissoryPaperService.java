@@ -328,17 +328,17 @@ public class PromissoryPaperService {
         return Math.round(repaymentRate * 100.0) / 100.0;
     }
 
-    @Transactional
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void expiring() {
-
-        List<PromissoryPaper> expiringTargets = promissoryPaperRepository
-                .findAllByRepaymentEndDateAndPaperStatus(LocalDate.now(), PaperStatus.COMPLETE_WRITING);
-
-        for (PromissoryPaper paper : expiringTargets) {
-            paper.modifyPaperStatus(PaperStatus.EXPIRED);
-        }
-    }
+//    @Transactional
+//    @Scheduled(cron = "0 0 0 * * ?")
+//    public void expiring() {
+//
+//        List<PromissoryPaper> expiringTargets = promissoryPaperRepository
+//                .findAllByRepaymentEndDateAndPaperStatus(LocalDate.now(), PaperStatus.COMPLETE_WRITING);
+//
+//        for (PromissoryPaper paper : expiringTargets) {
+//            paper.modifyPaperStatus(PaperStatus.EXPIRED);
+//        }
+//    }
 
     @Transactional
     public void repayment(LoginUser loginUser, RepaymentRequest repaymentRequest) {

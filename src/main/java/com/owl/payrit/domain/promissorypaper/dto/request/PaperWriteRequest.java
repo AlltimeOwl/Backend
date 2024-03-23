@@ -19,6 +19,7 @@ public record PaperWriteRequest(
         @Schema(description = "차용증 작성 일자")
         LocalDate transactionDate,
 
+
         @Schema(description = "상환 시작일(빌려주기로 한 날짜)")
         LocalDate repaymentStartDate,
 
