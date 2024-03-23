@@ -349,9 +349,16 @@ public class PromissoryPaperService {
 
         repaymentHistoryService.create(loginedMember, paper, repaymentRequest);
 
+        long totalRemainingAmount = paper.getRemainingAmount() - repaymentRequest.repaymentAmount();
+
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .remainingAmount(paper.getRemainingAmount() - repaymentRequest.repaymentAmount())
+                .remainingAmount(totalRemainingAmount)
                 .build();
+
+        //상환이 완료되었을 경우, 만료 처리
+        if (totalRemainingAmount == 0) {
+            modifiedPaper.modifyPaperStatus(PaperStatus.EXPIRED);
+        }
 
         promissoryPaperRepository.save(modifiedPaper);
     }
