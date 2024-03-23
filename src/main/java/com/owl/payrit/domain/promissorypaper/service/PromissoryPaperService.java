@@ -328,6 +328,7 @@ public class PromissoryPaperService {
         return Math.round(repaymentRate * 100.0) / 100.0;
     }
 
+    //NOTE: 기간이 지나더라도 일부 상환, 메모 작성이 가능하도록 주석 처리
 //    @Transactional
 //    @Scheduled(cron = "0 0 0 * * ?")
 //    public void expiring() {
@@ -365,8 +366,6 @@ public class PromissoryPaperService {
 
         long needToCancelAmount = history.getRepaymentAmount();
         repaymentHistoryService.remove(loginedMember, paper, history);
-
-
 
         PromissoryPaper modifiedPaper = paper.toBuilder()
                 .remainingAmount(paper.getRemainingAmount() + needToCancelAmount)

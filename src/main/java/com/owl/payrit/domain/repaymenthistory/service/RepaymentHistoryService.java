@@ -43,19 +43,24 @@ public class RepaymentHistoryService {
         LocalDate repaymentStartDate = paper.getRepaymentStartDate();
         LocalDate repaymentEndDate = paper.getRepaymentEndDate();
 
-        if(!paper.getPaperStatus().equals(PaperStatus.COMPLETE_WRITING)){
+        if (!paper.getPaperStatus().equals(PaperStatus.COMPLETE_WRITING)) {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_STATUS_ERROR);
         }
 
-        if(!paper.getCreditor().equals(member)) {
+        if (!paper.getCreditor().equals(member)) {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_ONLY_ACCESS_CREDITOR);
         }
 
-        if(requestDate.isBefore(repaymentStartDate) || requestDate.isAfter(repaymentEndDate)) {
+//        if(requestDate.isBefore(repaymentStartDate) || requestDate.isAfter(repaymentEndDate)) {
+//            throw new RepaymentException(RepaymentErrorCode.REPAYMENT_NOT_VALID_DATE);
+//        }
+
+        //NOTE: 윗 상황에서 기간이 지나도 상환이 가능하도록 변경
+        if (requestDate.isBefore(repaymentStartDate)) {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_NOT_VALID_DATE);
         }
 
-        if(paper.getRemainingAmount() < repaymentRequest.repaymentAmount()) {
+        if (paper.getRemainingAmount() < repaymentRequest.repaymentAmount()) {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_AMOUNT_OVER);
         }
     }
@@ -63,7 +68,7 @@ public class RepaymentHistoryService {
     @Transactional
     public void remove(Member member, PromissoryPaper paper, RepaymentHistory repaymentHistory) {
 
-        if(!member.equals(paper.getCreditor())) {
+        if (!member.equals(paper.getCreditor())) {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_ONLY_ACCESS_CREDITOR);
         }
 
