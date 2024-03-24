@@ -36,13 +36,16 @@ public class TransactionHistoryService {
 
     private final TransactionHistoryRepository transactionHistoryRepository;
 
+    //FIXME: 가격 설정 하드코딩 배제 필요
+    private static final long PAPER_COST = 1000;
+
     @Transactional
     public void saveHistory(LoginUser loginUser, TransactionHistorySaveRequest request) {
 
         PromissoryPaper paper = promissoryPaperService.getById(request.paperId());
         Member loginedMember = memberService.findById(loginUser.id());
-        
-        //TODO: 결제 가능 여부 체크 필요
+
+        checkSaveRequest(loginedMember, paper, request);
 
         TransactionHistory history = TransactionHistory.builder()
                 .paidMember(loginedMember)
@@ -61,17 +64,19 @@ public class TransactionHistoryService {
 
     public TransactionHistoryDetailResponse getDetail(LoginUser loginUser, Long historyId) {
 
-        //TODO: 조회 조건 체크 필요
-        
+        Member loginedMember = memberService.findById(loginUser.id());
+
         TransactionHistory history = getById(historyId);
-        
+
+        checkDetailRequest(loginedMember, history);
+
         return new TransactionHistoryDetailResponse(history);
     }
 
     public TransactionHistory getById(Long historyId) {
 
         return transactionHistoryRepository.findById(historyId).orElseThrow(
-                () -> new TransactionHistoryException(TransactionHistoryErrorCode.HISTORY_NOT_FOUND));
+                () -> new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_NOT_FOUND));
     }
 
     public List<TransactionHistoryListResponse> getListResponses(LoginUser loginUser) {
@@ -82,7 +87,7 @@ public class TransactionHistoryService {
 
         List<TransactionHistoryListResponse> historyListResponses = new ArrayList<>();
 
-        for(TransactionHistory history : histories) {
+        for (TransactionHistory history : histories) {
 
             LocalDate transactionDate = history.getTransactionDate().toLocalDate();
 
@@ -95,6 +100,38 @@ public class TransactionHistoryService {
     public List<TransactionHistory> getAllByPaidMember(Member member) {
 
         return transactionHistoryRepository.findAllByPaidMember(member);
+    }
+
+    public void checkSaveRequest(Member loginedMember, PromissoryPaper paper, TransactionHistorySaveRequest request) {
+
+        if (request.amount() != PAPER_COST) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_BAD_COST);
+        }
+
+        if (request.transactionDate().isAfter(LocalDateTime.now())) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_BAD_DATE);
+        }
+
+        if (!paper.getWriter().equals(loginedMember)) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_ONLY_WRITER);
+        }
+
+        if (transactionHistoryRepository.findByOrderNumber(request.orderNumber()).isPresent()) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_ORDER_NUM_CONFLICT);
+        }
+
+        if (transactionHistoryRepository.findByApprovalNumber(request.approvalNumber()).isPresent()) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_APPROVAL_NUM_CONFLICT);
+        }
+    }
+
+    public void checkDetailRequest(Member loginedMember, TransactionHistory history) {
+
+        if (!history.getPaidMember().equals(loginedMember)) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_FORBIDDEN);
+        }
+
+        //TODO ...
     }
 
 }
