@@ -22,6 +22,12 @@ public record PaperDetailResponse(
         @Schema(description = "나의 역할")
         PaperRole memberRole,
 
+        @Schema(description = "순수 원금")
+        long primeAmount,
+
+        @Schema(description = "이자액")
+        long interest,
+
         @Schema(description = "총액(원금 + 이자)")
         long amount,
 
@@ -42,6 +48,9 @@ public record PaperDetailResponse(
 
         @Schema(description = "상환 마감일")
         LocalDate repaymentEndDate,
+
+        @Schema(description = "차용증 작성일")
+        LocalDate transactionDate,
 
         @Schema(description = "남은 일 수")
         long dueDate,
@@ -80,6 +89,8 @@ public record PaperDetailResponse(
                 promissoryPaper.getId(),
                 promissoryPaper.getStorageUrl(),
                 memberRole,
+                promissoryPaper.getPrimeAmount(),
+                promissoryPaper.getInterest(),
                 promissoryPaper.getAmount(),
                 promissoryPaper.getRemainingAmount(),
                 promissoryPaper.getInterestRate(),
@@ -87,6 +98,7 @@ public record PaperDetailResponse(
                 repaymentRate,
                 promissoryPaper.getRepaymentStartDate(),
                 promissoryPaper.getRepaymentEndDate(),
+                promissoryPaper.getTransactionDate(),
                 dueDate,
                 promissoryPaper.getCreditorName(),
                 promissoryPaper.getCreditorPhoneNumber(),
