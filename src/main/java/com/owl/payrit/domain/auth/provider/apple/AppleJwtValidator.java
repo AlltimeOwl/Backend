@@ -88,12 +88,15 @@ public class AppleJwtValidator {
     }
 
     private PrivateKey generatePrivateKey() throws IOException {
+        log.info("generatePrivateKey - start");
         ClassPathResource resource = new ClassPathResource(keyClassPath);
         String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+        log.info("privateKey = {}", privateKey);
         Reader pemReader = new StringReader(privateKey);
         PEMParser pemParser = new PEMParser(pemReader);
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
+        log.info("generatePrivateKey - end");
         return converter.getPrivateKey(object);
     }
 
