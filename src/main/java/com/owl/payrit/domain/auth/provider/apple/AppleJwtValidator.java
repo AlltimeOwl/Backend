@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class AppleJwtValidator {
@@ -95,6 +97,7 @@ public class AppleJwtValidator {
     }
 
     public AppleTokenGenerateRequest generateAppleToken(String authorizationCode) {
+        log.info("AppleTokenGenerate code : {}", authorizationCode);
         AppleTokenGenerateRequest appleTokenGenerateRequest = null;
         try {
             String clientSecret = createClientSecret();
