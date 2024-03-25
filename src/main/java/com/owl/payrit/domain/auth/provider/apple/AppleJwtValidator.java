@@ -9,12 +9,12 @@ import com.owl.payrit.domain.auth.exception.AuthException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
@@ -29,7 +29,6 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -88,25 +87,18 @@ public class AppleJwtValidator {
     }
 
     private PrivateKey generatePrivateKey() throws IOException {
-        log.info("generatePrivateKey - start");
         String privateKey = null;
-        try {
-            ClassPathResource resource = new ClassPathResource(keyClassPath);
-            log.info("exists = {}", resource.exists());
-            log.info("resource = '{}'", resource.getURL());
-            privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-            log.info("privateKey = {}", privateKey);
-        } catch (Exception e) {
-            log.info(e.getMessage());
-            log.info(e.getLocalizedMessage());
-            throw new IOException("파일 경로 에러");
+        try (InputStream inputStream = getClass().getResourceAsStream(keyClassPath)) {
+            if (inputStream == null) {
+                throw new FileNotFoundException("Resource not found: " + keyClassPath);
+            }
+            privateKey = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         }
 
         Reader pemReader = new StringReader(privateKey);
         PEMParser pemParser = new PEMParser(pemReader);
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
-        log.info("generatePrivateKey - end");
         return converter.getPrivateKey(object);
     }
 
