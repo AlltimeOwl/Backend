@@ -46,7 +46,6 @@ jobs:
       - name: DockerHub Push
         run: docker push ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
 
-      # key 파일을 복사하여 Dockerfile에서 해당 위치로 포함
       - name: Copy key file to Docker image
         run: |
           docker create --name temp-container ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
