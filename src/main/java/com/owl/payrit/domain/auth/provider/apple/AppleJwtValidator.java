@@ -89,9 +89,19 @@ public class AppleJwtValidator {
 
     private PrivateKey generatePrivateKey() throws IOException {
         log.info("generatePrivateKey - start");
-        ClassPathResource resource = new ClassPathResource(keyClassPath);
-        String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
-        log.info("privateKey = {}", privateKey);
+        String privateKey = null;
+        try {
+            ClassPathResource resource = new ClassPathResource(keyClassPath);
+            log.info("exists = {}", resource.exists());
+            log.info("resource = '{}'", resource.getURL());
+            privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+            log.info("privateKey = {}", privateKey);
+        } catch (Exception e) {
+            log.info(e.getMessage());
+            log.info(e.getLocalizedMessage());
+            throw new IOException("파일 경로 에러");
+        }
+
         Reader pemReader = new StringReader(privateKey);
         PEMParser pemParser = new PEMParser(pemReader);
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
