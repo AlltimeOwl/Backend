@@ -31,6 +31,7 @@ jobs:
       - name: List files in resources folder
         run: |
           ls src/main/resources/apple
+          cat src/main/resources/apple/AuthKey_32NZF755K3.p8
           ls src/main/resources/
 
       - name: DockerHub Login
