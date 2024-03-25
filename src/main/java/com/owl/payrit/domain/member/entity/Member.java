@@ -78,6 +78,10 @@ public class Member extends BaseEntity implements UserDetails {
         this.isAgreeNotification = !this.isAgreeNotification;
     }
 
+    public void upsertFirebaseToken(String firebaseToken) {
+        this.firebaseToken = firebaseToken;
+    }
+
     @Override
     public String getPassword() {
         return null;

@@ -25,7 +25,7 @@ public class AuthController implements AuthApiDocs{
     @PostMapping("/{oauthProvider}")
     public ResponseEntity<TokenResponse> login(@PathVariable("oauthProvider") OauthProvider oauthProvider, @RequestBody LoginTokenRequest loginTokenRequest) {
         log.info("login request {}", oauthProvider);
-        TokenResponse tokenResponse = authService.login(oauthProvider, loginTokenRequest.accessToken());
+        TokenResponse tokenResponse = authService.login(oauthProvider, loginTokenRequest);
         return ResponseEntity.ok().body(tokenResponse);
     }
 
