@@ -18,7 +18,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
 
     @Transactional
-    public void create(Member member, String contents, NotificationType notificationType) {
+    public void create(Member member, String contents) {
 
         Notification notification = new Notification(member, contents, notificationType);
 
