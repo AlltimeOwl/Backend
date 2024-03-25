@@ -82,9 +82,7 @@ public class PromissoryPaperService {
                 .debtorPhoneNumber(paperWriteRequest.debtorPhoneNumber())
                 .debtorAddress(paperWriteRequest.debtorAddress())
                 .isDebtorAgree(loginedMember.equals(debtor))
-                .paperKey(getRandomKey())
                 .memos(new ArrayList<>())
-                .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
 
         checkPaperData(loginedMember, paper);

@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.promissorypaper.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.owl.payrit.domain.docsinfo.entity.DocsInfo;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.memo.entity.Memo;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
@@ -90,7 +91,7 @@ public class PromissoryPaper extends BaseEntity {
     @Builder.Default
     private boolean isPaid = false;
 
-    @Embedded
+    @OneToOne
     private DocsInfo docsInfo;
 
     //차용증 상태
