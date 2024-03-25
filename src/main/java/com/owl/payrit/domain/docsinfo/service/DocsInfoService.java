@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.docsinfo.service;
 
+import com.azure.storage.file.share.models.ShareFileUploadInfo;
 import com.owl.payrit.domain.docsinfo.config.AzureStorageConfigProps;
 import com.owl.payrit.domain.docsinfo.entity.DocsInfo;
 import com.owl.payrit.domain.docsinfo.exception.DocsInfoErrorCode;
@@ -11,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.azure.storage.file.share.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -41,7 +44,8 @@ public class DocsInfoService {
     }
 
     @Transactional
-    public void acceptByAccepter(DocsInfo docsInfo, Member accepter, String accepterIpAddr, String accepterCI) {
+    public void acceptByAccepter(DocsInfo docsInfo, Member accepter, String accepterIpAddr, String accepterCI,
+                                 MultipartFile documentFile) throws IOException {
 
         String uniqueDocsKey = getUniqueDocsKey();
 
@@ -51,7 +55,7 @@ public class DocsInfoService {
                 .accepterCI(accepterCI)
                 .acceptedAt(LocalDateTime.now())
                 .docsKey(uniqueDocsKey)
-                .docsUrl(uploadFile(uniqueDocsKey))
+                .docsUrl(uploadFile(documentFile))
                 .build();
 
         docsInfoRepository.save(completedDocsInfo);
@@ -62,7 +66,7 @@ public class DocsInfoService {
         return docsInfoRepository.existsByDocsKey(docsKey) ? getUniqueDocsKey() : docsKey;
     }
 
-    public String uploadFile(String fileName) {
+    public String uploadFile(MultipartFile documentFile) throws IOException {
 
         String connectStr = storageConfigProps.getConnectStr();
         String shareName = storageConfigProps.getShareName();
@@ -74,9 +78,17 @@ public class DocsInfoService {
                     .resourcePath(dirName)
                     .buildDirectoryClient();
 
+            String fileName = documentFile.getOriginalFilename();
             ShareFileClient fileClient = dirClient.getFileClient(fileName);
-            fileClient.create(1024);
-            fileClient.uploadFromFile(fileName);
+
+            // 파일 크기 설정은 MultipartFile에서 가져옵니다.
+            long fileSize = documentFile.getSize();
+
+            // 파일을 업로드합니다.
+            fileClient.create(fileSize);
+            ShareFileUploadInfo shareFileUploadInfo = fileClient.uploadRange(documentFile.getInputStream(), fileSize);
+
+            log.info("file info : " + shareFileUploadInfo.toString());
 
         } catch (Exception e) {
             log.error("uploadFile exception: " + e.getMessage());
