@@ -70,10 +70,11 @@ public class AppleJwtValidator {
     }
 
     public String createClientSecret() throws IOException{
+        log.info("CreateClientSecret");
         LocalDateTime issuedTime = LocalDateTime.now().plusMinutes(10L);
         Map<String, Object> jwtHeader = new HashMap<>();
-        jwtHeader.put("kid", appleKeyId);
         jwtHeader.put("alg", "ES256");
+        jwtHeader.put("kid", appleKeyId);
 
         return Jwts.builder()
                    .setHeaderParams(jwtHeader)
@@ -102,10 +103,10 @@ public class AppleJwtValidator {
         try {
             String clientSecret = createClientSecret();
             appleTokenGenerateRequest = new AppleTokenGenerateRequest(appleBundleId, clientSecret, authorizationCode);
+            return appleTokenGenerateRequest;
         } catch (Exception e) {
             throw new AuthException(AuthErrorCode.FILE_PATH_ERROR);
         }
-        return appleTokenGenerateRequest;
     }
 
     public AppleRevokeRequest generateAppleRevokeRequest(String accessToken) {
@@ -113,9 +114,9 @@ public class AppleJwtValidator {
         try {
             String clientSecret = createClientSecret();
             appleRevokeRequest = new AppleRevokeRequest(appleBundleId, clientSecret, accessToken);
+            return appleRevokeRequest;
         } catch (Exception e) {
             throw new AuthException(AuthErrorCode.FILE_PATH_ERROR);
         }
-        return appleRevokeRequest;
     }
 }
