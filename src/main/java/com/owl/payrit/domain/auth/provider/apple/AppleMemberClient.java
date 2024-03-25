@@ -85,6 +85,7 @@ public class AppleMemberClient implements OauthClient {
             log.info("Response Body: {}" , response.getBody());
             return response.getBody();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new AuthException(AuthErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
