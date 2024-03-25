@@ -93,6 +93,7 @@ public class AppleJwtValidator {
                 throw new FileNotFoundException("Resource not found: " + keyClassPath);
             }
             privateKey = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            log.info("private key : {}" , privateKey);
         }
 
         Reader pemReader = new StringReader(privateKey);
