@@ -46,12 +46,12 @@ jobs:
       - name: DockerHub Push
         run: docker push ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
 
-      - name: Copy key file to Docker image
-        run: |
-          docker create --name temp-container ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
-          docker cp src/main/resources/apple/AuthKey_32NZF755K3.p8 temp-container:/app/src/main/resources/apple/AuthKey_32NZF755K3.p8
-          docker commit temp-container ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
-          docker rm temp-container
+#      - name: Copy key file to Docker image
+#        run: |
+#          docker create --name temp-container ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
+#          docker cp src/main/resources/apple/AuthKey_32NZF755K3.p8 temp-container:/app/src/main/resources/apple/AuthKey_32NZF755K3.p8
+#          docker commit temp-container ${{ secrets.DOCKERHUB_USERTAG }}/${{ secrets.PROJECT_NAME }}
+#          docker rm temp-container
     
       - name: Application Run
         uses: appleboy/ssh-action@v0.1.6
