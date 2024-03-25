@@ -10,14 +10,15 @@ public record PaperWriteRequest(
         @Schema(description = "작성자 역할")
         PaperRole writerRole,
 
-        @Schema(description = "금전거래 원금", minimum = "0", maximum = "30000000")
+        @Schema(description = "금전거래 순수 원금", minimum = "0", maximum = "30000000")
         long amount,
 
-        @Schema(description = "계산된 금액(원금 + 이자)")
-        long calcedAmount,
+        @Schema(description = "계산된 이자 금액")
+        long interest,
         
         @Schema(description = "차용증 작성 일자")
         LocalDate transactionDate,
+
 
         @Schema(description = "상환 시작일(빌려주기로 한 날짜)")
         LocalDate repaymentStartDate,

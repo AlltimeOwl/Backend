@@ -37,10 +37,13 @@ public record PaperListResponse(
         long dueDate,
 
         @Schema(description = "상환율")
-        double repaymentRate
+        double repaymentRate,
+
+        @Schema(description = "작성자 여부")
+        boolean isWriter
 ) {
     public PaperListResponse(PromissoryPaper promissoryPaper, PaperRole paperRole,
-                             String peerName, long dueDate, double repaymentRate) {
+                             String peerName, long dueDate, double repaymentRate, boolean isWriter) {
         this(
                 promissoryPaper.getId(),
                 paperRole,
@@ -51,7 +54,8 @@ public record PaperListResponse(
                 promissoryPaper.getPaperStatus(),
                 peerName,
                 dueDate,
-                repaymentRate
+                repaymentRate,
+                isWriter
         );
     }
 }

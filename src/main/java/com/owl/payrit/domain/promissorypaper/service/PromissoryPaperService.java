@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +37,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PromissoryPaperService {
+
+    private final static Long EXPIRED_STANDARD_DATE = 30L;
 
     private final RepaymentHistoryService repaymentHistoryService;
     private final MemberService memberService;
@@ -56,8 +59,10 @@ public class PromissoryPaperService {
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
 
         PromissoryPaper paper = PromissoryPaper.builder()
-                .amount(paperWriteRequest.calcedAmount())
-                .remainingAmount(paperWriteRequest.calcedAmount())
+                .primeAmount(paperWriteRequest.amount())
+                .interest(paperWriteRequest.interest())
+                .amount(paperWriteRequest.amount() + paperWriteRequest.interest())
+                .remainingAmount(paperWriteRequest.amount() + paperWriteRequest.interest())
                 .repaymentHistory(new ArrayList<>())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
@@ -159,10 +164,10 @@ public class PromissoryPaperService {
         return papers.stream().map(paper -> {
             if (role.equals(PaperRole.CREDITOR)) {
                 return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(),
-                        calcDueDate(paper), calcRepaymentRate(paper));
+                        calcDueDate(paper), calcRepaymentRate(paper), isWriter(paper, loginedMember));
             } else {
                 return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName()
-                        , calcDueDate(paper), calcRepaymentRate(paper));
+                        , calcDueDate(paper), calcRepaymentRate(paper), isWriter(paper, loginedMember));
             }
         }).collect(Collectors.toList());
     }
@@ -244,11 +249,11 @@ public class PromissoryPaperService {
 
         checkPaperBeforeModify(loginedMember, paper);
 
-        //TODO: 더 좋은 방법 고려 필요. 수정할 부분이 어딘지 명시된다면?
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .amount(paperWriteRequest.calcedAmount())
-                .remainingAmount(paperWriteRequest.calcedAmount())
-                .amount(paperWriteRequest.amount())
+                .primeAmount(paperWriteRequest.amount())
+                .interest(paperWriteRequest.interest())
+                .amount(paperWriteRequest.amount() + paperWriteRequest.interest())
+                .remainingAmount(paperWriteRequest.amount() + paperWriteRequest.interest())
                 .transactionDate(paperWriteRequest.transactionDate())
                 .repaymentStartDate(paperWriteRequest.repaymentStartDate())
                 .repaymentEndDate(paperWriteRequest.repaymentEndDate())
@@ -326,22 +331,18 @@ public class PromissoryPaperService {
         return Math.round(repaymentRate * 100.0) / 100.0;
     }
 
-    @Transactional
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void expiring() {
-
-        List<PromissoryPaper> expiringTargets = promissoryPaperRepository
-                .findAllByRepaymentEndDateAndPaperStatus(LocalDate.now(), PaperStatus.COMPLETE_WRITING);
-
-        for (PromissoryPaper paper : expiringTargets) {
-            paper.modifyPaperStatus(PaperStatus.EXPIRED);
-        }
-    }
-
-    public long calcInterest(long amount, float interestRate) {
-
-        return Math.round(amount * interestRate / 100);
-    }
+    //NOTE: 기간이 지나더라도 일부 상환, 메모 작성이 가능하도록 주석 처리
+//    @Transactional
+//    @Scheduled(cron = "0 0 0 * * ?")
+//    public void expiringByRepaymentEndDate() {
+//
+//        List<PromissoryPaper> expiringTargets = promissoryPaperRepository
+//                .findAllByRepaymentEndDateAndPaperStatus(LocalDate.now(), PaperStatus.COMPLETE_WRITING);
+//
+//        for (PromissoryPaper paper : expiringTargets) {
+//            paper.modifyPaperStatus(PaperStatus.EXPIRED);
+//        }
+//    }
 
     @Transactional
     public void repayment(LoginUser loginUser, RepaymentRequest repaymentRequest) {
@@ -351,9 +352,16 @@ public class PromissoryPaperService {
 
         repaymentHistoryService.create(loginedMember, paper, repaymentRequest);
 
+        long totalRemainingAmount = paper.getRemainingAmount() - repaymentRequest.repaymentAmount();
+
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .remainingAmount(paper.getRemainingAmount() - repaymentRequest.repaymentAmount())
+                .remainingAmount(totalRemainingAmount)
                 .build();
+
+        //상환이 완료되었을 경우, 만료 처리
+        if (totalRemainingAmount == 0) {
+            modifiedPaper.modifyPaperStatus(PaperStatus.EXPIRED);
+        }
 
         promissoryPaperRepository.save(modifiedPaper);
     }
@@ -366,13 +374,34 @@ public class PromissoryPaperService {
 
         RepaymentHistory history = repaymentHistoryService.getById(repaymentCancelRequest.historyId());
 
-        long repaymentAmount = history.getRepaymentAmount();
+        long needToCancelAmount = history.getRepaymentAmount();
         repaymentHistoryService.remove(loginedMember, paper, history);
 
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .remainingAmount(paper.getRemainingAmount() + repaymentAmount)
+                .remainingAmount(paper.getRemainingAmount() + needToCancelAmount)
                 .build();
 
         promissoryPaperRepository.save(modifiedPaper);
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * ?")
+    public void expiringForUnusedData() {
+
+        //FIXME: 만료 기준 지정 및 보관
+        LocalDateTime expiredStandardDate = LocalDateTime.now().minusDays(EXPIRED_STANDARD_DATE);
+
+        List<PromissoryPaper> targetPapers = new ArrayList<>();
+
+        List<PromissoryPaper> targetFromWaitingAgree = promissoryPaperRepository
+                .findAllByUpdatedAtBeforeAndPaperStatus(expiredStandardDate, PaperStatus.WAITING_AGREE);
+
+        List<PromissoryPaper> targetFromPaymentRequired = promissoryPaperRepository
+                .findAllByUpdatedAtBeforeAndPaperStatus(expiredStandardDate, PaperStatus.PAYMENT_REQUIRED);
+
+        targetPapers.addAll(targetFromWaitingAgree);
+        targetPapers.addAll(targetFromPaymentRequired);
+
+        promissoryPaperRepository.deleteAll(targetPapers);
     }
 }
