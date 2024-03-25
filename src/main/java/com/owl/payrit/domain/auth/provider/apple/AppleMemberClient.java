@@ -14,6 +14,7 @@ import java.security.PublicKey;
 import java.util.Collections;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class AppleMemberClient implements OauthClient {
@@ -75,6 +77,8 @@ public class AppleMemberClient implements OauthClient {
 
         try {
             ResponseEntity<AppleTokenResponse> response = restTemplate.postForEntity(authUrl, httpEntity, AppleTokenResponse.class);
+            log.info("Response Status: {}" , response.getStatusCode());
+            log.info("Response Body: {}" , response.getBody());
             return response.getBody();
         } catch (Exception e) {
             throw new AuthException(AuthErrorCode.INTERNAL_SERVER_ERROR);
@@ -91,7 +95,9 @@ public class AppleMemberClient implements OauthClient {
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
             HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(requestBody, headers);
 
-            restTemplate.postForEntity(revokeUrl, httpEntity, String.class);
+            ResponseEntity<String> revokeResponse = restTemplate.postForEntity(revokeUrl, httpEntity, String.class);
+            log.info("Response Status: {}" , revokeResponse.getStatusCode());
+            log.info("Response Body: {}" , revokeResponse.getBody());
         }
     }
 
