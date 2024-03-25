@@ -90,15 +90,13 @@ public class PromissoryPaper extends BaseEntity {
     @Builder.Default
     private boolean isPaid = false;
 
-    private String paperKey;    //차용증 고유 값
+    @Embedded
+    private DocsInfo docsInfo;
 
     //차용증 상태
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private PaperStatus paperStatus = PaperStatus.WAITING_AGREE;
-
-    //저장소 URL
-    private String storageUrl;
 
     @OneToMany(mappedBy = "promissoryPaper", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Memo> memos = new ArrayList<>();
