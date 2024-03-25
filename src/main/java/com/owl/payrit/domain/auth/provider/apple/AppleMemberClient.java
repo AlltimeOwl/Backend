@@ -50,8 +50,11 @@ public class AppleMemberClient implements OauthClient {
     @Override
     public void revoke(String authorizationCode) {
         AppleTokenGenerateRequest appleTokenGenerateRequest = appleJwtValidator.generateAppleToken(authorizationCode);
+        log.info("TokenGenerate Result is : {}", appleTokenGenerateRequest.toString());
         AppleTokenResponse appleTokenResponse = generateAppleToken(appleTokenGenerateRequest.toRequestBody());
+        log.info("TokenGenerate Response is : {}", appleTokenResponse.toString());
         AppleRevokeRequest appleRevokeRequest = appleJwtValidator.generateAppleRevokeRequest(appleTokenResponse.accessToken());
+        log.info("RevokeRequest is : {}", appleRevokeRequest.toString());
         revokeAppleToken(appleRevokeRequest.toRequestBody());
 
     }
@@ -68,6 +71,7 @@ public class AppleMemberClient implements OauthClient {
     }
 
     public AppleTokenResponse generateAppleToken(MultiValueMap<String, String> requestBody) {
+        log.info("generateAppleToken");
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         String authUrl = "https://appleid.apple.com/auth/token";
         HttpHeaders headers = new HttpHeaders();
@@ -86,6 +90,7 @@ public class AppleMemberClient implements OauthClient {
     }
 
     public void revokeAppleToken(MultiValueMap<String, String> requestBody) {
+        log.info("generate Revoke Token");
         if (requestBody.get("token") != null) {
             RestTemplate restTemplate = new RestTemplateBuilder().build();
             String revokeUrl = "https://appleid.apple.com/auth/revoke";

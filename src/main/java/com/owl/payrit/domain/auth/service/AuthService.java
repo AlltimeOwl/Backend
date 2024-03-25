@@ -55,8 +55,10 @@ public class AuthService {
     }
 
     @Transactional
-    public void revoke(LoginUser loginUser, RevokeRequest revokeRequest) {;
+    public void revoke(LoginUser loginUser, RevokeRequest revokeRequest) {
+        log.info("revoke service for : {}", loginUser.oauthInformation().getOauthProviderId());
         Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
+        log.info("member : {}", member.getOauthInformation().getOauthProviderId());
         oauthClientComposite.revoke(member.getOauthInformation().getOauthProvider(), revokeRequest.oauthCode());
         memberService.delete(member);
     }
