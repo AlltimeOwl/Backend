@@ -92,6 +92,7 @@ public class PromissoryPaper extends BaseEntity {
     private boolean isPaid = false;
 
     @OneToOne
+    @JoinColumn(name = "DOCS_INFO_ID")
     private DocsInfo docsInfo;
 
     //차용증 상태

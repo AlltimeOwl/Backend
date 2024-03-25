@@ -3,10 +3,7 @@ package com.owl.payrit.domain.docsinfo.entity;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.global.entity.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,10 +18,12 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @ToString(callSuper = true)
-public class DocsInfo extends BaseEntity {
+public class DocsInfo {
 
-    @OneToOne
-    private PromissoryPaper linkedPaper;
+    @Id
+    @Column(name = "DOCS_INFO_ID")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;

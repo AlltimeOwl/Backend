@@ -90,10 +90,10 @@ public class PromissoryPaperService {
         return promissoryPaperRepository.save(paper).getId();
     }
 
-    private String getRandomKey() {
-        String paperKey = UUID.randomUUID().toString();
-        return promissoryPaperRepository.existsByPaperKey(paperKey) ? getRandomKey() : paperKey;
-    }
+//    private String getRandomKey() {
+//        String paperKey = UUID.randomUUID().toString();
+//        return promissoryPaperRepository.existsByPaperKey(paperKey) ? getRandomKey() : paperKey;
+//    }
 
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
 
