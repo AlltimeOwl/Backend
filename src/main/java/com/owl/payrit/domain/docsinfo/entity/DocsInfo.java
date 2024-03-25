@@ -11,6 +11,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -32,6 +33,8 @@ public class DocsInfo {
 
     private String writerCI;                 //TODO: Memmber Entity CI 추가
 
+    private LocalDateTime createdAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member accepter;
 
@@ -39,7 +42,7 @@ public class DocsInfo {
 
     private String accepterCI;
 
-    private LocalDate acceptDate;
+    private LocalDateTime acceptedAt;
 
     private String docsKey;
 

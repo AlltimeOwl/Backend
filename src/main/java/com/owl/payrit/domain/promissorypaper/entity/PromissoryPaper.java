@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
@@ -91,8 +92,8 @@ public class PromissoryPaper extends BaseEntity {
     @Builder.Default
     private boolean isPaid = false;
 
-    @OneToOne
     @JoinColumn(name = "DOCS_INFO_ID")
+    @OneToOne(cascade = CascadeType.ALL)
     private DocsInfo docsInfo;
 
     //차용증 상태
