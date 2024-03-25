@@ -1,6 +1,9 @@
 package com.owl.payrit.domain.docsinfo.service;
 
+import com.owl.payrit.domain.docsinfo.config.AzureStorageConfigProps;
 import com.owl.payrit.domain.docsinfo.entity.DocsInfo;
+import com.owl.payrit.domain.docsinfo.exception.DocsInfoErrorCode;
+import com.owl.payrit.domain.docsinfo.exception.DocsInfoException;
 import com.owl.payrit.domain.docsinfo.repository.DocsInfoRepository;
 import com.owl.payrit.domain.member.entity.Member;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class DocsInfoService {
+
+    private final AzureStorageConfigProps storageConfigProps;
 
     private final DocsInfoRepository docsInfoRepository;
 
@@ -38,13 +43,15 @@ public class DocsInfoService {
     @Transactional
     public void acceptByAccepter(DocsInfo docsInfo, Member accepter, String accepterIpAddr, String accepterCI) {
 
+        String uniqueDocsKey = getUniqueDocsKey();
+
         DocsInfo completedDocsInfo = docsInfo.toBuilder()
                 .accepter(accepter)
                 .accepterIpAddr(accepterIpAddr)
                 .accepterCI(accepterCI)
                 .acceptedAt(LocalDateTime.now())
-                .docsKey(getUniqueDocsKey())
-                .docsUrl(uploadToStorage())
+                .docsKey(uniqueDocsKey)
+                .docsUrl(uploadFile(uniqueDocsKey))
                 .build();
 
         docsInfoRepository.save(completedDocsInfo);
@@ -55,12 +62,27 @@ public class DocsInfoService {
         return docsInfoRepository.existsByDocsKey(docsKey) ? getUniqueDocsKey() : docsKey;
     }
 
-    private String uploadToStorage() {
+    public String uploadFile(String fileName) {
 
+        String connectStr = storageConfigProps.getConnectStr();
+        String shareName = storageConfigProps.getShareName();
+        String dirName = storageConfigProps.getDirName();
 
-        //TODO
+        try {
+            ShareDirectoryClient dirClient = new ShareFileClientBuilder()
+                    .connectionString(connectStr).shareName(shareName)
+                    .resourcePath(dirName)
+                    .buildDirectoryClient();
 
+            ShareFileClient fileClient = dirClient.getFileClient(fileName);
+            fileClient.create(1024);
+            fileClient.uploadFromFile(fileName);
 
-        return "Storage URL";
+        } catch (Exception e) {
+            log.error("uploadFile exception: " + e.getMessage());
+            throw new DocsInfoException(DocsInfoErrorCode.DOCS_BAD_REQUEST);
+        }
+
+        return "file url";
     }
 }

@@ -63,6 +63,7 @@ dependencies {
 	//Azure Storage
 	implementation 'com.azure:azure-storage-file-share:12.21.3'
 
+	annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
 }
 
 tasks.named('test') {
