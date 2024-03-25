@@ -9,7 +9,6 @@ import com.owl.payrit.domain.auth.exception.AuthException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -29,6 +28,7 @@ import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -88,18 +88,19 @@ public class AppleJwtValidator {
 
     private PrivateKey generatePrivateKey() throws IOException {
         String privateKey = null;
-        try (InputStream inputStream = getClass().getResourceAsStream(keyClassPath)) {
-            if (inputStream == null) {
-                throw new FileNotFoundException("Resource not found: " + keyClassPath);
-            }
+        ClassPathResource classPathResource = new ClassPathResource(keyClassPath);
+        log.info("keyClassPath : {}", keyClassPath);
+        try (InputStream inputStream = classPathResource.getInputStream()) {
             privateKey = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            log.info("private key : {}" , privateKey);
+            log.info("private key : {}", privateKey);
+        } catch (Exception e) {
+            log.error("Failed to read private key file", e);
         }
-
         Reader pemReader = new StringReader(privateKey);
         PEMParser pemParser = new PEMParser(pemReader);
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
+
         return converter.getPrivateKey(object);
     }
 
