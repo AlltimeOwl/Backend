@@ -3,9 +3,9 @@ FROM openjdk:17-alpine
 ARG JAR_FILE=build/libs/*.jar
 
 COPY ${JAR_FILE} /app.jar
-COPY src/main/resources/apple/AuthKey_32NZF755K3.p8 /app/src/main/resources/apple/AuthKey_32NZF755K3.p8
+# COPY src/main/resources/apple/AuthKey_32NZF755K3.p8 /app/src/main/resources/apple/AuthKey_32NZF755K3.p8
 
-WORKDIR /app
+# WORKDIR /app
 
 EXPOSE 8080
 
