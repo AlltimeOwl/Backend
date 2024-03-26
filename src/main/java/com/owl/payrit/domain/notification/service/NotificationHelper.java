@@ -20,6 +20,7 @@ public class NotificationHelper {
     private final NotificationPushService notificationPushService;
     private final MemberService memberService;
 
+    @Transactional
     public void generateNotification(Long targetId, NotificationMessage notificationMessage, String[] args) {
         Member member = memberService.findById(targetId);
         if(!checkNotificationAvailable(member)) return;
@@ -31,7 +32,7 @@ public class NotificationHelper {
         return member.isAgreeNotification() && member.getFirebaseToken() != null;
     }
 
-    public void save(NotificationMessage notificationMessage, Member member, String[] args) {
+    private void save(NotificationMessage notificationMessage, Member member, String[] args) {
         String message = notificationMessage.generateMessage(args);
         Notification notification = Notification.builder()
                                                 .member(member)
