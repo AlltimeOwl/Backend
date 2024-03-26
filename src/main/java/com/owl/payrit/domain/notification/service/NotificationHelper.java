@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationHelper {
 
     private final NotificationRepository notificationRepository;
-
+    private final NotificationPushService notificationPushService;
     /*
     TODO
     FCM 의존성
