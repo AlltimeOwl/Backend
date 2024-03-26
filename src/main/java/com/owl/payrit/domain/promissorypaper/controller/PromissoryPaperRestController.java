@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -66,11 +67,13 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     @Override
     @PutMapping("/approve/accept/{id}")
     public ResponseEntity<Void> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
-                                            @PathVariable(value = "id") Long paperId) {
+                                            @PathVariable(value = "id") Long paperId,
+                                            @RequestPart("file") MultipartFile file,
+                                            HttpServletRequest req) throws IOException {
 
         log.info("request user id : " + loginUser.id());
 
-        promissoryPaperService.acceptPaper(loginUser, paperId);
+        promissoryPaperService.acceptPaper(loginUser, paperId, file, req);
 
         return ResponseEntity.noContent().build();
     }

@@ -21,6 +21,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -62,7 +64,9 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
     })
     ResponseEntity<Void> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
-                                     @Parameter(description = "차용증 id", required = true) Long id);
+                                     @Parameter(description = "차용증 id", required = true) Long id,
+                                     @RequestPart("file") MultipartFile file,
+                                     HttpServletRequest req) throws IOException;
 
     @Operation(summary = "차용증 수정 요청 API", description = "차용증의 수정을 요청합니다.")
     @ApiErrorCodeExample(PromissoryPaperErrorCode.class)

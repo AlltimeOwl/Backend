@@ -34,7 +34,7 @@ public class DocsInfoService {
         DocsInfo docsInfo = DocsInfo.builder()
                 .writer(writer)
                 .writerIpAddr(writerIpAddr)
-                .writerCI("작성자의 본인인증 CI 값이 저장됩니다.")         //FIXME: Need to Member CI
+                .writerCI(writerCI)         //FIXME: Need to Member CI
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -48,7 +48,7 @@ public class DocsInfoService {
         DocsInfo completedDocsInfo = docsInfo.toBuilder()
                 .accepter(accepter)
                 .accepterIpAddr(accepterIpAddr)
-                .accepterCI("승인자의 본인인증 CI 값이 저장됩니다.")
+                .accepterCI(accepterCI)
                 .acceptedAt(LocalDateTime.now())
                 .docsKey(getUniqueDocsKey())
                 .docsUrl(uploadFile(documentFile))

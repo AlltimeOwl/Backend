@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -186,12 +187,16 @@ public class PromissoryPaperService {
     }
 
     @Transactional
-    public void acceptPaper(LoginUser loginUser, Long paperId) {
+    public void acceptPaper(LoginUser loginUser, Long paperId, MultipartFile documentFile
+            , HttpServletRequest req) throws IOException {
 
         Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperId);
+        DocsInfo docsInfo = paper.getDocsInfo();
 
         checkAcceptData(loginedMember, paper);
+
+        docsInfoService.acceptByAccepter(docsInfo, loginedMember, getIpByReq(req), "승인자 CI", documentFile);
 
         //FIXME: 결제 연동 후 상태 변경
         //paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
@@ -414,35 +419,35 @@ public class PromissoryPaperService {
 
         String ip = req.getHeader("X-Forwarded-For");
 
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = req.getHeader("Proxy-Client-IP");
         }
 
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = req.getHeader("WL-Proxy-Client-IP");
         }
 
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = req.getHeader("HTTP_CLIENT_IP");
         }
 
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = req.getHeader("HTTP_X_FORWARDED_FOR");
         }
 
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = req.getHeader("X-Real-IP");
         }
 
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = req.getHeader("X-RealIP");
         }
 
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = req.getHeader("REMOTE_ADDR");
         }
 
-        if(ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = req.getRemoteAddr();
         }
 
