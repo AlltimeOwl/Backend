@@ -28,14 +28,14 @@ import java.util.Collections;
                 "oauth_provider_id",
                 "oauth_provider"
             }
-        ),
-        @UniqueConstraint(
-            name = "DUPLICATED",
-            columnNames = {
-                "name",
-                "phone_number"
-            }
         )
+//        @UniqueConstraint(
+//            name = "DUPLICATED",
+//            columnNames = {
+//                "name",
+//                "phone_number"
+//            }
+//        )
     })
 public class Member extends BaseEntity implements UserDetails {
 

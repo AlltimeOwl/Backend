@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class NotificationService {
+public class NotificationHelper {
 
     private final NotificationRepository notificationRepository;
 
