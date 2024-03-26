@@ -1,5 +1,9 @@
 package com.owl.payrit.domain.notification.service;
 
+import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.notification.entity.Notification;
+import com.owl.payrit.domain.notification.entity.NotificationMessage;
 import com.owl.payrit.domain.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +18,29 @@ public class NotificationHelper {
 
     private final NotificationRepository notificationRepository;
     private final NotificationPushService notificationPushService;
+    private final MemberService memberService;
+
+    public void generateNotification(Long targetId, NotificationMessage notificationMessage, String[] args) {
+        Member member = memberService.findById(targetId);
+        if(!checkNotificationAvailable(member)) return;
+        save(notificationMessage, member, args);
+        notificationPushService.push(notificationMessage, args, member.getFirebaseToken());
+    }
+
+    private boolean checkNotificationAvailable(Member member) {
+        return member.isAgreeNotification() && member.getFirebaseToken() != null;
+    }
+
+    public void save(NotificationMessage notificationMessage, Member member, String[] args) {
+        String message = notificationMessage.generateMessage(args);
+        Notification notification = Notification.builder()
+                                                .member(member)
+                                                .notificationType(notificationMessage.getNotificationType())
+                                                .contents(message)
+                                                .build();
+        notificationRepository.save(notification);
+    }
+
     /*
     TODO
     FCM 의존성
