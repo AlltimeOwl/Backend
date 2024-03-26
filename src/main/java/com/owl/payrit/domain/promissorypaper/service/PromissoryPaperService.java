@@ -446,8 +446,6 @@ public class PromissoryPaperService {
             ip = req.getRemoteAddr();
         }
 
-        log.error("ip : " + ip);
-
         return ip;
     }
 }
