@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.azure.storage.file.share.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -81,20 +83,15 @@ public class DocsInfoService {
             String fileName = documentFile.getOriginalFilename();
             ShareFileClient fileClient = dirClient.getFileClient(fileName);
 
-            // 파일 크기 설정은 MultipartFile에서 가져옵니다.
-            long fileSize = documentFile.getSize();
+            InputStream fileStream = documentFile.getInputStream();
+            byte[] fileBytes = fileStream.readAllBytes();
 
-            // 파일을 업로드합니다.
-            fileClient.create(fileSize);
-            ShareFileUploadInfo shareFileUploadInfo = fileClient.uploadRange(documentFile.getInputStream(), fileSize);
-
-            log.info("file info : " + shareFileUploadInfo.toString());
+            fileClient.create(fileBytes.length);
+            ShareFileUploadInfo shareFileUploadInfo = fileClient.uploadRange(new ByteArrayInputStream(fileBytes), fileBytes.length);
 
         } catch (Exception e) {
             log.error("uploadFile exception: " + e.getMessage());
             throw new DocsInfoException(DocsInfoErrorCode.DOCS_BAD_REQUEST);
         }
-
-        return "file url";
     }
 }

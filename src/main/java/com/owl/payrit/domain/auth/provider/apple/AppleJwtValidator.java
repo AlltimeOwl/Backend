@@ -10,11 +10,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
@@ -88,12 +87,20 @@ public class AppleJwtValidator {
     }
 
     private PrivateKey generatePrivateKey() throws IOException {
-        ClassPathResource resource = new ClassPathResource(keyClassPath);
-        String privateKey = new String(Files.readAllBytes(Paths.get(resource.getURI())));
+        String privateKey = null;
+        ClassPathResource classPathResource = new ClassPathResource(keyClassPath);
+        log.info("keyClassPath : {}", keyClassPath);
+        try (InputStream inputStream = classPathResource.getInputStream()) {
+            privateKey = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            log.info("private key : {}", privateKey);
+        } catch (Exception e) {
+            log.error("Failed to read private key file", e);
+        }
         Reader pemReader = new StringReader(privateKey);
         PEMParser pemParser = new PEMParser(pemReader);
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter();
         PrivateKeyInfo object = (PrivateKeyInfo) pemParser.readObject();
+
         return converter.getPrivateKey(object);
     }
 

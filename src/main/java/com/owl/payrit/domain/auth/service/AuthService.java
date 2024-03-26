@@ -35,9 +35,10 @@ public class AuthService {
     private String secretKey;
 
     @Transactional
-    public TokenResponse login(OauthProvider oauthProvider, String accessToken) {
+    public TokenResponse login(OauthProvider oauthProvider, LoginTokenRequest loginTokenRequest) {
 
-        Member memberInformation = oauthClientComposite.fetch(oauthProvider, accessToken);
+        Member memberInformation = oauthClientComposite.fetch(oauthProvider, loginTokenRequest.accessToken());
+        memberInformation.upsertFirebaseToken(loginTokenRequest.firebaseToken());
         Member savedMember = memberService.findByOauthInformationOrSave(memberInformation);
         // TODO : 새로 만들었다면, 차용증 매핑
         return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getOauthInformation(), savedMember.getRole(), secretKey);

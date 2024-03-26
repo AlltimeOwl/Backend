@@ -64,6 +64,9 @@ dependencies {
 	implementation 'com.azure:azure-storage-file-share:12.21.3'
 
 	annotationProcessor('org.springframework.boot:spring-boot-configuration-processor')
+	//firebase
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+
 }
 
 tasks.named('test') {
@@ -74,4 +77,8 @@ tasks.named('test') {
 tasks.named('asciidoctor') {
 	inputs.dir snippetsDir
 	dependsOn test
+}
+
+configurations.all {
+	exclude group: 'commons-logging', module: 'commons-logging'
 }

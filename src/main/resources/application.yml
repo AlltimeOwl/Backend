@@ -12,3 +12,6 @@ oauth:
     appleTeamId: ${APPLE_TEAM_ID}
     appleBundleId: ${APPLE_BUNDLE_ID}
     classpath: ${APPLE_KEY_CLASSPATH}
+
+firebase:
+  url: ${FIREBASE_URL}
