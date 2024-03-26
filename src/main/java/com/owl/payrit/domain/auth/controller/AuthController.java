@@ -7,6 +7,7 @@ import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.auth.service.AuthService;
+import com.owl.payrit.domain.notification.service.NotificationHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController implements AuthApiDocs{
 
     private final AuthService authService;
+    private final NotificationHelper notificationHelper;
 
     @Override
     @PostMapping("/{oauthProvider}")
@@ -71,6 +73,12 @@ public class AuthController implements AuthApiDocs{
         log.info("user request refresh AccessToken");
         TokenRefreshResponse tokenResponse = authService.refreshAccessToken(loginTokenRequest);
         return ResponseEntity.ok().body(tokenResponse);
+    }
+
+    @GetMapping("/hello")
+    public ResponseEntity<Void> hello() {
+        notificationHelper.hello();
+        return ResponseEntity.noContent().build();
     }
 
 
