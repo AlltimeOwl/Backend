@@ -75,11 +75,5 @@ public class AuthController implements AuthApiDocs{
         return ResponseEntity.ok().body(tokenResponse);
     }
 
-    @GetMapping("/hello")
-    public ResponseEntity<Void> hello() {
-        notificationHelper.hello();
-        return ResponseEntity.noContent().build();
-    }
-
 
 }
