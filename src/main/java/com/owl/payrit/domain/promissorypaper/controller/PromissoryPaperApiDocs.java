@@ -17,10 +17,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "차용증 관련 API", description = "차용증 서비스 API 입니다.")
@@ -32,8 +34,8 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
     })
     ResponseEntity<Void> write(@AuthenticationPrincipal LoginUser loginUser,
-                               @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest
-    );
+                               @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest,
+                               HttpServletRequest req) throws IOException;
 
     @Operation(summary = "차용증 상세 조회 API", description = "차용증 id를 파라미터로 입력하여 상세 조회가 가능합니다.")
     @ApiResponses(value = {

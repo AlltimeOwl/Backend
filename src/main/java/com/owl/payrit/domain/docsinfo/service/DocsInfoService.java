@@ -29,20 +29,16 @@ public class DocsInfoService {
     private final DocsInfoRepository docsInfoRepository;
 
     @Transactional
-    public Long createByWriter(Member writer, String writerIpAddr, String writerCI,
-                               MultipartFile documentFile) throws IOException {
+    public DocsInfo createByWriter(Member writer, String writerIpAddr, String writerCI) throws IOException {
 
         DocsInfo docsInfo = DocsInfo.builder()
                 .writer(writer)
                 .writerIpAddr(writerIpAddr)
                 .writerCI("작성자의 본인인증 CI 값이 저장됩니다.")         //FIXME: Need to Member CI
                 .createdAt(LocalDateTime.now())
-                .docsUrl(uploadFile(documentFile))
                 .build();
 
-        DocsInfo savedDocsInfo = docsInfoRepository.save(docsInfo);
-
-        return savedDocsInfo.getId();
+        return docsInfoRepository.save(docsInfo);
     }
 
     @Transactional
@@ -52,7 +48,7 @@ public class DocsInfoService {
         DocsInfo completedDocsInfo = docsInfo.toBuilder()
                 .accepter(accepter)
                 .accepterIpAddr(accepterIpAddr)
-                .accepterCI(accepterCI)
+                .accepterCI("승인자의 본인인증 CI 값이 저장됩니다.")
                 .acceptedAt(LocalDateTime.now())
                 .docsKey(getUniqueDocsKey())
                 .docsUrl(uploadFile(documentFile))
