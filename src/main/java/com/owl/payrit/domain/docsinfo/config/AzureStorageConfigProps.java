@@ -16,6 +16,7 @@ public class AzureStorageConfigProps {
     private String accountKey;
     private String shareName;
     private String dirName;
+    private String urlHeader;
 
     @Bean
     public String getConnectStr() {
