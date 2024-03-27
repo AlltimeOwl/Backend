@@ -137,6 +137,14 @@ public class PromissoryPaperService {
 
     public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
 
+        if(promissoryPaper.getCreditor() == null) {
+            return promissoryPaper.getDebtor().getId().equals(memberId);
+        }
+
+        if(promissoryPaper.getDebtor() == null) {
+            return promissoryPaper.getCreditor().getId().equals(memberId);
+        }
+
         return promissoryPaper.getCreditor().getId().equals(memberId)
                 || promissoryPaper.getDebtor().getId().equals(memberId);
     }
