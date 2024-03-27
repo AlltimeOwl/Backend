@@ -1,8 +1,5 @@
 package com.owl.payrit.domain.docsinfo.entity;
 
-import com.owl.payrit.domain.member.entity.Member;
-import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
-import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,17 +22,23 @@ public class DocsInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member writer;
+    private Long writerId;
+
+    private String writerName;
+
+    private String writerPhoneNum;
 
     private String writerIpAddr;
 
-    private String writerCI;                 //TODO: Memmber Entity CI 추가
+    private String writerCI;
 
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member accepter;
+    private Long accepterId;
+
+    private String accepterName;
+
+    private String accepterPhoneNum;
 
     private String accepterIpAddr;
 

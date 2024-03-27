@@ -33,8 +33,14 @@ public class DocsInfoService {
     @Transactional
     public DocsInfo createByWriter(Member writer, String writerIpAddr, String writerCI) throws IOException {
 
+        //FIXME: getName, getPhoneNumber 하면 온전한 값으로 들어오는가?
+        //FIXME: + 암호화 방법
+        
+        
         DocsInfo docsInfo = DocsInfo.builder()
-                .writer(writer)
+                .writerId(writer.getId())
+                .writerName(writer.getName())
+                .writerPhoneNum(writer.getPhoneNumber())
                 .writerIpAddr(writerIpAddr)
                 .writerCI(writerCI)         //FIXME: Need to Member CI
                 .createdAt(LocalDateTime.now())
@@ -47,10 +53,12 @@ public class DocsInfoService {
     public void acceptByAccepter(DocsInfo docsInfo, Member accepter, String accepterIpAddr, String accepterCI,
                                  MultipartFile documentFile) throws IOException {
 
-        String docsName = genDocsNameByPaper(docsInfo.getWriter(), accepter);
+        String docsName = getUniqueDocsKey();
 
         DocsInfo completedDocsInfo = docsInfo.toBuilder()
-                .accepter(accepter)
+                .accepterId(accepter.getId())
+                .accepterName(accepter.getName())
+                .accepterPhoneNum(accepter.getPhoneNumber())
                 .accepterIpAddr(accepterIpAddr)
                 .accepterCI(accepterCI)
                 .acceptedAt(LocalDateTime.now())
@@ -59,11 +67,6 @@ public class DocsInfoService {
                 .build();
 
         docsInfoRepository.save(completedDocsInfo);
-    }
-
-    private String getUniqueDocsKey() {
-        String docsKey = UUID.randomUUID().toString();
-        return docsInfoRepository.existsByDocsKey(docsKey) ? getUniqueDocsKey() : docsKey;
     }
 
     public String uploadFile(MultipartFile documentFile, String docsName) throws IOException {
@@ -93,17 +96,8 @@ public class DocsInfoService {
         }
     }
 
-    public String genDocsNameByPaper(Member writer, Member accepter) {
-
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("YYYY-MM-dd");
-
-        String formattedDate = LocalDate.now().format(dateTimeFormatter);
-
-        String writerName = writer.getName();
-        Long writerId = writer.getId();
-        String accepterName = accepter.getName();
-        Long accepterId = accepter.getId();
-
-        return writerName + writerId + "_" + formattedDate + "_" + accepterName + accepterId;
+    private String getUniqueDocsKey() {
+        String docsKey = UUID.randomUUID().toString();
+        return docsInfoRepository.existsByDocsKey(docsKey) ? getUniqueDocsKey() : docsKey;
     }
 }
