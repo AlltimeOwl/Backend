@@ -21,6 +21,8 @@ jobs:
         run: |
           echo '${{ secrets.APPLE_SECRET_KEY }}' > src/main/resources/apple/AuthKey_JNGL644KHU.p8
           echo '${{ secrets.PAYRIT_FIREBASE }}' > src/main/resources/firebase/payrit_firebase.json
+          echo '${{ secrets.SECRET_YML }}' > src/main/resources/application-secret.yml
+          
 
       #          echo '${{ secrets.SSH_SECRET_KEY }}' | base64 --decode -i > src/main/resources/keystore.p12
       #
