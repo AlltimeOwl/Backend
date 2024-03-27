@@ -1,5 +1,9 @@
 package com.owl.payrit.domain.promissorypaper.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
@@ -9,7 +13,10 @@ import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
+import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
 import com.owl.payrit.util.ServiceTest;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,12 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -35,6 +36,8 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     @Autowired
     PromissoryPaperService promissoryPaperService;
 
+    @Autowired
+    PromissoryPaperRepository promissoryPaperRepository;
     PaperWriteRequest creditorWriteRequest;
     PaperWriteRequest debtorWriteRequest;
     PaperWriteRequest modifyWriteRequest;
@@ -48,25 +51,26 @@ public class PromissoryPaperServiceTest extends ServiceTest {
     void setting() {
 
         creditorWriteRequest = new PaperWriteRequest(
-                PaperRole.CREDITOR, 3000, LocalDate.now(), LocalDate.now(),
-                LocalDate.now().plusDays(7), TEST_CONTENT, 12, 10,
-                "name00", "010-1234-5670", "(12345) 서울시 종로구 광화문로 1234",
-                "name01", "010-1234-5671", "(67890) 경기도 고양시 일산서로 5678"
+            PaperRole.CREDITOR, 30000, 3000, LocalDate.now(), LocalDate.now(),
+            LocalDate.now().plusDays(7), TEST_CONTENT, 12, 10,
+            "name00", "010-1234-5670", "(12345) 서울시 종로구 광화문로 1234",
+            "name01", "010-1234-5671", "(67890) 경기도 고양시 일산서로 5678"
         );
 
         debtorWriteRequest = new PaperWriteRequest(
-                PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
-                LocalDate.now().plusDays(7), TEST_CONTENT, 20, 5,
-                "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
-                "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
+            PaperRole.DEBTOR, 50000, 5000, LocalDate.now(), LocalDate.now(),
+            LocalDate.now().plusDays(7), TEST_CONTENT, 20, 5,
+            "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
+            "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
         );
 
         modifyWriteRequest = new PaperWriteRequest(
-                PaperRole.CREDITOR, 3000, LocalDate.now(), LocalDate.now(),
-                LocalDate.now().plusDays(7), TEST_CONTENT.concat("(수정 완료)"), 12, 10,
-                "name00", "010-1234-5670", "(12345) 서울시 종로구 광화문로 1234",
-                "name01", "010-1234-5671", "(67890) 경기도 고양시 일산서로 5678"
+            PaperRole.CREDITOR, 30000, 3000, LocalDate.now(), LocalDate.now(),
+            LocalDate.now().plusDays(7), TEST_CONTENT.concat("(수정 완료)"), 12, 10,
+            "name00", "010-1234-5670", "(12345) 서울시 종로구 광화문로 1234",
+            "name01", "010-1234-5671", "(67890) 경기도 고양시 일산서로 5678"
         );
+
 
         setUp();
     }
@@ -126,11 +130,12 @@ public class PromissoryPaperServiceTest extends ServiceTest {
         LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
-                PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
-                LocalDate.now().plusDays(7), TEST_CONTENT, 30, 5,
-                "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
-                "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
+            PaperRole.DEBTOR, 5000, 500, LocalDate.now(), LocalDate.now(),
+            LocalDate.now().plusDays(7), TEST_CONTENT, 30, 5,
+            "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
+            "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
         );
+
 
         assertThrows(PromissoryPaperException.class, () -> {
             promissoryPaperService.writePaper(loginUser, paperWriteRequest);
@@ -144,11 +149,12 @@ public class PromissoryPaperServiceTest extends ServiceTest {
         LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
-                PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now().minusDays(3),
-                LocalDate.now().plusDays(7), TEST_CONTENT, 30, 5,
-                "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
-                "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
+            PaperRole.DEBTOR, 5000, 500, LocalDate.now(), LocalDate.now(),
+            LocalDate.now().plusDays(7), TEST_CONTENT, 30, 5,
+            "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
+            "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
         );
+
 
         assertThrows(PromissoryPaperException.class, () -> {
             promissoryPaperService.writePaper(loginUser, paperWriteRequest);
@@ -162,11 +168,12 @@ public class PromissoryPaperServiceTest extends ServiceTest {
         LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(
-                PaperRole.DEBTOR, 5000, LocalDate.now(), LocalDate.now(),
-                LocalDate.now().minusDays(3), TEST_CONTENT, 30, 5,
-                "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
-                "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
+            PaperRole.DEBTOR, 5000, 500, LocalDate.now(), LocalDate.now(),
+            LocalDate.now().plusDays(7), TEST_CONTENT, 30, 5,
+            "name01", "010-1234-5671", "(12345) 서울시 종로구 광화문로 1234",
+            "name00", "010-1234-5670", "(67890) 경기도 고양시 일산서로 5678"
         );
+
 
         assertThrows(PromissoryPaperException.class, () -> {
             promissoryPaperService.writePaper(loginUser, paperWriteRequest);
@@ -362,5 +369,26 @@ public class PromissoryPaperServiceTest extends ServiceTest {
         });
 
         assertThat(paper.getSpecialConditions().contains("(수정 완료)")).isTrue();
+    }
+
+    @Test
+    @DisplayName("모든 연관관계 해제된다")
+    void t017 () throws Exception {
+        Member member = findByEmail("test00");
+
+        LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
+
+        promissoryPaperService.writePaper(loginUser, creditorWriteRequest);
+        promissoryPaperService.writePaper(loginUser, debtorWriteRequest);
+
+        List<PromissoryPaper> promissoryPaperList = promissoryPaperRepository.findAllByCreditorOrDebtorOrWriter(member);
+
+        assertThat(promissoryPaperList.size()).isEqualTo(2);
+
+        promissoryPaperService.removeRelation(member);
+        List<PromissoryPaper> removeList = promissoryPaperRepository.findAllByCreditorOrDebtorOrWriter(member);
+
+        assertThat(promissoryPaperList.size()).isEqualTo(2);
+        assertThat(removeList.size()).isEqualTo(0);
     }
 }
