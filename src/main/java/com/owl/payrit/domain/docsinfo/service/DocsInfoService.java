@@ -49,7 +49,9 @@ public class DocsInfoService {
     public void acceptByAccepter(DocsInfo docsInfo, Member accepter, String accepterIpAddr, String accepterCI,
                                  MultipartFile documentFile) throws IOException {
 
-        String docsName = getUniqueDocsKey();
+        StringBuilder sb = new StringBuilder();
+        sb.append(getUniqueDocsKey());
+        sb.append(".pdf");
 
         DocsInfo completedDocsInfo = docsInfo.toBuilder()
                 .accepterId(accepter.getId())
@@ -59,7 +61,7 @@ public class DocsInfoService {
                 .accepterCI(accepterCI)
                 .acceptedAt(LocalDateTime.now())
                 .docsKey(getUniqueDocsKey())
-                .docsUrl(uploadFile(documentFile, docsName))
+                .docsUrl(uploadFile(documentFile, sb.toString()))
                 .build();
 
         docsInfoRepository.save(completedDocsInfo);
