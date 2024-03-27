@@ -13,6 +13,7 @@ import com.owl.payrit.domain.auth.util.JwtProvider;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,7 @@ public class AuthService {
 
     private final MemberService memberService;
     private final OauthClientComposite oauthClientComposite;
+    private final PromissoryPaperService promissoryPaperService;
     private final JwtProvider jwtProvider;
     private final RedisTemplate<OauthInformation, String> oauthRedisTemplate;
 
@@ -61,6 +63,7 @@ public class AuthService {
         Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
         log.info("member : {}", member.getOauthInformation().getOauthProviderId());
         oauthClientComposite.revoke(member.getOauthInformation().getOauthProvider(), revokeRequest.oauthCode());
+        promissoryPaperService.removeRelation(member);
         memberService.delete(member);
     }
 
