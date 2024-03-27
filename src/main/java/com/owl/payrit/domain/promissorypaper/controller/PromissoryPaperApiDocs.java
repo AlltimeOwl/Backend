@@ -65,7 +65,8 @@ public interface PromissoryPaperApiDocs {
     })
     ResponseEntity<Void> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
                                      @Parameter(description = "차용증 id", required = true) Long id,
-                                     @RequestPart("file") MultipartFile file,
+                                     @RequestPart("file")
+                                     @Schema(example = "multipart/form-data") MultipartFile file,
                                      HttpServletRequest req) throws IOException;
 
     @Operation(summary = "차용증 수정 요청 API", description = "차용증의 수정을 요청합니다.")
