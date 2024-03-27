@@ -1,5 +1,8 @@
 package com.owl.payrit.domain.docsinfo.service;
 
+import com.azure.storage.file.share.ShareDirectoryClient;
+import com.azure.storage.file.share.ShareFileClient;
+import com.azure.storage.file.share.ShareFileClientBuilder;
 import com.owl.payrit.domain.docsinfo.config.AzureStorageConfigProps;
 import com.owl.payrit.domain.docsinfo.entity.DocsInfo;
 import com.owl.payrit.domain.docsinfo.exception.DocsInfoErrorCode;
@@ -10,14 +13,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.azure.storage.file.share.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Service
@@ -33,10 +33,6 @@ public class DocsInfoService {
     @Transactional
     public DocsInfo createByWriter(Member writer, String writerIpAddr, String writerCI) throws IOException {
 
-        //FIXME: getName, getPhoneNumber 하면 온전한 값으로 들어오는가?
-        //FIXME: + 암호화 방법
-        
-        
         DocsInfo docsInfo = DocsInfo.builder()
                 .writerId(writer.getId())
                 .writerName(writer.getName())

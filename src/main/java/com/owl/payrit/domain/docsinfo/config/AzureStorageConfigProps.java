@@ -25,7 +25,7 @@ public class AzureStorageConfigProps {
 
         sb.append("DefaultEndpointsProtocol=https;");
         sb.append("AccountName=%s;".formatted(accountName));
-        sb.append("AccountKey=%s".formatted(accountKey));      //FIXME: Azure file storage Key;
+        sb.append("AccountKey=%s".formatted(accountKey));
 
         return sb.toString();
     }

@@ -8,7 +8,6 @@ import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
