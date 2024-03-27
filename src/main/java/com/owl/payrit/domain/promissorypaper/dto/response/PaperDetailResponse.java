@@ -1,7 +1,6 @@
 package com.owl.payrit.domain.promissorypaper.dto.response;
 
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
-import com.owl.payrit.domain.memo.entity.Memo;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.repaymenthistory.dto.RepaymentHistoryDto;

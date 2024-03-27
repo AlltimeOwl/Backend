@@ -21,7 +21,6 @@ import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +30,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -61,7 +59,6 @@ public class PromissoryPaperService {
         //TODO: 본인 인증이 완료된 회원만 차용증 작성이 가능하다.(v2)
         //if(!loginedMember.isAuthentication) { throw new exception ... }
 
-        //FIXME: 상대방이 회원가입 하지 않은 상황이면, 조회가 불가능? => 일단 null로 반환함.
         Member creditor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.creditorPhoneNumber()).orElse(null);
         Member debtor = memberService.findByPhoneNumberForPromissory(
@@ -136,6 +133,14 @@ public class PromissoryPaperService {
     }
 
     public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
+
+        if(promissoryPaper.getCreditor() == null) {
+            return promissoryPaper.getDebtor().getId().equals(memberId);
+        }
+
+        if(promissoryPaper.getDebtor() == null) {
+            return promissoryPaper.getCreditor().getId().equals(memberId);
+        }
 
         return promissoryPaper.getCreditor().getId().equals(memberId)
                 || promissoryPaper.getDebtor().getId().equals(memberId);
