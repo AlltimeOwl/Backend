@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17
+FROM openjdk:17-jdk-alpine
 
 ARG JAR_FILE=build/libs/*.jar
 
@@ -10,4 +10,4 @@ COPY ${JAR_FILE} /app.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod -Djava.net.preferIPv4Stack=true -Djava.net.preferIPv4Addresses=true", "/app.jar"]
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "-Djava.net.preferIPv4Stack=true", "-Djava.net.preferIPv4Addresses=true", "/app.jar"]
