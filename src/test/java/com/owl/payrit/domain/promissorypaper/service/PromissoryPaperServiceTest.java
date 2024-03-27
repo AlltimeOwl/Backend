@@ -388,8 +388,8 @@ public class PromissoryPaperServiceTest extends ServiceTest {
 
         LoginUser loginUser = prepareLoginUserByEmail(WRITER_CREDITOR_EMAIL);
 
-        promissoryPaperService.writePaper(loginUser, creditorWriteRequest);
-        promissoryPaperService.writePaper(loginUser, debtorWriteRequest);
+        promissoryPaperService.writePaper(loginUser, creditorWriteRequest, request);
+        promissoryPaperService.writePaper(loginUser, debtorWriteRequest, request);
 
         List<PromissoryPaper> promissoryPaperList = promissoryPaperRepository.findAllByCreditorOrDebtorOrWriter(member);
 

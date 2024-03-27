@@ -132,7 +132,7 @@ public class PromissoryPaperService {
 
     public boolean isWriter(PromissoryPaper paper, Member member) {
 
-        return paper.getWriter().equals(member);
+        return paper.getWriter() != null && paper.getWriter().equals(member);
     }
 
     public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
