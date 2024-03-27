@@ -30,6 +30,8 @@ jobs:
         run: |
           ls src/main/resources/apple
           cat src/main/resources/apple/AuthKey_JNGL644KHU.p8
+          ls src/main/resources/
+          cat src/main/resources/application-secret.yml
           ls src/main/resources/firebase/payrit_firebase.json
 
 
