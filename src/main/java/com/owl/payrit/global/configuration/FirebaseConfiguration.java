@@ -33,7 +33,5 @@ public class FirebaseConfiguration {
                 log.info("FirebaseApp initialization complete");
             }
         }
-
-
     }
 }

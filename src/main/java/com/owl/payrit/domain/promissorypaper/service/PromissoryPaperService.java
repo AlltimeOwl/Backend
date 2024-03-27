@@ -1,6 +1,8 @@
 package com.owl.payrit.domain.promissorypaper.service;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.docsinfo.entity.DocsInfo;
+import com.owl.payrit.domain.docsinfo.service.DocsInfoService;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
@@ -19,12 +21,18 @@ import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -40,12 +48,13 @@ public class PromissoryPaperService {
 
     private final static Long EXPIRED_STANDARD_DATE = 30L;
 
+    private final DocsInfoService docsInfoService;
     private final RepaymentHistoryService repaymentHistoryService;
     private final MemberService memberService;
     private final PromissoryPaperRepository promissoryPaperRepository;
 
     @Transactional
-    public Long writePaper(LoginUser loginUser, PaperWriteRequest paperWriteRequest) {
+    public Long writePaper(LoginUser loginUser, PaperWriteRequest paperWriteRequest, HttpServletRequest req) throws IOException {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
@@ -57,6 +66,9 @@ public class PromissoryPaperService {
                 paperWriteRequest.creditorPhoneNumber()).orElse(null);
         Member debtor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.debtorPhoneNumber()).orElse(null);
+
+        //FIXME: 작성자 CI
+        DocsInfo docsInfo = docsInfoService.createByWriter(loginedMember, getIpByReq(req), "작성자 CI");
 
         PromissoryPaper paper = PromissoryPaper.builder()
                 .primeAmount(paperWriteRequest.amount())
@@ -82,19 +94,13 @@ public class PromissoryPaperService {
                 .debtorPhoneNumber(paperWriteRequest.debtorPhoneNumber())
                 .debtorAddress(paperWriteRequest.debtorAddress())
                 .isDebtorAgree(loginedMember.equals(debtor))
-                .paperKey(getRandomKey())
+                .docsInfo(docsInfo)
                 .memos(new ArrayList<>())
-                .storageUrl(null)           //FIXME: 추후 저장소 URL로 저장 필요
                 .build();
 
         checkPaperData(loginedMember, paper);
 
         return promissoryPaperRepository.save(paper).getId();
-    }
-
-    private String getRandomKey() {
-        String paperKey = UUID.randomUUID().toString();
-        return promissoryPaperRepository.existsByPaperKey(paperKey) ? getRandomKey() : paperKey;
     }
 
     public PaperDetailResponse getDetail(LoginUser loginUser, Long paperId) {
@@ -126,7 +132,7 @@ public class PromissoryPaperService {
 
     public boolean isWriter(PromissoryPaper paper, Member member) {
 
-        return paper.getWriter() != null && paper.getWriter().equals(member) ;
+        return paper.getWriter() != null && paper.getWriter().equals(member);
     }
 
     public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
@@ -181,12 +187,16 @@ public class PromissoryPaperService {
     }
 
     @Transactional
-    public void acceptPaper(LoginUser loginUser, Long paperId) {
+    public void acceptPaper(LoginUser loginUser, Long paperId, MultipartFile documentFile
+            , HttpServletRequest req) throws IOException {
 
         Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperId);
+        DocsInfo docsInfo = paper.getDocsInfo();
 
         checkAcceptData(loginedMember, paper);
+
+        docsInfoService.acceptByAccepter(docsInfo, loginedMember, getIpByReq(req), "승인자 CI", documentFile);
 
         //FIXME: 결제 연동 후 상태 변경
         //paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
@@ -403,6 +413,45 @@ public class PromissoryPaperService {
         targetPapers.addAll(targetFromPaymentRequired);
 
         promissoryPaperRepository.deleteAll(targetPapers);
+    }
+
+    public String getIpByReq(HttpServletRequest req) {
+
+        String ip = req.getHeader("X-Forwarded-For");
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = req.getHeader("Proxy-Client-IP");
+        }
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = req.getHeader("WL-Proxy-Client-IP");
+        }
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = req.getHeader("HTTP_CLIENT_IP");
+        }
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = req.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = req.getHeader("X-Real-IP");
+        }
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = req.getHeader("X-RealIP");
+        }
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = req.getHeader("REMOTE_ADDR");
+        }
+
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = req.getRemoteAddr();
+        }
+
+        return ip;
     }
 
     @Transactional

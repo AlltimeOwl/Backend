@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.promissorypaper.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.owl.payrit.domain.docsinfo.entity.DocsInfo;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.memo.entity.Memo;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
@@ -18,6 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
@@ -90,15 +92,14 @@ public class PromissoryPaper extends BaseEntity {
     @Builder.Default
     private boolean isPaid = false;
 
-    private String paperKey;    //차용증 고유 값
+    @JoinColumn(name = "DOCS_INFO_ID")
+    @OneToOne(cascade = CascadeType.ALL)
+    private DocsInfo docsInfo;
 
     //차용증 상태
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private PaperStatus paperStatus = PaperStatus.WAITING_AGREE;
-
-    //저장소 URL
-    private String storageUrl;
 
     @OneToMany(mappedBy = "promissoryPaper", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Memo> memos = new ArrayList<>();

@@ -18,12 +18,15 @@ import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.util.ServiceTest;
+
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 class MemoServiceTest extends ServiceTest {
@@ -39,7 +42,9 @@ class MemoServiceTest extends ServiceTest {
 
     @Autowired
     MemoRepository memoRepository;
-    
+
+    MockHttpServletRequest request = new MockHttpServletRequest();
+
     @BeforeEach
     void settingMember() {
         setUp();
@@ -52,11 +57,11 @@ class MemoServiceTest extends ServiceTest {
         return new LoginUser(member.getId(), member.getOauthInformation());
     }
 
-    private Long preparePromissoryPaper(LoginUser loginUser) {
+    private Long preparePromissoryPaper(LoginUser loginUser) throws IOException {
         PaperWriteRequest paperWriteRequest = new PaperWriteRequest(PaperRole.CREDITOR, 3000000, 3100000,
             LocalDate.now(), LocalDate.now(), LocalDate.now(), "내용", 20.0f, 28, "name00",
             "010-1234-5670", "광화문", "name01", "010-1234-5671", "중구");
-        return promissoryPaperService.writePaper(loginUser, paperWriteRequest);
+        return promissoryPaperService.writePaper(loginUser, paperWriteRequest, request);
     }
 
     @Test
