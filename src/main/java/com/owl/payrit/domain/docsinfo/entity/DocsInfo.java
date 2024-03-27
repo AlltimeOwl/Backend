@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.docsinfo.entity;
 
+import com.owl.payrit.global.encryption.PromissoryPaperStringConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,10 +25,13 @@ public class DocsInfo {
 
     private Long writerId;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String writerName;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String writerPhoneNum;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String writerIpAddr;
 
     private String writerCI;
@@ -36,10 +40,13 @@ public class DocsInfo {
 
     private Long accepterId;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String accepterName;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String accepterPhoneNum;
 
+    @Convert(converter = PromissoryPaperStringConverter.class)
     private String accepterIpAddr;
 
     private String accepterCI;
