@@ -39,7 +39,7 @@ class MemoServiceTest extends ServiceTest {
 
     @Autowired
     MemoRepository memoRepository;
-
+    
     @BeforeEach
     void settingMember() {
         setUp();

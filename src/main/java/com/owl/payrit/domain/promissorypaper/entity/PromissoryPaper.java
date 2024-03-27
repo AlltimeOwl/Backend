@@ -106,6 +106,18 @@ public class PromissoryPaper extends BaseEntity {
     public void modifyPaperStatus(PaperStatus status) {
         this.paperStatus = status;
     }
+
+    public void removeCreditorRelation() {
+        this.creditor = null;
+    }
+
+    public void removeDebtorRelation() {
+        this.debtor = null;
+    }
+
+    public void removeWriterRelation() {
+        this.writer = null;
+    }
 }
 
 
