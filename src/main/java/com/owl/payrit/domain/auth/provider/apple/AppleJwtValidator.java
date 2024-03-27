@@ -89,10 +89,8 @@ public class AppleJwtValidator {
     private PrivateKey generatePrivateKey() throws IOException {
         String privateKey = null;
         ClassPathResource classPathResource = new ClassPathResource(keyClassPath);
-        log.info("keyClassPath : {}", keyClassPath);
         try (InputStream inputStream = classPathResource.getInputStream()) {
             privateKey = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            log.info("private key : {}", privateKey);
         } catch (Exception e) {
             log.error("Failed to read private key file", e);
         }
@@ -105,7 +103,6 @@ public class AppleJwtValidator {
     }
 
     public AppleTokenGenerateRequest generateAppleToken(String authorizationCode) {
-        log.info("AppleTokenGenerate code : {}", authorizationCode);
         AppleTokenGenerateRequest appleTokenGenerateRequest = null;
         try {
             String clientSecret = createClientSecret();

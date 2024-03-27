@@ -18,15 +18,10 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/alarm")
-    public ResponseEntity<Void> modifyAlarmStatus(@AuthenticationPrincipal LoginUser loginUser) {
-        log.debug("'{}' member request alarm status", loginUser.oauthInformation().getOauthProviderId());
+    @GetMapping("/notification")
+    public ResponseEntity<Void> modifyNotificationStatus(@AuthenticationPrincipal LoginUser loginUser) {
+        log.debug("'{}' member request notification status", loginUser.oauthInformation().getOauthProviderId());
         memberService.modifyAlarmStatus(loginUser);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/")
-    public ResponseEntity<LoginUser> test(@AuthenticationPrincipal LoginUser loginUser) {
-        return ResponseEntity.ok().body(loginUser);
     }
 }

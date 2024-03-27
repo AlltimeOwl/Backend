@@ -453,4 +453,14 @@ public class PromissoryPaperService {
 
         return ip;
     }
+
+    @Transactional
+    public void removeRelation(Member member) {
+        promissoryPaperRepository.findAllByCreditorOrDebtorOrWriter(member).parallelStream()
+            .forEach( paper -> {
+                if(paper.getWriter().equals(member)) paper.removeWriterRelation();
+                if(paper.getDebtor().equals(member)) paper.removeDebtorRelation();
+                if(paper.getCreditor().equals(member)) paper.removeCreditorRelation();
+            });
+    }
 }
