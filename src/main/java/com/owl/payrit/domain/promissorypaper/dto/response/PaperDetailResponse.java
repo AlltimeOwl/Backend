@@ -16,9 +16,6 @@ public record PaperDetailResponse(
         @Schema(description = "차용증 id")
         Long paperId,
 
-        @Schema(description = "저장소 URL")
-        String paperUrl,
-
         @Schema(description = "나의 역할")
         PaperRole memberRole,
 
@@ -87,7 +84,6 @@ public record PaperDetailResponse(
                                double repaymentRate, long dueDate, List<MemoListResponse> memoListResponses) {
         this(
                 promissoryPaper.getId(),
-                promissoryPaper.getStorageUrl(),
                 memberRole,
                 promissoryPaper.getPrimeAmount(),
                 promissoryPaper.getInterest(),

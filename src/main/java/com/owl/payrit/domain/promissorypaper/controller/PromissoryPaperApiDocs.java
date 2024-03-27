@@ -17,10 +17,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "차용증 관련 API", description = "차용증 서비스 API 입니다.")
@@ -32,8 +36,8 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
     })
     ResponseEntity<Void> write(@AuthenticationPrincipal LoginUser loginUser,
-                               @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest
-    );
+                               @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest,
+                               HttpServletRequest req) throws IOException;
 
     @Operation(summary = "차용증 상세 조회 API", description = "차용증 id를 파라미터로 입력하여 상세 조회가 가능합니다.")
     @ApiResponses(value = {
@@ -60,7 +64,9 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
     })
     ResponseEntity<Void> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
-                                     @Parameter(description = "차용증 id", required = true) Long id);
+                                     @Parameter(description = "차용증 id", required = true) Long id,
+                                     @RequestPart("file") MultipartFile file,
+                                     HttpServletRequest req) throws IOException;
 
     @Operation(summary = "차용증 수정 요청 API", description = "차용증의 수정을 요청합니다.")
     @ApiErrorCodeExample(PromissoryPaperErrorCode.class)

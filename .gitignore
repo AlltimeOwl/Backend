@@ -170,5 +170,7 @@ gradle-app.setting
 
 # End of https://www.toptal.com/developers/gitignore/api/java,intellij,gradle
 
+#Custom Ignore
 src/main/resources/apple
 src/main/resources/firebase
+src/main/resources/application-secret.yml
