@@ -15,7 +15,7 @@
 ## 🛠 Tech Stacks
 
 ### Back-end
-<img src="https://github.com/AlltimeOwl/Backend/assets/39723465/edef91eb-74d5-481b-93a7-b10d528b59ea">
+<img src="https://github.com/AlltimeOwl/Backend/assets/39723465/5e838587-5c23-4b82-8eff-4f3157cd74d3">
 
 ### Front-end
 
