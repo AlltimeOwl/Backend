@@ -26,29 +26,30 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         return httpSecurity.csrf(AbstractHttpConfigurer::disable)
-                           .httpBasic(AbstractHttpConfigurer::disable)
-                           .cors(Customizer.withDefaults())
-                           .headers(headers -> headers.frameOptions(
-                               HeadersConfigurer.FrameOptionsConfig::disable))
-                           .authorizeHttpRequests(
-                               authorize -> authorize.requestMatchers(
-                                                         antMatcher("/api/v1/oauth/**")
-                                                        ,antMatcher("/swagger-ui/**")
-                                                        ,antMatcher("/swagger-resources/**")
-                                                        ,antMatcher("/v3/api-docs/**")
-                                                        ,antMatcher("/h2-console/**")
-                                                        ,antMatcher("/img/**")
-                                                        ,antMatcher("/css/**")
-                                                        ,antMatcher("/")
-                                                     )
-                                                     .permitAll()
-                                                     .anyRequest()
-                                                     .authenticated())
-                           .sessionManagement(session -> session.sessionCreationPolicy(
-                               SessionCreationPolicy.STATELESS))
-                           .addFilterBefore(jwtAuthenticationFilter,
-                               UsernamePasswordAuthenticationFilter.class)
-                           .getOrBuild();
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .headers(headers -> headers.frameOptions(
+                        HeadersConfigurer.FrameOptionsConfig::disable))
+                .authorizeHttpRequests(
+                        authorize -> authorize.requestMatchers(
+                                        antMatcher("/api/v1/oauth/**")
+                                        , antMatcher("/swagger-ui/**")
+                                        , antMatcher("/swagger-resources/**")
+                                        , antMatcher("/v3/api-docs/**")
+                                        , antMatcher("/h2-console/**")
+                                        , antMatcher("/img/**")
+                                        , antMatcher("/css/**")
+                                        , antMatcher("/")
+                                        , antMatcher("/payment")        //FIXME: 삭제 필요
+                                )
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
+                .getOrBuild();
 
     }
 }

@@ -3,14 +3,15 @@ package com.owl.payrit.domain.transactionhistory.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
-import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
-import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
+import com.owl.payrit.domain.transactionhistory.configuration.PaymentConfigProps;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
+import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionHistory;
+import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
 import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryErrorCode;
 import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryException;
 import com.owl.payrit.domain.transactionhistory.repository.TransactionHistoryRepository;
@@ -23,7 +24,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,18 +32,35 @@ import java.util.stream.Collectors;
 public class TransactionHistoryService {
 
     private final MemberService memberService;
+    private final PaymentConfigProps paymentConfigProps;
     private final PromissoryPaperService promissoryPaperService;
 
     private final TransactionHistoryRepository transactionHistoryRepository;
 
-    //FIXME: 가격 설정 하드코딩 배제 필요
-    private static final long PAPER_COST = 1000;
+    public PaymentInfoResponse getPaymentInfo(Long memberId, TransactionType transactionType) {
+
+        Member loginedMember = memberService.findById(memberId);
+
+        String PID = paymentConfigProps.getPID();
+        String PGCode = paymentConfigProps.getTestPGCode();     //FIXME: PGCODE <-> TESTPGCODE
+        String merchantUID = genMerchantUID();
+        String name = transactionType.getContent();
+        int amount = getCostByType(transactionType);
+        String buyerEmail = loginedMember.getEmail();
+        String buyerName = loginedMember.getName();
+        String buyerTel = loginedMember.getPhoneNumber();
+
+        return new PaymentInfoResponse(PID, PGCode, merchantUID, name, amount, buyerEmail, buyerName, buyerTel);
+    }
 
     @Transactional
-    public void saveHistory(LoginUser loginUser, TransactionHistorySaveRequest request) {
+    public void saveHistory(Long memberId, TransactionHistorySaveRequest request) {
+
+        //FIXME: memberId(테스트용) -> loginUser
 
         PromissoryPaper paper = promissoryPaperService.getById(request.paperId());
-        Member loginedMember = memberService.findById(loginUser.id());
+        Member loginedMember = memberService.findById(memberId);
+//        Member loginedMember = memberService.findById(loginUser.id());
 
         checkSaveRequest(loginedMember, paper, request);
 
@@ -104,7 +121,7 @@ public class TransactionHistoryService {
 
     public void checkSaveRequest(Member loginedMember, PromissoryPaper paper, TransactionHistorySaveRequest request) {
 
-        if (request.amount() != PAPER_COST) {
+        if (request.amount() != paymentConfigProps.getPaperCost()) {        //FIXME: 수수료 부과시 변경 필요
             throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_BAD_COST);
         }
 
@@ -134,4 +151,22 @@ public class TransactionHistoryService {
         //TODO ...
     }
 
+    public String genMerchantUID() {
+
+        int secondForMerchantUID = LocalDateTime.now().getSecond();
+
+        return "PR_" + secondForMerchantUID;
+    }
+
+    public int getCostByType(TransactionType transactionType) {
+
+        switch(transactionType) {
+            case PAPER_TRANSACTION:
+                return paymentConfigProps.getPaperCost();
+            case NOTIFICATION_TRANSACTION:
+                return paymentConfigProps.getNotiCost();
+            default:
+                throw new TransactionHistoryException(TransactionHistoryErrorCode.PAYMENT_BAD_TYPE);
+        }
+    }
 }

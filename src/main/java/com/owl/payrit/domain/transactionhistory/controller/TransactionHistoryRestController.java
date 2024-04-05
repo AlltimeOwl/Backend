@@ -2,8 +2,10 @@ package com.owl.payrit.domain.transactionhistory.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
+import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
+import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
 import com.owl.payrit.domain.transactionhistory.service.TransactionHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +24,23 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
     private final TransactionHistoryService transactionHistoryService;
 
     @Override
+    @GetMapping("/paymentInfo")
+    public ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser) {
+
+        //FIXME: TRANSACTION TYPE FIX
+        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), TransactionType.PAPER_TRANSACTION);
+
+        return ResponseEntity.ok().body(paymentInfo);
+    }
+
+    @Override
     @PostMapping("/save")
     public ResponseEntity<Void> save(@AuthenticationPrincipal LoginUser loginUser,
                                      @RequestBody TransactionHistorySaveRequest transactionHistorySaveRequest) {
 
         log.info(transactionHistorySaveRequest.toString());
 
-        transactionHistoryService.saveHistory(loginUser, transactionHistorySaveRequest);
+        transactionHistoryService.saveHistory(loginUser.id(), transactionHistorySaveRequest);
 
         return ResponseEntity.noContent().build();
     }
@@ -55,5 +67,4 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
 
         return ResponseEntity.ok().body(listResponses);
     }
-
 }
