@@ -7,7 +7,9 @@ import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
+import com.owl.payrit.domain.transactionhistory.configuration.PaymentConfigProps;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
+import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionHistory;
@@ -32,12 +34,29 @@ import java.util.stream.Collectors;
 public class TransactionHistoryService {
 
     private final MemberService memberService;
+    private final PaymentConfigProps paymentConfigProps;
     private final PromissoryPaperService promissoryPaperService;
 
     private final TransactionHistoryRepository transactionHistoryRepository;
 
-    //FIXME: 가격 설정 하드코딩 배제 필요
-    private static final long PAPER_COST = 1000;
+    public PaymentInfoResponse getPaymentInfo() {
+
+        String PID = paymentConfigProps.getPID();
+        String PGCode = paymentConfigProps.getTestPGCode();     //FIXME: PGCODE <-> TESTPGCODE
+        String merchantUID =
+        /*
+        String PID,
+        String PGCode,
+        String merchantUID,
+        String name,
+        String amount,
+        String buyerEmail,
+        String buyerName,
+        String buyerTel
+        String cost;
+         */
+
+    }
 
     @Transactional
     public void saveHistory(LoginUser loginUser, TransactionHistorySaveRequest request) {
