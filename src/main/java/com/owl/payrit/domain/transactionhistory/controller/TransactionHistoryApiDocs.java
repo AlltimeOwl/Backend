@@ -2,8 +2,10 @@ package com.owl.payrit.domain.transactionhistory.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
+import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
+import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
 import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryErrorCode;
 import com.owl.payrit.global.swagger.annotation.ApiErrorCodeExample;
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,4 +55,14 @@ public interface TransactionHistoryApiDocs {
                     })
     })
     ResponseEntity<List<TransactionHistoryListResponse>> list(@AuthenticationPrincipal LoginUser loginUser);
+
+    @Operation(summary = "결제 사전정보 받기 API", description = "결제 모듈 호출을 위해 필요한 정보를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회에 성공하여 결제 모듈 정보를 가져옵니다.",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = PaymentInfoResponse.class))
+                    })
+    })
+    ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser);
 }

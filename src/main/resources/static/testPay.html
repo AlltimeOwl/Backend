@@ -9,28 +9,44 @@
     <!-- iamport.payment.js -->
     <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
 
-    <script>
+    <script th:inline="javascript">
+
+        /*<![CDATA[*/
+        var pid = /*[[${PID}]]*/ 'none_pid';
+        var pg = /*[[${PG}]]*/ 'none_pg';
+        /*]]>*/
+
         var IMP = window.IMP;
-        var pid = pid;
-        var pg = pg;
         IMP.init(pid);
 
         /*
-pid
-pg
         merchant_uid: "PAYRIT" + makeMerchantUid,
         name: '차용증 대금 결제',
         amount: 1000,
         buyer_email: 'sunghoon1216@naver.com',
         buyer_name: '김성훈_테스트_결제',
         buyer_tel: '010-5527-2383',
-        buyer_addr: '서울특별시 강남구 삼성동',
  */
 
         function requestPay() {
+            /*<![CDATA[*/
+            var merchant_uid = /*[[${merchantUID}]]*/ 'NONE_MUID';
+            var name = /*[[${name}]]*/ 'NONE_NAME';
+            var amount = /*[[${amount}]]*/ 'NONE_AMOUNT';
+            var buyer_name = /*[[${buyerName}]]*/ 'NONE_EMAIL';
+            var buyer_email = /*[[${buyerEmail}]]*/ 'NONE_EMAIL';
+            var buyer_tel = /*[[${buyerTel}]]*/ 'NONE_TEL';
+            /*]]>*/
+
             IMP.request_pay({
                 pg: pg,       //kcp.AO09C(테스트), kcp.IP05D(실 결제)
                 pay_method: 'card',
+                merchant_uid: merchant_uid,
+                name: name,
+                amount: amount,
+                buyer_name: buyer_name,
+                buyer_email: buyer_email,
+                buyer_tel: buyer_tel,
 
             }, function (rsp) { // callback
                 if (rsp.success) {
