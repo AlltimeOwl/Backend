@@ -14,5 +14,6 @@ public class PaymentConfigProps {
     private String PID;
     private String PGCode;
     private String testPGCode;
-    private String paperCost;
+    private int paperCost;
+    private int notiCost;
 }

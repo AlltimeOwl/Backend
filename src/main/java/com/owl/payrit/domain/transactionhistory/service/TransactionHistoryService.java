@@ -13,6 +13,7 @@ import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionHistory;
+import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
 import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryErrorCode;
 import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryException;
 import com.owl.payrit.domain.transactionhistory.repository.TransactionHistoryRepository;
@@ -23,8 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,23 +43,20 @@ public class TransactionHistoryService {
 
     private final TransactionHistoryRepository transactionHistoryRepository;
 
-    public PaymentInfoResponse getPaymentInfo() {
+    public PaymentInfoResponse getPaymentInfo(Long memberId, TransactionType transactionType) {
+
+        Member loginedMember = memberService.findById(memberId);
 
         String PID = paymentConfigProps.getPID();
         String PGCode = paymentConfigProps.getTestPGCode();     //FIXME: PGCODE <-> TESTPGCODE
-        String merchantUID =
-        /*
-        String PID,
-        String PGCode,
-        String merchantUID,
-        String name,
-        String amount,
-        String buyerEmail,
-        String buyerName,
-        String buyerTel
-        String cost;
-         */
+        String merchantUID = genMerchantUID();
+        String name = transactionType.getContent();
+        int amount = getCostByType(transactionType);
+        String buyerEmail = loginedMember.getEmail();
+        String buyerName = loginedMember.getName();
+        String buyerTel = loginedMember.getPhoneNumber();
 
+        return new PaymentInfoResponse(PID, PGCode, merchantUID, name, amount, buyerEmail, buyerName, buyerTel);
     }
 
     @Transactional
@@ -123,7 +124,7 @@ public class TransactionHistoryService {
 
     public void checkSaveRequest(Member loginedMember, PromissoryPaper paper, TransactionHistorySaveRequest request) {
 
-        if (request.amount() != PAPER_COST) {
+        if (request.amount() != paymentConfigProps.getPaperCost()) {        //FIXME: 수수료 부과시 변경 필요
             throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_BAD_COST);
         }
 
@@ -153,4 +154,22 @@ public class TransactionHistoryService {
         //TODO ...
     }
 
+    public String genMerchantUID() {
+
+        int secondForMerchantUID = LocalDateTime.now().getSecond();
+
+        return "PR_" + secondForMerchantUID;
+    }
+
+    public int getCostByType(TransactionType transactionType) {
+
+        switch(transactionType) {
+            case PAPER_TRANSACTION:
+                return paymentConfigProps.getPaperCost();
+            case NOTIFICATION_TRANSACTION:
+                return paymentConfigProps.getNotiCost();
+            default:
+                throw new TransactionHistoryException(TransactionHistoryErrorCode.PAYMENT_BAD_TYPE);
+        }
+    }
 }
