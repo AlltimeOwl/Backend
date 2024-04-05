@@ -1,13 +1,16 @@
 package com.owl.payrit.domain.transactionhistory.controller;
 
+import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
 import com.owl.payrit.domain.transactionhistory.service.TransactionHistoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class TransactionTestController {
@@ -15,6 +18,7 @@ public class TransactionTestController {
     //FIXME: 결제 테스트를 위한 컨트롤러. 삭제 필요
 
     private final TransactionHistoryService transactionHistoryService;
+    private final MemberService memberService;
 
     @GetMapping("/payment")
     public String getTestPay(Model model) {

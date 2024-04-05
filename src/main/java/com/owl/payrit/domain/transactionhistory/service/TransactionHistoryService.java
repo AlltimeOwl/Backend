@@ -3,8 +3,6 @@ package com.owl.payrit.domain.transactionhistory.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
-import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
-import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.domain.transactionhistory.configuration.PaymentConfigProps;
@@ -24,12 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -60,10 +54,13 @@ public class TransactionHistoryService {
     }
 
     @Transactional
-    public void saveHistory(LoginUser loginUser, TransactionHistorySaveRequest request) {
+    public void saveHistory(Long memberId, TransactionHistorySaveRequest request) {
+
+        //FIXME: memberId(테스트용) -> loginUser
 
         PromissoryPaper paper = promissoryPaperService.getById(request.paperId());
-        Member loginedMember = memberService.findById(loginUser.id());
+        Member loginedMember = memberService.findById(memberId);
+//        Member loginedMember = memberService.findById(loginUser.id());
 
         checkSaveRequest(loginedMember, paper, request);
 

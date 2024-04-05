@@ -19,15 +19,6 @@
         var IMP = window.IMP;
         IMP.init(pid);
 
-        /*
-        merchant_uid: "PAYRIT" + makeMerchantUid,
-        name: '차용증 대금 결제',
-        amount: 1000,
-        buyer_email: 'sunghoon1216@naver.com',
-        buyer_name: '김성훈_테스트_결제',
-        buyer_tel: '010-5527-2383',
- */
-
         function requestPay() {
             /*<![CDATA[*/
             var merchant_uid = /*[[${merchantUID}]]*/ 'NONE_MUID';
@@ -50,6 +41,32 @@
 
             }, function (rsp) { // callback
                 if (rsp.success) {
+
+                    const requestData = {
+                        paperId: 1,
+                        transactionDate: "2024-04-05T10:15:30",
+                        amount: amount,
+                        contents: name,
+                        transactionType: rsp.card_name + " (" + rsp.card_number.substring(0, 4) + ")",
+                        approvalNumber: rsp.apply_num,
+                        orderNumber: merchant_uid,
+                        isSuccess: true
+                    }
+
+                    console.log("request data : " + requestData);
+
+                    $.ajax({
+                        url: "/api/v1/transaction/save",
+                        type: "POST",
+                        contentType: 'application/json',
+                        data: JSON.stringify(requestData),
+                        headers: {"Authorization": "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwib2F1dGhJbmZvcm1hdGlvbiI6eyJvYXV0aFByb3ZpZGVySWQiOiIwIiwib2F1dGhQcm92aWRlciI6IktBS0FPIn0sInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTIzMDIzNDQsImV4cCI6MTcxMjkwNzE0NH0.bP6OE_2lHfaQXRa_CQtBnTrfM91vzXiRi2hZ-TAKZYc"},
+                        success: function (data) {
+                            alert("결제가 성공하였습니다.")
+                            console.log(data);
+                        }
+                    });
+
                     console.log(rsp);
                 } else {
                     console.log(rsp);

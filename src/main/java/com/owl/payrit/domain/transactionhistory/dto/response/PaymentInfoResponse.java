@@ -1,7 +1,5 @@
 package com.owl.payrit.domain.transactionhistory.dto.response;
 
-import lombok.AllArgsConstructor;
-
 public record PaymentInfoResponse(
 
         String PID,
