@@ -2,8 +2,10 @@ package com.owl.payrit.domain.transactionhistory.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
+import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
+import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
 import com.owl.payrit.domain.transactionhistory.service.TransactionHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,15 @@ import java.util.List;
 public class TransactionHistoryRestController implements TransactionHistoryApiDocs {
 
     private final TransactionHistoryService transactionHistoryService;
+
+    @GetMapping("/paymentInfo")
+    public ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser,
+                                                              TransactionType transactionType) {
+
+        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), transactionType);
+
+        return ResponseEntity.ok().body(paymentInfo);
+    }
 
     @Override
     @PostMapping("/save")
