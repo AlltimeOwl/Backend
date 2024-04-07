@@ -100,7 +100,7 @@ public class AuthService {
         PortOneTokenResponse portOneTokenResponse = portOneApiClient.getAccessToken(portOneTokenRequest);
 
         // 3. imp_uid를 통해 인증 된 정보를 가져옵니다.
-        PortOneCertificationResponse portOneCertificationResponse = portOneApiClient.getCertificationInformation(portOneTokenResponse.authAnnotation().accessToken(), certificationRequest.impUid());
+        PortOneCertificationResponse portOneCertificationResponse = portOneApiClient.getCertificationInformation("Bearer %s".formatted(portOneTokenResponse.authAnnotation().accessToken()), certificationRequest.impUid());
         CertificationInformation certificationInformation = portOneCertificationResponse.toEntity();
 
         // 4. 기존에 다른 아이디로 본인인증 된 적이 있는지 확인합니다.
