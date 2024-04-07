@@ -45,6 +45,9 @@ public class Member extends BaseEntity implements UserDetails {
     @Embedded
     private OauthInformation oauthInformation;
 
+    @Embedded
+    private CertificationInformation certificationInformation;
+
     @Column(nullable = false)
     private String email;
 
