@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.auth.controller;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.request.CertificationRequest;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
 import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
@@ -50,4 +51,8 @@ public interface AuthApiDocs {
             @Content(mediaType = "application/json", schema = @Schema(implementation = TokenResponse.class))
         })
     ResponseEntity<TokenRefreshResponse> refreshAccessToken(LoginTokenRequest loginTokenRequest);
+
+    @Operation(summary = "본인 인증 완료 API", description = "본인인증이 성공한 유저에 대해서, 서버에 정보를 등록하는 API 입니다. 본인인증이 성공한 뒤, Imp_uid를 body에 담아서 전송하면 서버에서 PortOne 서버로 인증 정보를 요청합니다.")
+    @ApiResponse(responseCode = "204")
+    ResponseEntity<Void> initializeCertificationInformation(@AuthenticationPrincipal LoginUser loginUser, @RequestBody CertificationRequest certificationRequest);
 }
