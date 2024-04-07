@@ -62,4 +62,8 @@ public class MemberService {
     public void delete(Member member) {
         memberRepository.delete(member);
     }
+
+    public boolean existsByCertificationInformation(String name, String phone) {
+        return memberRepository.existsByCertificationInformationNameAndCertificationInformationPhone(name, phone);
+    }
 }

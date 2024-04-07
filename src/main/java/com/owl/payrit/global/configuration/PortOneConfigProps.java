@@ -14,4 +14,5 @@ public class PortOneConfigProps {
     private String storeId;
     private String accessKey;
     private String secretKey;
+
 }

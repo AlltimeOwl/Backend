@@ -88,6 +88,10 @@ public class Member extends BaseEntity implements UserDetails {
         this.firebaseToken = firebaseToken;
     }
 
+    public void updateCertificationInformation(CertificationInformation certificationInformation) {
+        this.certificationInformation = certificationInformation;
+        this.isAuthenticated = true;
+    }
     @Override
     public String getPassword() {
         return null;

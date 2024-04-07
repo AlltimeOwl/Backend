@@ -9,7 +9,6 @@ public record PortOneTokenResponse(
     String message,
     AuthAnnotation authAnnotation
 ) {
-
     @JsonNaming(SnakeCaseStrategy.class)
     public record AuthAnnotation(
         String accessToken,
@@ -19,3 +18,5 @@ public record PortOneTokenResponse(
 
     }
 }
+
+
