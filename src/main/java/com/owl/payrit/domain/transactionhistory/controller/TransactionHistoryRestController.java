@@ -40,7 +40,7 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
 
         log.info(transactionHistorySaveRequest.toString());
 
-        transactionHistoryService.saveHistory(loginUser.id(), transactionHistorySaveRequest);
+        transactionHistoryService.saveHistory(loginUser, transactionHistorySaveRequest);
 
         return ResponseEntity.noContent().build();
     }

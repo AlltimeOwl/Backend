@@ -318,6 +318,10 @@ public class PromissoryPaperService {
 
         LocalDate today = LocalDate.now();
 
+        if(member.isAuthenticated()) {
+            throw new PromissoryPaperException(PromissoryPaperErrorCode.NEED_AUTHENTICATION);
+        }
+
         if (!checkMemberData(member, paper, paper.getWriterRole())) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_MATCHING_FAILED);
         }

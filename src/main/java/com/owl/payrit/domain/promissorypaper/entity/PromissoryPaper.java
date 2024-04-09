@@ -99,6 +99,7 @@ public class PromissoryPaper extends BaseEntity {
     private List<Memo> memos = new ArrayList<>();
 
     public void modifyPaperStatus(PaperStatus status) {
+
         this.paperStatus = status;
     }
 

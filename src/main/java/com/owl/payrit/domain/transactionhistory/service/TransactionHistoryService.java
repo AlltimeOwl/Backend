@@ -3,6 +3,7 @@ package com.owl.payrit.domain.transactionhistory.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.domain.transactionhistory.configuration.PaymentConfigProps;
@@ -54,13 +55,10 @@ public class TransactionHistoryService {
     }
 
     @Transactional
-    public void saveHistory(Long memberId, TransactionHistorySaveRequest request) {
-
-        //FIXME: memberId(테스트용) -> loginUser
+    public void saveHistory(LoginUser loginUser, TransactionHistorySaveRequest request) {
 
         PromissoryPaper paper = promissoryPaperService.getById(request.paperId());
-        Member loginedMember = memberService.findById(memberId);
-//        Member loginedMember = memberService.findById(loginUser.id());
+        Member loginedMember = memberService.findById(loginUser.id());
 
         checkSaveRequest(loginedMember, paper, request);
 
@@ -75,6 +73,8 @@ public class TransactionHistoryService {
                 .orderNumber(request.orderNumber())
                 .isSuccess(request.isSuccess())
                 .build();
+
+        paper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
 
         transactionHistoryRepository.save(history);
     }
