@@ -38,14 +38,12 @@ public class MemberService {
                                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
-    /*
-    차용증 작성 시, 상대방이 가입되어있지 않을 상황을 고려해 Optional<Member> 반환
-     */
+
     public Optional<Member> findByPhoneNumberForPromissory(String phoneNumber) {
 
+        //NOTE: 차용증 작성 시, 상대방이 가입되어있지 않을 상황을 고려해 Optional<Member> 반환
 
-
-        return memberRepository.findByPhoneNumber(phoneNumber);
+        return memberRepository.findByCertificationInformationPhone(phoneNumber);
     }
 
     public Member findByOauthInformation(OauthInformation oauthInformation) {

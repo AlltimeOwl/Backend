@@ -21,6 +21,7 @@ import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentCancelRequest
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
+import com.owl.payrit.global.utils.Ut;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,8 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class PromissoryPaperService {
 
-    private final static Long EXPIRED_STANDARD_DATE = 30L;
+    private static final Integer INTEREST_LIMIT = 20;
+    private static final Long EXPIRED_STANDARD_DATE = 30L;
 
     private final DocsInfoService docsInfoService;
     private final RepaymentHistoryService repaymentHistoryService;
@@ -57,12 +59,12 @@ public class PromissoryPaperService {
         Member loginedMember = memberService.findById(loginUser.id());
 
         Member creditor = memberService.findByPhoneNumberForPromissory(
-                paperWriteRequest.creditorPhoneNumber()).orElse(null);
+                Ut.str.parsedPhoneNumber(paperWriteRequest.creditorPhoneNumber())).orElse(null);
         Member debtor = memberService.findByPhoneNumberForPromissory(
-                paperWriteRequest.debtorPhoneNumber()).orElse(null);
+                Ut.str.parsedPhoneNumber(paperWriteRequest.debtorPhoneNumber())).orElse(null);
 
-        //FIXME: 작성자 CI
-        DocsInfo docsInfo = docsInfoService.createByWriter(loginedMember, getIpByReq(req), "작성자 CI");
+        DocsInfo docsInfo = docsInfoService.createByWriter(loginedMember, getIpByReq(req),
+                loginedMember.getCertificationInformation().getImpUid());
 
         PromissoryPaper paper = PromissoryPaper.builder()
                 .primeAmount(paperWriteRequest.amount())
@@ -131,11 +133,11 @@ public class PromissoryPaperService {
 
     public boolean isMine(Long memberId, PromissoryPaper promissoryPaper) {
 
-        if(promissoryPaper.getCreditor() == null) {
+        if (promissoryPaper.getCreditor() == null) {
             return promissoryPaper.getDebtor().getId().equals(memberId);
         }
 
-        if(promissoryPaper.getDebtor() == null) {
+        if (promissoryPaper.getDebtor() == null) {
             return promissoryPaper.getCreditor().getId().equals(memberId);
         }
 
@@ -198,11 +200,10 @@ public class PromissoryPaperService {
 
         checkAcceptData(loginedMember, paper);
 
-        docsInfoService.acceptByAccepter(docsInfo, loginedMember, getIpByReq(req), "승인자 CI", documentFile);
+        docsInfoService.acceptByAccepter(docsInfo, loginedMember, getIpByReq(req),
+                loginedMember.getCertificationInformation().getImpUid(), documentFile);
 
-        //FIXME: 결제 연동 후 상태 변경
-        //paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
-        paper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
+        paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
     }
 
     public void checkAcceptData(Member member, PromissoryPaper paper) {
@@ -242,12 +243,10 @@ public class PromissoryPaperService {
 
     public void checkModifyRequestData(Member member, PromissoryPaper paper) {
 
-        //승인 대기 단계에서만 수정 요청이 가능함
         if (!paper.getPaperStatus().equals(PaperStatus.WAITING_AGREE)) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_STATUS_IS_NOT_WAITING);
         }
 
-        //승인 요청을 받은 사람만 수정 요청이 가능하다.
         if (!checkMemberData(member, paper, paper.getWriterRole().getReverse())) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_CANNOT_REQUEST_MODIFY);
         }
@@ -315,7 +314,7 @@ public class PromissoryPaperService {
 
         LocalDate today = LocalDate.now();
 
-        if(member.isAuthenticated()) {
+        if (member.isAuthenticated()) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.NEED_AUTHENTICATION);
         }
 
@@ -323,8 +322,7 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_MATCHING_FAILED);
         }
 
-        //FIXME: 하드코딩 개선 필요
-        if (paper.getInterestRate() > 20) {
+        if (paper.getInterestRate() > INTEREST_LIMIT) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_INTEREST_RATE_NOT_VALID);
         }
 
@@ -374,7 +372,6 @@ public class PromissoryPaperService {
                 .remainingAmount(totalRemainingAmount)
                 .build();
 
-        //상환이 완료되었을 경우, 만료 처리
         if (totalRemainingAmount == 0) {
             modifiedPaper.modifyPaperStatus(PaperStatus.EXPIRED);
         }
@@ -463,10 +460,10 @@ public class PromissoryPaperService {
     @Transactional
     public void removeRelation(Member member) {
         promissoryPaperRepository.findAllByCreditorOrDebtorOrWriter(member).parallelStream()
-            .forEach( paper -> {
-                if(paper.getWriter().equals(member)) paper.removeWriterRelation();
-                if(paper.getDebtor().equals(member)) paper.removeDebtorRelation();
-                if(paper.getCreditor().equals(member)) paper.removeCreditorRelation();
-            });
+                .forEach(paper -> {
+                    if (paper.getWriter().equals(member)) paper.removeWriterRelation();
+                    if (paper.getDebtor().equals(member)) paper.removeDebtorRelation();
+                    if (paper.getCreditor().equals(member)) paper.removeCreditorRelation();
+                });
     }
 }
