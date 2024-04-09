@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.auth.configuration;
 
 import com.owl.payrit.domain.auth.provider.apple.AppleApiClient;
+import com.owl.payrit.domain.auth.provider.portone.PortOneApiClient;
 import com.owl.payrit.domain.auth.provider.kakao.KakaoApiClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,11 @@ public class HttpInterfaceConfiguration {
     @Bean
     public AppleApiClient appleApiClient() {
         return createHttpInterface(AppleApiClient.class);
+    }
+
+    @Bean
+    public PortOneApiClient portOneApiClient() {
+        return createHttpInterface(PortOneApiClient.class);
     }
 
     private <T> T createHttpInterface(Class<T> clazz) {

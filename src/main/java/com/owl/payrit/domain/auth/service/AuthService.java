@@ -13,7 +13,7 @@ import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.auth.exception.AuthErrorCode;
 import com.owl.payrit.domain.auth.exception.AuthException;
 import com.owl.payrit.domain.auth.provider.OauthClientComposite;
-import com.owl.payrit.domain.auth.provider.danal.PortOneApiClient;
+import com.owl.payrit.domain.auth.provider.portone.PortOneApiClient;
 import com.owl.payrit.domain.auth.util.JwtProvider;
 import com.owl.payrit.domain.member.entity.CertificationInformation;
 import com.owl.payrit.domain.member.entity.Member;
