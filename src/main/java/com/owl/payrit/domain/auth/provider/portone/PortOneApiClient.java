@@ -1,4 +1,4 @@
-package com.owl.payrit.domain.auth.provider.danal;
+package com.owl.payrit.domain.auth.provider.portone;
 
 import com.owl.payrit.domain.auth.dto.request.PortOneTokenRequest;
 import com.owl.payrit.domain.auth.dto.response.PortOneCertificationResponse;
