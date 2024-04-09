@@ -3,7 +3,6 @@ package com.owl.payrit.domain.auth.service;
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.CertificationRequest;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
-import com.owl.payrit.domain.auth.dto.request.PortOneTokenRequest;
 import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.dto.response.PortOneCertificationResponse;
@@ -24,9 +23,16 @@ import com.owl.payrit.global.configuration.PortOneConfigProps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -96,11 +102,11 @@ public class AuthService {
         Member member = memberService.findById(loginUser.id());
         checkIfUserAlreadyAuthenticated(member.isAuthenticated());
         // 2. PortOne AccessToken을 요청합니다.
-        PortOneTokenRequest portOneTokenRequest = new PortOneTokenRequest(portOneConfigProps.getAccessKey(), portOneConfigProps.getSecretKey());
-        PortOneTokenResponse portOneTokenResponse = portOneApiClient.getAccessToken(portOneTokenRequest);
+
+        PortOneTokenResponse portOneTokenResponse = getPortOneAccessToken();
 
         // 3. imp_uid를 통해 인증 된 정보를 가져옵니다.
-        PortOneCertificationResponse portOneCertificationResponse = portOneApiClient.getCertificationInformation("Bearer %s".formatted(portOneTokenResponse.authAnnotation().accessToken()), certificationRequest.impUid());
+        PortOneCertificationResponse portOneCertificationResponse = portOneApiClient.getCertificationInformation("Bearer %s".formatted(portOneTokenResponse.response().accessToken()), certificationRequest.impUid());
         CertificationInformation certificationInformation = portOneCertificationResponse.toEntity();
 
         // 4. 기존에 다른 아이디로 본인인증 된 적이 있는지 확인합니다.
@@ -109,6 +115,26 @@ public class AuthService {
         // 5. 유저의 본인인증 정보를 업데이트 합니다.
         member.updateCertificationInformation(certificationInformation);
 
+    }
+
+    private PortOneTokenResponse getPortOneAccessToken() {
+        RestTemplate restTemplate = new RestTemplateBuilder().build();
+        try {
+            JSONObject formData = new JSONObject();
+            formData.put("imp_key", portOneConfigProps.getAccessKey());
+            formData.put("imp_secret", portOneConfigProps.getSecretKey());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> requestEntity = new HttpEntity<>(formData.toString(), headers);
+
+            ResponseEntity<PortOneTokenResponse> responseEntity = restTemplate.postForEntity("https://api.iamport.kr/users/getToken", requestEntity, PortOneTokenResponse.class);
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("Error occurred while getting PortOne access token", e);
+        }
+        return null;
     }
 
     public void checkCertificationInformationExistence(String name, String phone) {

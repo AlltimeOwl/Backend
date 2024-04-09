@@ -1,4 +1,4 @@
-package com.owl.payrit.domain.member.dto;
+package com.owl.payrit.domain.member.dto.request;
 
 import java.time.LocalDate;
 
