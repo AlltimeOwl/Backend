@@ -56,9 +56,6 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
-        //TODO: 본인 인증이 완료된 회원만 차용증 작성이 가능하다.(v2)
-        //if(!loginedMember.isAuthentication) { throw new exception ... }
-
         Member creditor = memberService.findByPhoneNumberForPromissory(
                 paperWriteRequest.creditorPhoneNumber()).orElse(null);
         Member debtor = memberService.findByPhoneNumberForPromissory(
