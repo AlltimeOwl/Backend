@@ -4,20 +4,19 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.owl.payrit.domain.member.entity.CertificationInformation;
 
-@JsonNaming(SnakeCaseStrategy.class)
 public record PortOneCertificationResponse(
-    int code,
+    Integer code,
     String message,
-    CertificationAnnotation certificationAnnotation
+    CertificationAnnotation response
 ) {
 
     public CertificationInformation toEntity() {
         return CertificationInformation.builder()
-                                       .impUid(certificationAnnotation.impUid)
-                                       .name(certificationAnnotation.name)
-                                       .gender(certificationAnnotation.gender)
-                                       .birthday(certificationAnnotation.birthday)
-                                       .phone(certificationAnnotation.phone)
+                                       .impUid(response.impUid)
+                                       .name(response.name)
+                                       .gender(response.gender)
+                                       .birthday(response.birthday)
+                                       .phone(response.phone)
                                        .build();
     }
 
