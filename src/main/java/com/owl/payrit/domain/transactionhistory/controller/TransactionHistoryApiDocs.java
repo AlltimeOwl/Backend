@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -64,5 +65,6 @@ public interface TransactionHistoryApiDocs {
                                     schema = @Schema(implementation = PaymentInfoResponse.class))
                     })
     })
-    ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser, TransactionType transactionType);
+    ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser, TransactionType transactionType,
+                                                       @PathVariable(name = "id") Long paperId);
 }

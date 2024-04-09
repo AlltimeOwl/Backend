@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -38,13 +39,13 @@ public class TransactionHistoryService {
 
     private final TransactionHistoryRepository transactionHistoryRepository;
 
-    public PaymentInfoResponse getPaymentInfo(Long memberId, TransactionType transactionType) {
+    public PaymentInfoResponse getPaymentInfo(Long memberId, TransactionType transactionType, Long paperId) {
 
         Member loginedMember = memberService.findById(memberId);
 
         String PID = paymentConfigProps.getPID();
         String PGCode = paymentConfigProps.getTestPGCode();     //FIXME: PGCODE <-> TESTPGCODE
-        String merchantUID = genMerchantUID();
+        String merchantUID = genMerchantUID(paperId);
         String name = transactionType.getContent();
         int amount = getCostByType(transactionType);
         String buyerEmail = loginedMember.getEmail();
@@ -151,16 +152,19 @@ public class TransactionHistoryService {
         //TODO ...
     }
 
-    public String genMerchantUID() {
+    public String genMerchantUID(Long paperId) {
 
-        int secondForMerchantUID = LocalDateTime.now().getSecond();
+        Random random = new Random();
+        LocalDateTime now = LocalDateTime.now();
 
-        return "PR_" + secondForMerchantUID;
+        int randomValue = random.nextInt(9) + 1;
+
+        return "PR_" + paperId + now.getMonthValue() + now.getDayOfMonth() + now.getSecond() + randomValue;
     }
 
     public int getCostByType(TransactionType transactionType) {
 
-        switch(transactionType) {
+        switch (transactionType) {
             case PAPER_TRANSACTION:
                 return paymentConfigProps.getPaperCost();
             case NOTIFICATION_TRANSACTION:
