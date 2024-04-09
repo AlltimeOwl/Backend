@@ -21,7 +21,7 @@ public class FakeKakaoMemberClient implements OauthClient {
     public Member fetch(String accessToken) {
         // 가짜 유저 정보를 생성하여 반환
         OauthInformation fakeOauthInformation = new OauthInformation("fake_oauth_provider_id", OauthProvider.FAKE_KAKAO);
-        return new Member(fakeOauthInformation, "fake_email@example.com", "fake_phone_number", LocalDate.now(),"test",true, true, "fake_firebase_token", "fake_address", Role.MEMBER);
+        return new Member(fakeOauthInformation, null ,"fake_email@example.com", "fake_phone_number", LocalDate.now(),"test",true, true, "fake_firebase_token", "fake_address", Role.MEMBER);
     }
 
     @Override

@@ -45,6 +45,9 @@ public class Member extends BaseEntity implements UserDetails {
     @Embedded
     private OauthInformation oauthInformation;
 
+    @Embedded
+    private CertificationInformation certificationInformation;
+
     @Column(nullable = false)
     private String email;
 
@@ -85,6 +88,10 @@ public class Member extends BaseEntity implements UserDetails {
         this.firebaseToken = firebaseToken;
     }
 
+    public void updateCertificationInformation(CertificationInformation certificationInformation) {
+        this.certificationInformation = certificationInformation;
+        this.isAuthenticated = true;
+    }
     @Override
     public String getPassword() {
         return null;

@@ -1,19 +1,26 @@
 package com.owl.payrit.domain.auth.service;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.request.CertificationRequest;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
+import com.owl.payrit.domain.auth.dto.request.PortOneTokenRequest;
 import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.auth.dto.response.PortOneCertificationResponse;
+import com.owl.payrit.domain.auth.dto.response.PortOneTokenResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
 import com.owl.payrit.domain.auth.exception.AuthErrorCode;
 import com.owl.payrit.domain.auth.exception.AuthException;
 import com.owl.payrit.domain.auth.provider.OauthClientComposite;
+import com.owl.payrit.domain.auth.provider.danal.PortOneApiClient;
 import com.owl.payrit.domain.auth.util.JwtProvider;
+import com.owl.payrit.domain.member.entity.CertificationInformation;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
+import com.owl.payrit.global.configuration.PortOneConfigProps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +39,8 @@ public class AuthService {
     private final PromissoryPaperService promissoryPaperService;
     private final JwtProvider jwtProvider;
     private final RedisTemplate<OauthInformation, String> oauthRedisTemplate;
+    private final PortOneApiClient portOneApiClient;
+    private final PortOneConfigProps portOneConfigProps;
 
     @Value("${jwt.token.secret}")
     private String secretKey;
@@ -80,4 +89,39 @@ public class AuthService {
         String accessToken = jwtProvider.refreshAccessToken(loginTokenRequest.refreshToken(),secretKey);
         return new TokenRefreshResponse(accessToken, loginTokenRequest.refreshToken());
     }
+
+    @Transactional
+    public void initializeCertificationInformation(LoginUser loginUser, CertificationRequest certificationRequest) {
+        // 1. 기존에 본인인증 한 적이 있는지 확인합니다.
+        Member member = memberService.findById(loginUser.id());
+        checkIfUserAlreadyAuthenticated(member.isAuthenticated());
+        // 2. PortOne AccessToken을 요청합니다.
+        PortOneTokenRequest portOneTokenRequest = new PortOneTokenRequest(portOneConfigProps.getAccessKey(), portOneConfigProps.getSecretKey());
+        PortOneTokenResponse portOneTokenResponse = portOneApiClient.getAccessToken(portOneTokenRequest);
+
+        // 3. imp_uid를 통해 인증 된 정보를 가져옵니다.
+        PortOneCertificationResponse portOneCertificationResponse = portOneApiClient.getCertificationInformation("Bearer %s".formatted(portOneTokenResponse.authAnnotation().accessToken()), certificationRequest.impUid());
+        CertificationInformation certificationInformation = portOneCertificationResponse.toEntity();
+
+        // 4. 기존에 다른 아이디로 본인인증 된 적이 있는지 확인합니다.
+        checkCertificationInformationExistence(certificationInformation.getName(), certificationInformation.getPhone());
+
+        // 5. 유저의 본인인증 정보를 업데이트 합니다.
+        member.updateCertificationInformation(certificationInformation);
+
+    }
+
+    public void checkCertificationInformationExistence(String name, String phone) {
+        boolean exists = memberService.existsByCertificationInformation(name, phone);
+        if (exists) {
+            throw new AuthException(AuthErrorCode.IMMUTABLE_USER_AUTHENTICATED);
+        }
+    }
+
+    public void checkIfUserAlreadyAuthenticated(boolean isAuthenticated) {
+        if(isAuthenticated) {
+            throw new AuthException(AuthErrorCode.ALREADY_USER_AUTHENTICATED);
+        }
+    }
+
 }

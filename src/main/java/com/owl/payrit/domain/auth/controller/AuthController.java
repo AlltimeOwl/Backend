@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.auth.controller;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.request.CertificationRequest;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
 import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
@@ -73,6 +74,14 @@ public class AuthController implements AuthApiDocs{
         log.info("user request refresh AccessToken");
         TokenRefreshResponse tokenResponse = authService.refreshAccessToken(loginTokenRequest);
         return ResponseEntity.ok().body(tokenResponse);
+    }
+
+    @Override
+    @PostMapping("/certification/init")
+    public ResponseEntity<Void> initializeCertificationInformation(@AuthenticationPrincipal LoginUser loginUser, @RequestBody CertificationRequest certificationRequest) {
+        log.info("'{}' user requests to register certification information" , loginUser.oauthInformation().getOauthProviderId());
+        authService.initializeCertificationInformation(loginUser, certificationRequest);
+        return ResponseEntity.noContent().build();
     }
 
 
