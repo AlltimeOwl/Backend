@@ -25,10 +25,10 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
 
     @Override
     @GetMapping("/paymentInfo")
-    public ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser) {
+    public ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser,
+                                                              TransactionType transactionType) {
 
-        //FIXME: TRANSACTION TYPE FIX
-        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), TransactionType.PAPER_TRANSACTION);
+        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), transactionType);
 
         return ResponseEntity.ok().body(paymentInfo);
     }
