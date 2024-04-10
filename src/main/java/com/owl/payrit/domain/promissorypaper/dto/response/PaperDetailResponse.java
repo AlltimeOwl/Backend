@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.promissorypaper.dto.response;
 
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
+import com.owl.payrit.domain.promissorypaper.entity.PaperFormInfo;
 import com.owl.payrit.domain.promissorypaper.entity.PaperProfile;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
@@ -19,63 +20,20 @@ public record PaperDetailResponse(
         @Schema(description = "나의 역할")
         PaperRole memberRole,
 
-        @Schema(description = "순수 원금")
-        long primeAmount,
-
-        @Schema(description = "이자액")
-        long interest,
-
-        @Schema(description = "총액(원금 + 이자)")
-        long amount,
-
-        @Schema(description = "남은 금액(총액 - 일부상환액)")
-        long remainingAmount,
-
-        @Schema(description = "이자율")
-        float interestRate,
-
-        @Schema(description = "이자 지급일")
-        long interestPaymentDate,
+        @Schema(description = "차용증 폼 데이터")
+        PaperFormInfo paperFormInfo,
 
         @Schema(description = "상환 진행률")
         double repaymentRate,
 
-        @Schema(description = "상환 시작일")
-        LocalDate repaymentStartDate,
-
-        @Schema(description = "상환 마감일")
-        LocalDate repaymentEndDate,
-
-        @Schema(description = "차용증 작성일")
-        LocalDate transactionDate,
-
         @Schema(description = "남은 일 수")
         long dueDate,
 
+        @Schema(description = "채권자 정보")
         PaperProfile creditorProfile,
 
+        @Schema(description = "채무자 정보")
         PaperProfile debtorProfile,
-
-//        @Schema(description = "채권자 이름")
-//        String creditorName,
-//
-//        @Schema(description = "채권자 전화번호")
-//        String creditorPhoneNumber,
-//
-//        @Schema(description = "채권자 주소")
-//        String creditorAddress,
-//
-//        @Schema(description = "채무자 이름")
-//        String debtorName,
-//
-//        @Schema(description = "채무자 전화번호")
-//        String debtorPhoneNumber,
-//
-//        @Schema(description = "채무자 주소")
-//        String debtorAddress,
-
-        @Schema(description = "특약사항")
-        String specialConditions,
 
         @Schema(description = "해당 차용증에 내가 작성한 메모들")
         List<MemoListResponse> memoListResponses,
@@ -89,20 +47,11 @@ public record PaperDetailResponse(
         this(
                 promissoryPaper.getId(),
                 memberRole,
-                promissoryPaper.getPrimeAmount(),
-                promissoryPaper.getInterest(),
-                promissoryPaper.getAmount(),
-                promissoryPaper.getRemainingAmount(),
-                promissoryPaper.getInterestRate(),
-                promissoryPaper.getInterestPaymentDate(),
+                promissoryPaper.getPaperFormInfo(),
                 repaymentRate,
-                promissoryPaper.getRepaymentStartDate(),
-                promissoryPaper.getRepaymentEndDate(),
-                promissoryPaper.getTransactionDate(),
                 dueDate,
                 promissoryPaper.getCreditorProfile(),
                 promissoryPaper.getDebtorProfile(),
-                promissoryPaper.getSpecialConditions(),
                 memoListResponses,
                 promissoryPaper.getRepaymentHistory()
                         .stream()

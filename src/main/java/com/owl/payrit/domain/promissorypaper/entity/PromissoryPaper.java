@@ -25,29 +25,12 @@ import java.util.List;
 @DynamicUpdate
 public class PromissoryPaper extends BaseEntity {
 
-    private long primeAmount;           //순수 원금
-
-    private long interest;              //이자
-
-    private long amount;                //순수 원금 + 이자 (최종 금액)
-
-    private long remainingAmount;       //남은 금액
+    @Embedded
+    private PaperFormInfo paperFormInfo;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "paper", fetch = FetchType.LAZY)
     private List<RepaymentHistory> repaymentHistory;
-
-    private LocalDate transactionDate;
-
-    private LocalDate repaymentStartDate;
-
-    private LocalDate repaymentEndDate;
-
-    private String specialConditions;
-
-    private float interestRate;
-
-    private long interestPaymentDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;

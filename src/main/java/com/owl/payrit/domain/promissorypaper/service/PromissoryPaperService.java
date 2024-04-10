@@ -11,10 +11,7 @@ import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
-import com.owl.payrit.domain.promissorypaper.entity.PaperProfile;
-import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
-import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
-import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
+import com.owl.payrit.domain.promissorypaper.entity.*;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperErrorCode;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
@@ -59,11 +56,6 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
-        log.info("{member phone : }" + loginedMember.getPhoneNumber());
-        log.info("{member cert phone : }" + loginedMember.getCertificationInformation().getPhone());
-        log.info("{creditor phone : }" + paperWriteRequest.creditorPhoneNumber());
-        log.info("{debtor phone : }" + paperWriteRequest.debtorPhoneNumber());
-
         Member creditor = memberService.findByPhoneNumberForPromissory(
                 Ut.str.parsedPhoneNumber(paperWriteRequest.creditorPhoneNumber())).orElse(null);
         Member debtor = memberService.findByPhoneNumberForPromissory(
@@ -73,24 +65,15 @@ public class PromissoryPaperService {
                 loginedMember.getCertificationInformation().getImpUid());
 
         PromissoryPaper paper = PromissoryPaper.builder()
-                .primeAmount(paperWriteRequest.amount())
-                .interest(paperWriteRequest.interest())
-                .amount(paperWriteRequest.amount() + paperWriteRequest.interest())
-                .remainingAmount(paperWriteRequest.amount() + paperWriteRequest.interest())
+                .paperFormInfo(getFormInfoByReq(paperWriteRequest))
                 .repaymentHistory(new ArrayList<>())
-                .transactionDate(paperWriteRequest.transactionDate())
-                .repaymentStartDate(paperWriteRequest.repaymentStartDate())
-                .repaymentEndDate(paperWriteRequest.repaymentEndDate())
-                .specialConditions(paperWriteRequest.specialConditions())
-                .interestRate(paperWriteRequest.interestRate())
-                .interestPaymentDate(paperWriteRequest.interestPaymentDate())
                 .writer(loginedMember)
                 .writerRole(paperWriteRequest.writerRole())
                 .creditor(creditor)
-                .creditorProfile(getProfileByRole(paperWriteRequest, PaperRole.CREDITOR))
+                .creditorProfile(getProfileByReqAndRole(paperWriteRequest, PaperRole.CREDITOR))
                 .isCreditorAgree(loginedMember.equals(creditor))
                 .debtor(debtor)
-                .debtorProfile(getProfileByRole(paperWriteRequest, PaperRole.DEBTOR))
+                .debtorProfile(getProfileByReqAndRole(paperWriteRequest, PaperRole.DEBTOR))
                 .isDebtorAgree(loginedMember.equals(debtor))
                 .docsInfo(docsInfo)
                 .memos(new ArrayList<>())
@@ -187,7 +170,7 @@ public class PromissoryPaperService {
     private long calcDueDate(PromissoryPaper paper) {
 
         LocalDate today = LocalDate.now();
-        LocalDate repaymentEndDate = paper.getRepaymentEndDate();
+        LocalDate repaymentEndDate = paper.getPaperFormInfo().getRepaymentEndDate();
 
         return ChronoUnit.DAYS.between(today, repaymentEndDate);
     }
@@ -263,18 +246,9 @@ public class PromissoryPaperService {
         checkPaperBeforeModify(loginedMember, paper);
 
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .primeAmount(paperWriteRequest.amount())
-                .interest(paperWriteRequest.interest())
-                .amount(paperWriteRequest.amount() + paperWriteRequest.interest())
-                .remainingAmount(paperWriteRequest.amount() + paperWriteRequest.interest())
-                .transactionDate(paperWriteRequest.transactionDate())
-                .repaymentStartDate(paperWriteRequest.repaymentStartDate())
-                .repaymentEndDate(paperWriteRequest.repaymentEndDate())
-                .specialConditions(paperWriteRequest.specialConditions())
-                .interestRate(paperWriteRequest.interestRate())
-                .interestPaymentDate(paperWriteRequest.interestPaymentDate())
-                .creditorProfile(getProfileByRole(paperWriteRequest, PaperRole.CREDITOR))
-                .debtorProfile(getProfileByRole(paperWriteRequest, PaperRole.DEBTOR))
+                .paperFormInfo(getFormInfoByReq(paperWriteRequest))
+                .creditorProfile(getProfileByReqAndRole(paperWriteRequest, PaperRole.CREDITOR))
+                .debtorProfile(getProfileByReqAndRole(paperWriteRequest, PaperRole.DEBTOR))
                 .paperStatus(PaperStatus.WAITING_AGREE)
                 .build();
 
@@ -312,6 +286,8 @@ public class PromissoryPaperService {
 
         LocalDate today = LocalDate.now();
 
+        PaperFormInfo paperFormInfo = paper.getPaperFormInfo();
+
         if (member.isAuthenticated()) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.NEED_AUTHENTICATION);
         }
@@ -320,23 +296,25 @@ public class PromissoryPaperService {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_MATCHING_FAILED);
         }
 
-        if (paper.getInterestRate() > INTEREST_LIMIT) {
+        if (paperFormInfo.getInterestRate() > INTEREST_LIMIT) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_INTEREST_RATE_NOT_VALID);
         }
 
-        if (paper.getRepaymentStartDate().isBefore(today)) {
+        if (paperFormInfo.getRepaymentStartDate().isBefore(today)) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_REPAYMENT_START_DATE_NOT_VALID);
         }
 
-        if (paper.getRepaymentEndDate().isBefore(paper.getRepaymentStartDate())) {
+        if (paperFormInfo.getRepaymentEndDate().isBefore(paperFormInfo.getRepaymentStartDate())) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_REPAYMENT_END_DATE_NOT_VALID);
         }
     }
 
     public double calcRepaymentRate(PromissoryPaper paper) {
 
-        long amount = paper.getAmount();
-        long needToRepaymentAmount = amount - paper.getRemainingAmount();
+        PaperFormInfo paperFormInfo = paper.getPaperFormInfo();
+
+        long amount = paperFormInfo.getAmount();
+        long needToRepaymentAmount = amount - paperFormInfo.getRemainingAmount();
 
         double repaymentRate = (double) needToRepaymentAmount / amount * 100.0;
 
@@ -361,13 +339,14 @@ public class PromissoryPaperService {
 
         PromissoryPaper paper = getById(repaymentRequest.paperId());
         Member loginedMember = memberService.findById(loginUser.id());
+        PaperFormInfo paperFormInfo = paper.getPaperFormInfo();
 
         repaymentHistoryService.create(loginedMember, paper, repaymentRequest);
 
-        long totalRemainingAmount = paper.getRemainingAmount() - repaymentRequest.repaymentAmount();
+        long totalRemainingAmount = paperFormInfo.getRemainingAmount() - repaymentRequest.repaymentAmount();
 
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .remainingAmount(totalRemainingAmount)
+                .paperFormInfo(paperFormInfo.repayment(totalRemainingAmount))
                 .build();
 
         if (totalRemainingAmount == 0) {
@@ -382,6 +361,7 @@ public class PromissoryPaperService {
 
         PromissoryPaper paper = getById(repaymentCancelRequest.paperId());
         Member loginedMember = memberService.findById(loginUser.id());
+        PaperFormInfo paperFormInfo = paper.getPaperFormInfo();
 
         RepaymentHistory history = repaymentHistoryService.getById(repaymentCancelRequest.historyId());
 
@@ -389,7 +369,7 @@ public class PromissoryPaperService {
         repaymentHistoryService.remove(loginedMember, paper, history);
 
         PromissoryPaper modifiedPaper = paper.toBuilder()
-                .remainingAmount(paper.getRemainingAmount() + needToCancelAmount)
+                .paperFormInfo(paperFormInfo.cancelRepayment(needToCancelAmount))
                 .build();
 
         promissoryPaperRepository.save(modifiedPaper);
@@ -465,12 +445,28 @@ public class PromissoryPaperService {
                 });
     }
 
-    public PaperProfile getProfileByRole(PaperWriteRequest request, PaperRole paperRole) {
+    public PaperProfile getProfileByReqAndRole(PaperWriteRequest request, PaperRole paperRole) {
 
         String name = paperRole.equals(PaperRole.CREDITOR) ? request.creditorName() : request.debtorName();
         String phoneNumber = paperRole.equals(PaperRole.CREDITOR) ? request.creditorPhoneNumber() : request.debtorPhoneNumber();
         String address = paperRole.equals(PaperRole.CREDITOR) ? request.creditorAddress() : request.debtorAddress();
 
         return new PaperProfile(name, phoneNumber, address);
+    }
+
+    public PaperFormInfo getFormInfoByReq(PaperWriteRequest paperWriteRequest) {
+
+        return PaperFormInfo.builder()
+                .primeAmount(paperWriteRequest.amount())
+                .interest(paperWriteRequest.interest())
+                .amount(paperWriteRequest.amount() + paperWriteRequest.interest())
+                .remainingAmount(paperWriteRequest.amount() + paperWriteRequest.interest())
+                .transactionDate(paperWriteRequest.transactionDate())
+                .repaymentStartDate(paperWriteRequest.repaymentStartDate())
+                .repaymentEndDate(paperWriteRequest.repaymentEndDate())
+                .specialConditions(paperWriteRequest.specialConditions())
+                .interestRate(paperWriteRequest.interestRate())
+                .interestPaymentDate(paperWriteRequest.interestPaymentDate())
+                .build();
     }
 }
