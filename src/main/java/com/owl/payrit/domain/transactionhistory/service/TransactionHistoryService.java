@@ -76,6 +76,7 @@ public class TransactionHistoryService {
                 .build();
 
         paper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
+        paper.paid();
 
         transactionHistoryRepository.save(history);
     }

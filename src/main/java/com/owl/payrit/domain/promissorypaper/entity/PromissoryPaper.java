@@ -83,6 +83,10 @@ public class PromissoryPaper extends BaseEntity {
         this.paperStatus = status;
     }
 
+    public void paid() {
+        this.isPaid = true;
+    }
+
     public void removeCreditorRelation() {
         this.creditor = null;
     }
