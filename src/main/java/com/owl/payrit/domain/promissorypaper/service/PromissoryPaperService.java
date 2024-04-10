@@ -472,4 +472,29 @@ public class PromissoryPaperService {
                 .interestPaymentDate(paperWriteRequest.interestPaymentDate())
                 .build();
     }
+
+    @Transactional
+    public void refuse(LoginUser loginUser, Long paperId) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+        PromissoryPaper paper = getById(paperId);
+
+        checkRefuseConditions(loginedMember, paper);
+
+        paper.modifyPaperStatus(PaperStatus.REFUSED);
+    }
+
+    public void checkRefuseConditions(Member loginedMember, PromissoryPaper paper) {
+
+        PaperRole memberRole = isWriter(paper, loginedMember) ? paper.getWriterRole() : paper.getWriterRole().getReverse();
+        Member memberInPaper = memberRole.equals(PaperRole.CREDITOR) ? paper.getCreditor() : paper.getDebtor();
+
+        if(!paper.getPaperStatus().equals(PaperStatus.WAITING_AGREE)) {
+            throw new PromissoryPaperException(PromissoryPaperErrorCode.REFUSE_NEED_WAITING_STATUS);
+        }
+
+        if(!memberInPaper.equals(loginedMember)) {
+            throw new PromissoryPaperException(PromissoryPaperErrorCode.REFUSE_CANT_OTHER_PERSON);
+        }
+    }
 }

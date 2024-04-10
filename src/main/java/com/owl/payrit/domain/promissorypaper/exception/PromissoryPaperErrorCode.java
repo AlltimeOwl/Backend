@@ -32,6 +32,8 @@ public enum PromissoryPaperErrorCode implements BaseErrorCode {
     @ExplainError("차용증의 수정은 상대방이 요청 했을 경우에만 가능합니다.")
     PAPER_STATUS_IS_NOT_MODIFYING(BAD_REQUEST, "PAPER_400_8", "차용증의 수정 요청을 받지 않았습니다."),
     NEED_AUTHENTICATION(BAD_REQUEST, "PAPER_400_9", "본인인증을 완료한 사용자만 차용증 작성이 가능합니다."),
+    REFUSE_NEED_WAITING_STATUS(BAD_REQUEST, "PAPER_400_10", "승인 대기 상태에서만 거절이 가능합니다."),
+    REFUSE_CANT_OTHER_PERSON(BAD_REQUEST, "PAPER_400_11", "거절은 요청을 받은 본인만 가능합니다."),
 
     //PromissoryPaper 403 Error
     @ExplainError("차용증은 채권자와 채무자에게만 접근 권한이 있습니다.")

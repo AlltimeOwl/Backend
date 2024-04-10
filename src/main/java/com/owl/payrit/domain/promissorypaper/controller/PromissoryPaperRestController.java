@@ -120,4 +120,14 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
 
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    @PutMapping("/refuse/{id}")
+    public ResponseEntity<Void> refuse(@AuthenticationPrincipal LoginUser loginUser,
+                                       @PathVariable(name="id") Long paperId) {
+
+        promissoryPaperService.refuse(loginUser, paperId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
