@@ -24,11 +24,12 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
     private final TransactionHistoryService transactionHistoryService;
 
     @Override
-    @GetMapping("/paymentInfo")
-    public ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser) {
+    @GetMapping("/paymentInfo/{id}")
+    public ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser,
+                                                              TransactionType transactionType,
+                                                              @PathVariable(name = "id") Long paperId) {
 
-        //FIXME: TRANSACTION TYPE FIX
-        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), TransactionType.PAPER_TRANSACTION);
+        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), transactionType, paperId);
 
         return ResponseEntity.ok().body(paymentInfo);
     }
@@ -40,7 +41,7 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
 
         log.info(transactionHistorySaveRequest.toString());
 
-        transactionHistoryService.saveHistory(loginUser.id(), transactionHistorySaveRequest);
+        transactionHistoryService.saveHistory(loginUser, transactionHistorySaveRequest);
 
         return ResponseEntity.noContent().build();
     }

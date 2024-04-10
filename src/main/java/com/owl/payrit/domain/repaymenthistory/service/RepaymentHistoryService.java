@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.repaymenthistory.service;
 
 import com.owl.payrit.domain.member.entity.Member;
+import com.owl.payrit.domain.promissorypaper.entity.PaperFormInfo;
 import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
@@ -39,9 +40,11 @@ public class RepaymentHistoryService {
 
     public void checkRepaymentConditions(Member member, PromissoryPaper paper, RepaymentRequest repaymentRequest) {
 
+        PaperFormInfo paperFormInfo = paper.getPaperFormInfo();
+
         LocalDate requestDate = repaymentRequest.repaymentDate();
-        LocalDate repaymentStartDate = paper.getRepaymentStartDate();
-        LocalDate repaymentEndDate = paper.getRepaymentEndDate();
+        LocalDate repaymentStartDate = paperFormInfo.getRepaymentStartDate();
+        LocalDate repaymentEndDate = paperFormInfo.getRepaymentEndDate();
 
         if (!paper.getPaperStatus().equals(PaperStatus.COMPLETE_WRITING)) {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_STATUS_ERROR);
@@ -60,7 +63,7 @@ public class RepaymentHistoryService {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_NOT_VALID_DATE);
         }
 
-        if (paper.getRemainingAmount() < repaymentRequest.repaymentAmount()) {
+        if (paperFormInfo.getRemainingAmount() < repaymentRequest.repaymentAmount()) {
             throw new RepaymentException(RepaymentErrorCode.REPAYMENT_AMOUNT_OVER);
         }
     }

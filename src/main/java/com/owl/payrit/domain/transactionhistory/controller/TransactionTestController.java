@@ -20,20 +20,20 @@ public class TransactionTestController {
     private final TransactionHistoryService transactionHistoryService;
     private final MemberService memberService;
 
-    @GetMapping("/payment")
-    public String getTestPay(Model model) {
-
-        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(1L, TransactionType.PAPER_TRANSACTION);
-
-        model.addAttribute("PID", paymentInfo.PID());
-        model.addAttribute("PG", paymentInfo.PGCode());
-        model.addAttribute("merchantUID", paymentInfo.merchantUID());
-        model.addAttribute("name", paymentInfo.name());
-        model.addAttribute("amount", paymentInfo.amount());
-        model.addAttribute("buyerName", paymentInfo.buyerName());
-        model.addAttribute("buyerEmail", paymentInfo.buyerEmail());
-        model.addAttribute("buyerTel", paymentInfo.buyerTel());
-
-        return "testPay";
-    }
+//    @GetMapping("/payment")
+//    public String getTestPay(Model model) {
+//
+//        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(1L, TransactionType.PAPER_TRANSACTION);
+//
+//        model.addAttribute("PID", paymentInfo.PID());
+//        model.addAttribute("PG", paymentInfo.PGCode());
+//        model.addAttribute("merchantUID", paymentInfo.merchantUID());
+//        model.addAttribute("name", paymentInfo.name());
+//        model.addAttribute("amount", paymentInfo.amount());
+//        model.addAttribute("buyerName", paymentInfo.buyerName());
+//        model.addAttribute("buyerEmail", paymentInfo.buyerEmail());
+//        model.addAttribute("buyerTel", paymentInfo.buyerTel());
+//
+//        return "testPay";
+//    }
 }

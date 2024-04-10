@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
@@ -101,5 +102,13 @@ public interface PromissoryPaperApiDocs {
     })
     ResponseEntity<Void> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
                                          @RequestBody @Schema(implementation = RepaymentCancelRequest.class) RepaymentCancelRequest repaymentCancelRequest);
+
+    @Operation(summary = "차용증 거절 API", description = "차용증 요청에 대해 거절 처리를 진행압니다.")
+    @ApiErrorCodeExample(RepaymentErrorCode.class)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "성공적으로 거절되었습니다."),
+    })
+    ResponseEntity<Void> refuse(@AuthenticationPrincipal LoginUser loginUser,
+                                @PathVariable(name = "id") Long paperId);
 
 }
