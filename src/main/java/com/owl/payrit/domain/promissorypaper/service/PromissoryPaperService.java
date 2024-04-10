@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class PromissoryPaperService {
 
+    private static final String MODIFY_HEADER = "[MODIFY]";
     private static final Integer INTEREST_LIMIT = 20;
     private static final Long EXPIRED_STANDARD_DATE = 30L;
 
@@ -217,6 +218,7 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperModifyRequest.paperId());
+        PaperFormInfo paperFormInfo = paper.getPaperFormInfo();
 
         checkModifyRequestData(loginedMember, paper);
 
@@ -224,6 +226,7 @@ public class PromissoryPaperService {
         Member writer = paper.getWriter();
 
         paper.modifyPaperStatus(PaperStatus.MODIFYING);
+        paperFormInfo.addModifyMsg(MODIFY_HEADER + paperModifyRequest.contents());
     }
 
     public void checkModifyRequestData(Member member, PromissoryPaper paper) {
