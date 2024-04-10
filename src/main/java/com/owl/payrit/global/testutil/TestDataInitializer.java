@@ -1,6 +1,7 @@
 package com.owl.payrit.global.testutil;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.member.entity.CertificationInformation;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.entity.Role;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -46,6 +48,18 @@ public class TestDataInitializer implements CommandLineRunner {
                 .birthDay(LocalDate.now())
                 .name(name)
                 .role(Role.MEMBER)
+                .certificationInformation(genCertInfo(index))
+                .build();
+    }
+
+    private CertificationInformation genCertInfo(int index) {
+
+        return CertificationInformation.builder()
+                .impUid("CI" + index)
+                .birthday("2000-01-01")
+                .gender("male")
+                .phone("010-1234-567%s".formatted(index))
+                .name("test0%s".formatted(index))
                 .build();
     }
 }

@@ -11,6 +11,7 @@ import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
+import com.owl.payrit.domain.promissorypaper.entity.PaperProfile;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
@@ -58,6 +59,11 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
+        log.info("{member phone : }" + loginedMember.getPhoneNumber());
+        log.info("{member cert phone : }" + loginedMember.getCertificationInformation().getPhone());
+        log.info("{creditor phone : }" + paperWriteRequest.creditorPhoneNumber());
+        log.info("{debtor phone : }" + paperWriteRequest.debtorPhoneNumber());
+
         Member creditor = memberService.findByPhoneNumberForPromissory(
                 Ut.str.parsedPhoneNumber(paperWriteRequest.creditorPhoneNumber())).orElse(null);
         Member debtor = memberService.findByPhoneNumberForPromissory(
@@ -81,14 +87,10 @@ public class PromissoryPaperService {
                 .writer(loginedMember)
                 .writerRole(paperWriteRequest.writerRole())
                 .creditor(creditor)
-                .creditorName(paperWriteRequest.creditorName())
-                .creditorPhoneNumber(paperWriteRequest.creditorPhoneNumber())
-                .creditorAddress(paperWriteRequest.creditorAddress())
+                .creditorProfile(getProfileByRole(paperWriteRequest, PaperRole.CREDITOR))
                 .isCreditorAgree(loginedMember.equals(creditor))
                 .debtor(debtor)
-                .debtorName(paperWriteRequest.debtorName())
-                .debtorPhoneNumber(paperWriteRequest.debtorPhoneNumber())
-                .debtorAddress(paperWriteRequest.debtorAddress())
+                .debtorProfile(getProfileByRole(paperWriteRequest, PaperRole.DEBTOR))
                 .isDebtorAgree(loginedMember.equals(debtor))
                 .docsInfo(docsInfo)
                 .memos(new ArrayList<>())
@@ -173,10 +175,10 @@ public class PromissoryPaperService {
 
         return papers.stream().map(paper -> {
             if (role.equals(PaperRole.CREDITOR)) {
-                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorName(),
+                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorProfile().getName(),
                         calcDueDate(paper), calcRepaymentRate(paper), isWriter(paper, loginedMember));
             } else {
-                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorName()
+                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorProfile().getName()
                         , calcDueDate(paper), calcRepaymentRate(paper), isWriter(paper, loginedMember));
             }
         }).collect(Collectors.toList());
@@ -271,12 +273,8 @@ public class PromissoryPaperService {
                 .specialConditions(paperWriteRequest.specialConditions())
                 .interestRate(paperWriteRequest.interestRate())
                 .interestPaymentDate(paperWriteRequest.interestPaymentDate())
-                .creditorName(paperWriteRequest.creditorName())
-                .creditorPhoneNumber(paperWriteRequest.creditorPhoneNumber())
-                .creditorAddress(paperWriteRequest.creditorAddress())
-                .debtorName(paperWriteRequest.debtorName())
-                .debtorPhoneNumber(paperWriteRequest.debtorPhoneNumber())
-                .debtorAddress(paperWriteRequest.debtorAddress())
+                .creditorProfile(getProfileByRole(paperWriteRequest, PaperRole.CREDITOR))
+                .debtorProfile(getProfileByRole(paperWriteRequest, PaperRole.DEBTOR))
                 .paperStatus(PaperStatus.WAITING_AGREE)
                 .build();
 
@@ -302,11 +300,11 @@ public class PromissoryPaperService {
         String phoneNumber = member.getPhoneNumber();
 
         if (paperRole.equals(PaperRole.CREDITOR)) {
-            return name.equals(paper.getCreditorName()) &&
-                    phoneNumber.equals(paper.getCreditorPhoneNumber());
+            return name.equals(paper.getCreditorProfile().getName()) &&
+                    phoneNumber.equals(paper.getCreditorProfile().getPhoneNumber());
         } else {
-            return name.equals(paper.getDebtorName()) &&
-                    phoneNumber.equals(paper.getDebtorPhoneNumber());
+            return name.equals(paper.getDebtorProfile().getName()) &&
+                    phoneNumber.equals(paper.getDebtorProfile().getPhoneNumber());
         }
     }
 
@@ -465,5 +463,14 @@ public class PromissoryPaperService {
                     if (paper.getDebtor().equals(member)) paper.removeDebtorRelation();
                     if (paper.getCreditor().equals(member)) paper.removeCreditorRelation();
                 });
+    }
+
+    public PaperProfile getProfileByRole(PaperWriteRequest request, PaperRole paperRole) {
+
+        String name = paperRole.equals(PaperRole.CREDITOR) ? request.creditorName() : request.debtorName();
+        String phoneNumber = paperRole.equals(PaperRole.CREDITOR) ? request.creditorPhoneNumber() : request.debtorPhoneNumber();
+        String address = paperRole.equals(PaperRole.CREDITOR) ? request.creditorAddress() : request.debtorAddress();
+
+        return new PaperProfile(name, phoneNumber, address);
     }
 }

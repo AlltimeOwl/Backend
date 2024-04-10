@@ -58,28 +58,26 @@ public class PromissoryPaper extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member creditor;
 
-    @Convert(converter = PromissoryPaperStringConverter.class)
-    private String creditorName;
-
-    @Convert(converter = PromissoryPaperStringConverter.class)
-    private String creditorPhoneNumber;
-
-    @Convert(converter = PromissoryPaperStringConverter.class)
-    private String creditorAddress;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "name", column = @Column(name = "creditor_name")),
+            @AttributeOverride(name = "phoneNumber", column = @Column(name = "creditor_phone_number")),
+            @AttributeOverride(name = "address", column = @Column(name = "creditor_address")),
+    })
+    private PaperProfile creditorProfile;
 
     private boolean isCreditorAgree;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member debtor;
 
-    @Convert(converter = PromissoryPaperStringConverter.class)
-    private String debtorName;
-
-    @Convert(converter = PromissoryPaperStringConverter.class)
-    private String debtorPhoneNumber;
-
-    @Convert(converter = PromissoryPaperStringConverter.class)
-    private String debtorAddress;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "name", column = @Column(name = "debtor_name")),
+            @AttributeOverride(name = "phoneNumber", column = @Column(name = "debtor_phone_number")),
+            @AttributeOverride(name = "address", column = @Column(name = "debtor_address")),
+    })
+    private PaperProfile debtorProfile;
 
     private boolean isDebtorAgree;
 
@@ -90,7 +88,6 @@ public class PromissoryPaper extends BaseEntity {
     @OneToOne(cascade = CascadeType.ALL)
     private DocsInfo docsInfo;
 
-    //차용증 상태
     @Builder.Default
     @Enumerated(EnumType.STRING)
     private PaperStatus paperStatus = PaperStatus.WAITING_AGREE;

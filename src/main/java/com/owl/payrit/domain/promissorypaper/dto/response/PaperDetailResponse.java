@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.promissorypaper.dto.response;
 
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
+import com.owl.payrit.domain.promissorypaper.entity.PaperProfile;
 import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.repaymenthistory.dto.RepaymentHistoryDto;
@@ -51,23 +52,27 @@ public record PaperDetailResponse(
         @Schema(description = "남은 일 수")
         long dueDate,
 
-        @Schema(description = "채권자 이름")
-        String creditorName,
+        PaperProfile creditorProfile,
 
-        @Schema(description = "채권자 전화번호")
-        String creditorPhoneNumber,
+        PaperProfile debtorProfile,
 
-        @Schema(description = "채권자 주소")
-        String creditorAddress,
-
-        @Schema(description = "채무자 이름")
-        String debtorName,
-
-        @Schema(description = "채무자 전화번호")
-        String debtorPhoneNumber,
-
-        @Schema(description = "채무자 주소")
-        String debtorAddress,
+//        @Schema(description = "채권자 이름")
+//        String creditorName,
+//
+//        @Schema(description = "채권자 전화번호")
+//        String creditorPhoneNumber,
+//
+//        @Schema(description = "채권자 주소")
+//        String creditorAddress,
+//
+//        @Schema(description = "채무자 이름")
+//        String debtorName,
+//
+//        @Schema(description = "채무자 전화번호")
+//        String debtorPhoneNumber,
+//
+//        @Schema(description = "채무자 주소")
+//        String debtorAddress,
 
         @Schema(description = "특약사항")
         String specialConditions,
@@ -95,12 +100,8 @@ public record PaperDetailResponse(
                 promissoryPaper.getRepaymentEndDate(),
                 promissoryPaper.getTransactionDate(),
                 dueDate,
-                promissoryPaper.getCreditorName(),
-                promissoryPaper.getCreditorPhoneNumber(),
-                promissoryPaper.getCreditorAddress(),
-                promissoryPaper.getDebtorName(),
-                promissoryPaper.getDebtorPhoneNumber(),
-                promissoryPaper.getDebtorAddress(),
+                promissoryPaper.getCreditorProfile(),
+                promissoryPaper.getDebtorProfile(),
                 promissoryPaper.getSpecialConditions(),
                 memoListResponses,
                 promissoryPaper.getRepaymentHistory()

@@ -8,11 +8,13 @@ import com.owl.payrit.domain.member.exception.MemberErrorCode;
 import com.owl.payrit.domain.member.exception.MemberException;
 import com.owl.payrit.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+@Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
@@ -42,6 +44,8 @@ public class MemberService {
     public Optional<Member> findByPhoneNumberForPromissory(String phoneNumber) {
 
         //NOTE: 차용증 작성 시, 상대방이 가입되어있지 않을 상황을 고려해 Optional<Member> 반환
+
+        log.info("{input phone num : }" + phoneNumber);
 
         return memberRepository.findByCertificationInformationPhone(phoneNumber);
     }
