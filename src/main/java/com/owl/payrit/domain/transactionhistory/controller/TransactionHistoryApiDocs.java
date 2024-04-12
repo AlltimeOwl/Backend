@@ -69,6 +69,6 @@ public interface TransactionHistoryApiDocs {
                     }),
     })
     ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser,
-                                        @RequestBody @Schema(implementation = TransactionInfoRequest.class)
-                                        TransactionInfoRequest transactionInfoRequest);
+                                                       @PathVariable(name = "id") Long paperId,
+                                                       @PathVariable(name = "transaction_type") TransactionType transactionType);
 }
