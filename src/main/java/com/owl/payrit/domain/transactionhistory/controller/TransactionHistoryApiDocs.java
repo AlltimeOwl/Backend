@@ -1,7 +1,9 @@
 package com.owl.payrit.domain.transactionhistory.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
+import com.owl.payrit.domain.transactionhistory.dto.request.TransactionInfoRequest;
 import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
@@ -58,13 +60,15 @@ public interface TransactionHistoryApiDocs {
     ResponseEntity<List<TransactionHistoryListResponse>> list(@AuthenticationPrincipal LoginUser loginUser);
 
     @Operation(summary = "결제 사전정보 받기 API", description = "결제 모듈 호출을 위해 필요한 정보를 조회합니다.")
+    @ApiErrorCodeExample(TransactionHistoryErrorCode.class)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회에 성공하여 결제 모듈 정보를 가져옵니다.",
                     content = {
                             @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = PaymentInfoResponse.class))
-                    })
+                    }),
     })
-    ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser, TransactionType transactionType,
-                                                       @PathVariable(name = "id") Long paperId);
+    ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser,
+                                        @RequestBody @Schema(implementation = TransactionInfoRequest.class)
+                                        TransactionInfoRequest transactionInfoRequest);
 }
