@@ -291,7 +291,7 @@ public class PromissoryPaperService {
 
         PaperFormInfo paperFormInfo = paper.getPaperFormInfo();
 
-        if (member.isAuthenticated()) {
+        if (!member.isAuthenticated()) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.NEED_AUTHENTICATION);
         }
 
