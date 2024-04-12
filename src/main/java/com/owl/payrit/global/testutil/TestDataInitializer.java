@@ -48,6 +48,7 @@ public class TestDataInitializer implements CommandLineRunner {
                 .birthDay(LocalDate.now())
                 .name(name)
                 .role(Role.MEMBER)
+                .isAuthenticated(true)
                 .certificationInformation(genCertInfo(index))
                 .build();
     }

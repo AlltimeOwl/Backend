@@ -278,10 +278,10 @@ public class PromissoryPaperService {
 
         if (paperRole.equals(PaperRole.CREDITOR)) {
             return name.equals(paper.getCreditorProfile().getName()) &&
-                    phoneNumber.equals(paper.getCreditorProfile().getPhoneNumber());
+                    phoneNumber.equals(paper.getCreditor().getCertificationInformation().getPhone());
         } else {
             return name.equals(paper.getDebtorProfile().getName()) &&
-                    phoneNumber.equals(paper.getDebtorProfile().getPhoneNumber());
+                    phoneNumber.equals(paper.getDebtor().getCertificationInformation().getPhone());
         }
     }
 
