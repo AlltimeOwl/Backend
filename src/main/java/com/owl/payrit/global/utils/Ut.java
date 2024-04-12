@@ -13,7 +13,15 @@ public class Ut {
 
         public static String parsedPhoneNumber(String phoneNumber) {
 
-            return phoneNumber.matches(KOREA_CODE) ? phoneNumber.replaceAll("\\+82 ", "0") : phoneNumber;
+            if(phoneNumber.matches(KOREA_CODE)) {
+                phoneNumber = phoneNumber.replaceAll("\\+82 ", "0");
+            }
+
+            if(phoneNumber.contains("-")) {
+                phoneNumber = phoneNumber.replaceAll("-", "");
+            }
+
+            return phoneNumber;
         }
 
     }
