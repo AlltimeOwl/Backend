@@ -59,7 +59,7 @@ public class TestDataInitializer implements CommandLineRunner {
                 .impUid("CI" + index)
                 .birthday("2000-01-01")
                 .gender("male")
-                .phone("010-1234-567%s".formatted(index))
+                .phone("0101234567%s".formatted(index))
                 .name("test0%s".formatted(index))
                 .build();
     }
