@@ -40,20 +40,20 @@ public class TransactionHistoryService {
 
     private final TransactionHistoryRepository transactionHistoryRepository;
 
-    public PaymentInfoResponse getPaymentInfo(Long memberId, TransactionInfoRequest request) {
+    public PaymentInfoResponse getPaymentInfo(Long memberId, Long paperId, TransactionType transactionType) {
 
         Member loginedMember = memberService.findById(memberId);
 
         String PID = paymentConfigProps.getPID();
         String PGCode = paymentConfigProps.getTestPGCode();     //FIXME: PGCODE <-> TESTPGCODE
-        String merchantUID = genMerchantUID(request.paperId());
-        String name = request.transactionType().getContent();
-        int amount = getCostByType(request.transactionType());
+        String merchantUID = genMerchantUID(paperId);
+        String name = transactionType.getContent();
+        int amount = getCostByType(transactionType);
         String buyerEmail = loginedMember.getEmail();
         String buyerName = loginedMember.getName();
         String buyerTel = loginedMember.getPhoneNumber();
 
-        PromissoryPaper targetPaper = promissoryPaperService.getById(request.paperId());
+        PromissoryPaper targetPaper = promissoryPaperService.getById(paperId);
 
         if(!targetPaper.getPaperStatus().equals(PaperStatus.PAYMENT_REQUIRED)) {
             throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_CANT_BEFORE_ACCEPT);
