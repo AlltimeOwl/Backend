@@ -18,6 +18,7 @@ public enum TransactionHistoryErrorCode implements BaseErrorCode {
     //TransactionHistory 400 Error
     TRANSACTION_BAD_COST(BAD_REQUEST, "TRANSACTION_400_1", "결제 금액이 올바르지 않습니다."),
     TRANSACTION_BAD_DATE(BAD_REQUEST, "TRANSACTION_400_2", "결제 시기가 올바르지 않습니다."),
+    TRANSACTION_CANT_BEFORE_ACCEPT(BAD_REQUEST, "TRANSACTION_400_3", "결제는 승인 완료 상태의 차용증만 가능합니다."),
     PAYMENT_BAD_TYPE(BAD_REQUEST, "PAYMENT_400_1", "결제 유형이 올바르지 않습니다."),
 
     //TransactionHistory 403 Error

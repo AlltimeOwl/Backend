@@ -53,6 +53,12 @@ public class TransactionHistoryService {
         String buyerName = loginedMember.getName();
         String buyerTel = loginedMember.getPhoneNumber();
 
+        PromissoryPaper targetPaper = promissoryPaperService.getById(request.paperId());
+
+        if(!targetPaper.getPaperStatus().equals(PaperStatus.PAYMENT_REQUIRED)) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_CANT_BEFORE_ACCEPT);
+        }
+
         return new PaymentInfoResponse(PID, PGCode, merchantUID, name, amount, buyerEmail, buyerName, buyerTel);
     }
 
