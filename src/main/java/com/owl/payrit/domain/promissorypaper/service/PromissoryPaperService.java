@@ -274,7 +274,7 @@ public class PromissoryPaperService {
     public boolean checkMemberData(Member member, PromissoryPaper paper, PaperRole paperRole) {
 
         String name = member.getName();
-        String phoneNumber = member.getPhoneNumber();
+        String phoneNumber = member.getCertificationInformation().getPhone();
 
         if (paperRole.equals(PaperRole.CREDITOR)) {
             return name.equals(paper.getCreditorProfile().getName()) &&
@@ -451,7 +451,8 @@ public class PromissoryPaperService {
     public PaperProfile getProfileByReqAndRole(PaperWriteRequest request, PaperRole paperRole) {
 
         String name = paperRole.equals(PaperRole.CREDITOR) ? request.creditorName() : request.debtorName();
-        String phoneNumber = paperRole.equals(PaperRole.CREDITOR) ? request.creditorPhoneNumber() : request.debtorPhoneNumber();
+        String phoneNumber = paperRole.equals(PaperRole.CREDITOR) ?
+                Ut.str.parsedPhoneNumber(request.creditorPhoneNumber()) : Ut.str.parsedPhoneNumber(request.debtorPhoneNumber());
         String address = paperRole.equals(PaperRole.CREDITOR) ? request.creditorAddress() : request.debtorAddress();
 
         return new PaperProfile(name, phoneNumber, address);
