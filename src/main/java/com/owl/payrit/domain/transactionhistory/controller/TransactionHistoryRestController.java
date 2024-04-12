@@ -2,6 +2,7 @@ package com.owl.payrit.domain.transactionhistory.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
+import com.owl.payrit.domain.transactionhistory.dto.request.TransactionInfoRequest;
 import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
@@ -24,12 +25,11 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
     private final TransactionHistoryService transactionHistoryService;
 
     @Override
-    @GetMapping("/paymentInfo/{id}")
+    @GetMapping("/paymentInfo")
     public ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser,
-                                                              TransactionType transactionType,
-                                                              @PathVariable(name = "id") Long paperId) {
+                                                              @RequestBody TransactionInfoRequest transactionInfoRequest) {
 
-        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), transactionType, paperId);
+        PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), transactionInfoRequest);
 
         return ResponseEntity.ok().body(paymentInfo);
     }

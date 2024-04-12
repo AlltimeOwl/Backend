@@ -8,6 +8,7 @@ import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.domain.transactionhistory.configuration.PaymentConfigProps;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
+import com.owl.payrit.domain.transactionhistory.dto.request.TransactionInfoRequest;
 import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
@@ -39,15 +40,15 @@ public class TransactionHistoryService {
 
     private final TransactionHistoryRepository transactionHistoryRepository;
 
-    public PaymentInfoResponse getPaymentInfo(Long memberId, TransactionType transactionType, Long paperId) {
+    public PaymentInfoResponse getPaymentInfo(Long memberId, TransactionInfoRequest request) {
 
         Member loginedMember = memberService.findById(memberId);
 
         String PID = paymentConfigProps.getPID();
         String PGCode = paymentConfigProps.getTestPGCode();     //FIXME: PGCODE <-> TESTPGCODE
-        String merchantUID = genMerchantUID(paperId);
-        String name = transactionType.getContent();
-        int amount = getCostByType(transactionType);
+        String merchantUID = genMerchantUID(request.paperId());
+        String name = request.transactionType().getContent();
+        int amount = getCostByType(request.transactionType());
         String buyerEmail = loginedMember.getEmail();
         String buyerName = loginedMember.getName();
         String buyerTel = loginedMember.getPhoneNumber();
