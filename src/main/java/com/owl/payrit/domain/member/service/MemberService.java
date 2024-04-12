@@ -45,8 +45,6 @@ public class MemberService {
 
         //NOTE: 차용증 작성 시, 상대방이 가입되어있지 않을 상황을 고려해 Optional<Member> 반환
 
-        log.info("{input phone num : }" + phoneNumber);
-
         return memberRepository.findByCertificationInformationPhone(phoneNumber);
     }
 

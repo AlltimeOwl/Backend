@@ -44,7 +44,7 @@ public class TestDataInitializer implements CommandLineRunner {
         return Member.builder()
                 .oauthInformation(oauthInformation)
                 .email(email)
-                .phoneNumber("010-1234-567%s".formatted(index))
+                .phoneNumber("+82 10-1234-567%s".formatted(index))
                 .birthDay(LocalDate.now())
                 .name(name)
                 .role(Role.MEMBER)
