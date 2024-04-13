@@ -58,7 +58,7 @@ public class TestDataInitializer implements CommandLineRunner {
                 .birthday("2000-01-01")
                 .gender("male")
                 .phone("0101234567%s".formatted(index))
-                .name("test0%s".formatted(index))
+                .name("name0%s".formatted(index))
                 .build();
     }
 }

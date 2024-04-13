@@ -375,6 +375,10 @@ public class PromissoryPaperService {
                 .paperFormInfo(paperFormInfo.cancelRepayment(needToCancelAmount))
                 .build();
 
+        if(modifiedPaper.getPaperStatus().equals(PaperStatus.EXPIRED)) {
+            modifiedPaper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
+        }
+
         promissoryPaperRepository.save(modifiedPaper);
     }
 
