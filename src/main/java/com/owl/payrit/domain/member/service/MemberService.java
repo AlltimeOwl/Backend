@@ -64,7 +64,7 @@ public class MemberService {
     }
 
     public void modifyAlarmStatus(LoginUser loginUser) {
-        Member member = findByOauthInformation(loginUser.oauthInformation());
+        Member member = findByOauthDetailInformation(loginUser.oauthInformation());
         member.modifyAlarmStatus();
     }
 
@@ -77,7 +77,7 @@ public class MemberService {
     }
 
     public CertificationResponse findCertificationInformation(LoginUser loginUser) {
-        Member member = findByOauthInformation(loginUser.oauthInformation());
+        Member member = findByOauthDetailInformation(loginUser.oauthInformation());
         return CertificationResponse.of(member);
     }
 }

@@ -92,7 +92,7 @@ public class AuthService {
     }
 
     public boolean checkAuthentication(LoginUser loginUser) {
-        Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
+        Member member = memberService.findByOauthDetailInformation(loginUser.oauthInformation());
         boolean status = member.isAuthenticated();
         if(Boolean.FALSE.equals(status)) {
             throw new AuthException(AuthErrorCode.NOT_AUTHORIZED_MEMBER);
