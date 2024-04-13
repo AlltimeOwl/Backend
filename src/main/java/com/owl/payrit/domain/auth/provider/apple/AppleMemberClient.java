@@ -49,12 +49,12 @@ public class AppleMemberClient implements OauthClient {
     }
 
     @Override
-    public void revoke(String authorizationCode) {
-        AppleTokenGenerateRequest appleTokenGenerateRequest = appleJwtValidator.generateAppleToken(authorizationCode);
-        log.info("TokenGenerate Result is : {}", appleTokenGenerateRequest.toString());
-        AppleTokenResponse appleTokenResponse = generateAppleToken(appleTokenGenerateRequest.toRequestBody());
-        log.info("TokenGenerate Response is : {}", appleTokenResponse.toString());
-        AppleRevokeRequest appleRevokeRequest = appleJwtValidator.generateAppleRevokeRequest(appleTokenResponse.accessToken());
+    public void revoke(String refreshToken) {
+//        AppleTokenGenerateRequest appleTokenGenerateRequest = appleJwtValidator.generateAppleToken(authorizationCode);
+//        log.info("TokenGenerate Result is : {}", appleTokenGenerateRequest.toString());
+//        AppleTokenResponse appleTokenResponse = generateAppleToken(appleTokenGenerateRequest.toRequestBody());
+//        log.info("TokenGenerate Response is : {}", appleTokenResponse.toString());
+        AppleRevokeRequest appleRevokeRequest = appleJwtValidator.generateAppleRevokeRequest(refreshToken);
         log.info("RevokeRequest is : {}", appleRevokeRequest.toString());
         revokeAppleToken(appleRevokeRequest.toRequestBody());
 

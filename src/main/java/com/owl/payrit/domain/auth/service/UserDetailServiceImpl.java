@@ -21,6 +21,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
     }
 
     public UserDetails loadUserByOauthInformation(OauthInformation oauthInformation) {
-        return memberRepository.findByOauthInformation(oauthInformation).orElseThrow(EntityNotFoundException::new);
+        return memberRepository.findByOauthInformationOauthProviderIdAndOauthInformationOauthProvider(oauthInformation.getOauthProviderId(), oauthInformation.getOauthProvider()).orElseThrow(EntityNotFoundException::new);
     }
 }

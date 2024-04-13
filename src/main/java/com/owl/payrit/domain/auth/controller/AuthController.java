@@ -3,7 +3,6 @@ package com.owl.payrit.domain.auth.controller;
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.CertificationRequest;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
-import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.dto.response.TokenRefreshResponse;
 import com.owl.payrit.domain.auth.dto.response.TokenResponse;
@@ -13,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,10 +53,10 @@ public class AuthController implements AuthApiDocs{
     }
 
     @Override
-    @PostMapping("/revoke")
-    public ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser, @RequestBody RevokeRequest revokeRequest) {
+    @DeleteMapping("/revoke")
+    public ResponseEntity<Void> revoke(@AuthenticationPrincipal LoginUser loginUser) {
         log.info("'{}' member requests revoke payrit", loginUser.oauthInformation().getOauthProviderId());
-        authService.revoke(loginUser, revokeRequest);
+        authService.revoke(loginUser);
         return ResponseEntity.noContent().build();
     }
 

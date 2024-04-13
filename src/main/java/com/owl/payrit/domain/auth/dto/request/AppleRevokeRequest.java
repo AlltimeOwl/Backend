@@ -17,7 +17,7 @@ public record AppleRevokeRequest(
             clientId,
             clientSecret,
             token,
-            "access_token"
+            "refresh_token"
         );
     }
 
