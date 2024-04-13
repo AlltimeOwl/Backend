@@ -103,12 +103,19 @@ public interface PromissoryPaperApiDocs {
     ResponseEntity<Void> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
                                          @RequestBody @Schema(implementation = RepaymentCancelRequest.class) RepaymentCancelRequest repaymentCancelRequest);
 
-    @Operation(summary = "차용증 거절 API", description = "차용증 요청에 대해 거절 처리를 진행압니다.")
-    @ApiErrorCodeExample(RepaymentErrorCode.class)
+    @Operation(summary = "차용증 거절 API", description = "차용증 요청에 대해 거절 처리를 진행합니다.")
+    @ApiErrorCodeExample(PromissoryPaperErrorCode.class)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "성공적으로 거절되었습니다."),
     })
     ResponseEntity<Void> refuse(@AuthenticationPrincipal LoginUser loginUser,
                                 @PathVariable(name = "id") Long paperId);
+
+    @Operation(summary = "차용증 갱신 API", description = "가입 이전에 작성된 차용증에 대한 갱신을 진행합니다.")
+    @ApiErrorCodeExample(PromissoryPaperErrorCode.class)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "갱신이 완료되었습니다."),
+    })
+    ResponseEntity<Void> reload(@AuthenticationPrincipal LoginUser loginUser);
 
 }
