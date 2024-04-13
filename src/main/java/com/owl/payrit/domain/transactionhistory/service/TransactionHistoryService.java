@@ -56,7 +56,7 @@ public class TransactionHistoryService {
         Member loginedMember = memberService.findById(memberId);
 
         String PID = paymentConfigProps.getPID();
-        String PGCode = paymentConfigProps.getTestPGCode();     //FIXME: PGCODE <-> TESTPGCODE
+        String PGCode = paymentConfigProps.getPGCode();     //NOTE: PGCODE <-> TESTPGCODE
         String merchantUID = genMerchantUID(paperId);
         String name = transactionType.getContent();
         int amount = getCostByType(transactionType);
