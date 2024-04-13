@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.auth.provider.kakao;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
 import com.owl.payrit.domain.auth.dto.response.KakaoOauthResponse;
 import com.owl.payrit.domain.auth.provider.OauthClient;
 import com.owl.payrit.domain.member.entity.Member;
@@ -21,8 +22,8 @@ public class KakaoMemberClient implements OauthClient {
     }
 
     @Override
-    public Member fetch(String accessToken) {
-        KakaoOauthResponse kakaoOauthResponse = kakaoApiClient.fetchMember("Bearer " + accessToken);
+    public Member fetch(LoginTokenRequest loginTokenRequest) {
+        KakaoOauthResponse kakaoOauthResponse = kakaoApiClient.fetchMember("Bearer " + loginTokenRequest.accessToken());
         return kakaoOauthResponse.toEntity();
     }
 

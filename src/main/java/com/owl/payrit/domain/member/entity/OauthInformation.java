@@ -22,4 +22,7 @@ public class OauthInformation {
     @Column(nullable = false, name = "oauth_provider")
     @Enumerated(EnumType.STRING)
     private OauthProvider oauthProvider;
+
+    @Column(nullable = true, name = "apple_refresh_token")
+    private String appleRefreshToken;
 }

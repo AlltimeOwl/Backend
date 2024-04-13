@@ -54,7 +54,7 @@ public class AuthService {
     @Transactional
     public TokenResponse login(OauthProvider oauthProvider, LoginTokenRequest loginTokenRequest) {
 
-        Member memberInformation = oauthClientComposite.fetch(oauthProvider, loginTokenRequest.accessToken());
+        Member memberInformation = oauthClientComposite.fetch(oauthProvider, loginTokenRequest);
         Member savedMember = memberService.findByOauthInformationOrSave(memberInformation);
         savedMember.upsertFirebaseToken(loginTokenRequest.firebaseToken());
         // TODO : 새로 만들었다면, 차용증 매핑

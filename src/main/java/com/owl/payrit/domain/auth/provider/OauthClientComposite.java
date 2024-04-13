@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.auth.provider;
 
 import com.owl.payrit.domain.auth.domain.OauthProvider;
+import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
 import com.owl.payrit.domain.member.entity.Member;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +28,8 @@ public class OauthClientComposite {
                          );
     }
 
-    public Member fetch(OauthProvider oauthProvider, String accessToken) {
-        return getProvider(oauthProvider).fetch(accessToken);
+    public Member fetch(OauthProvider oauthProvider, LoginTokenRequest loginTokenRequest) {
+        return getProvider(oauthProvider).fetch(loginTokenRequest);
     }
 
     private OauthClient getProvider(OauthProvider oauthProvider) {
