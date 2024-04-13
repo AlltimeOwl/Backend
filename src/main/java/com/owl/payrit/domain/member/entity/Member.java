@@ -92,6 +92,7 @@ public class Member extends BaseEntity implements UserDetails {
         this.certificationInformation = certificationInformation;
         this.isAuthenticated = true;
     }
+
     @Override
     public String getPassword() {
         return null;

@@ -11,7 +11,7 @@ public record AppleUser(
 ) {
     public Member toEntity() {
         return Member.builder()
-                     .oauthInformation(new OauthInformation(sub, OauthProvider.APPLE))
+                     .oauthInformation(new OauthInformation(sub, OauthProvider.APPLE, null))
                      .email(email)
                      .role(Role.MEMBER)
                      .build();

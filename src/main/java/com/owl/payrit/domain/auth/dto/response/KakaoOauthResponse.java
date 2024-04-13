@@ -21,7 +21,7 @@ public record KakaoOauthResponse(
 ) {
     public Member toEntity() {
         return Member.builder()
-                        .oauthInformation(new OauthInformation(String.valueOf(id), OauthProvider.KAKAO))
+                        .oauthInformation(new OauthInformation(String.valueOf(id), OauthProvider.KAKAO, null))
                         .email(kakaoAccount.email)
                         .name(kakaoAccount.name)
                         .phoneNumber(kakaoAccount.phoneNumber)

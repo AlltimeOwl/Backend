@@ -54,8 +54,13 @@ public class MemberService {
     }
 
     public Member findByOauthInformationOrSave(Member member) {
-        return memberRepository.findByOauthInformation(member.getOauthInformation())
+        return memberRepository.findByOauthInformationOauthProviderIdAndOauthInformationOauthProvider(member.getOauthInformation().getOauthProviderId(), member.getOauthInformation().getOauthProvider())
                                .orElseGet(() -> memberRepository.save(member));
+    }
+
+    public Member findByOauthDetailInformation(OauthInformation oauthInformation) {
+        return memberRepository.findByOauthInformationOauthProviderIdAndOauthInformationOauthProvider(oauthInformation.getOauthProviderId(), oauthInformation.getOauthProvider())
+                               .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     public void modifyAlarmStatus(LoginUser loginUser) {

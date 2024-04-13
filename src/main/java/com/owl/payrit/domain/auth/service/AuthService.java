@@ -3,7 +3,6 @@ package com.owl.payrit.domain.auth.service;
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.CertificationRequest;
 import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
-import com.owl.payrit.domain.auth.dto.request.RevokeRequest;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.dto.response.PortOneCertificationResponse;
 import com.owl.payrit.domain.auth.dto.response.PortOneTokenResponse;
@@ -22,8 +21,8 @@ import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.global.configuration.PortOneConfigProps;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
@@ -54,11 +53,21 @@ public class AuthService {
     @Transactional
     public TokenResponse login(OauthProvider oauthProvider, LoginTokenRequest loginTokenRequest) {
 
-        Member memberInformation = oauthClientComposite.fetch(oauthProvider, loginTokenRequest.accessToken());
+        Member memberInformation = oauthClientComposite.fetch(oauthProvider, loginTokenRequest);
         Member savedMember = memberService.findByOauthInformationOrSave(memberInformation);
+
+        if(savedMember.getOauthInformation().getAppleRefreshToken() == null) {
+            String appleRefreshToken = requestAppleRefreshToken(loginTokenRequest.authorizationCode());
+            savedMember.getOauthInformation().updateAppleRefreshToken(appleRefreshToken);
+        }
+
         savedMember.upsertFirebaseToken(loginTokenRequest.firebaseToken());
-        // TODO : 새로 만들었다면, 차용증 매핑
+
         return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getOauthInformation(), savedMember.getRole(), secretKey);
+    }
+
+    private String requestAppleRefreshToken(String authorizationCode) {
+        return oauthClientComposite.requestRefreshToken(OauthProvider.APPLE, authorizationCode);
     }
 
     public TokenResponse createTokenForTest(String email) {
@@ -73,11 +82,11 @@ public class AuthService {
     }
 
     @Transactional
-    public void revoke(LoginUser loginUser, RevokeRequest revokeRequest) {
+    public void revoke(LoginUser loginUser) {
         log.info("revoke service for : {}", loginUser.oauthInformation().getOauthProviderId());
-        Member member = memberService.findByOauthInformation(loginUser.oauthInformation());
+        Member member = memberService.findByOauthDetailInformation(loginUser.oauthInformation());
         log.info("member : {}", member.getOauthInformation().getOauthProviderId());
-        oauthClientComposite.revoke(member.getOauthInformation().getOauthProvider(), revokeRequest.oauthCode());
+        oauthClientComposite.revoke(member.getOauthInformation().getOauthProvider(), member.getOauthInformation().getAppleRefreshToken());
         promissoryPaperService.removeRelation(member);
         memberService.delete(member);
     }

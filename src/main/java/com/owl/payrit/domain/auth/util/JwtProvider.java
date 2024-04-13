@@ -167,7 +167,8 @@ public class JwtProvider {
         // Map에서 필요한 정보를 추출하여 OauthInformation 객체를 생성하는 로직
         String oauthProviderId = (String) map.get("oauthProviderId");
         OauthProvider oauthProvider = OauthProvider.valueOf((String) map.get("oauthProvider"));
-        return new OauthInformation(oauthProviderId, oauthProvider);
+        // apple refresh token은 회원 탈퇴 시 조회해서 가져오므로 null 처리, 추후에 문제 생길 시 변경하기
+        return new OauthInformation(oauthProviderId, oauthProvider, null);
     }
 
 }
