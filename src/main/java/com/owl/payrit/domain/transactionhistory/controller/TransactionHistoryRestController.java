@@ -72,6 +72,7 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
         return ResponseEntity.ok().body(listResponses);
     }
 
+    @Override
     @PostMapping("/dev/cancel/{secretKey}")
     public ResponseEntity<PortOnePaymentCancelResponse> cancelForDev(@AuthenticationPrincipal LoginUser loginUser,
                                                                      @PathVariable(name = "secretKey") String secretKey,
