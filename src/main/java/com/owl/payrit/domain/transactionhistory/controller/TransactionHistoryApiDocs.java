@@ -2,9 +2,11 @@ package com.owl.payrit.domain.transactionhistory.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
+import com.owl.payrit.domain.transactionhistory.dto.request.PortOnePaymentCancelRequest;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionInfoRequest;
 import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
+import com.owl.payrit.domain.transactionhistory.dto.response.PortOnePaymentCancelResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
@@ -17,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jdk.jfr.Description;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,4 +74,17 @@ public interface TransactionHistoryApiDocs {
     ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser,
                                                        @PathVariable(name = "id") Long paperId,
                                                        @PathVariable(name = "transaction_type") TransactionType transactionType);
+
+    @Operation(summary = "개발용 결제 취소 API", description = "개발 목적으로 진행된 결제를 취소합니다. (차용증 상태는 변화 X)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "삭제 요청에 성공하였습니다. 진행 결과는 결과값을 확인해주세요.",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = PortOnePaymentCancelResponse.class))
+                    })
+    })
+    ResponseEntity<PortOnePaymentCancelResponse> cancelForDev(@AuthenticationPrincipal LoginUser loginUser,
+                                                              @PathVariable(name = "secretKey") String secretKey,
+                                                              @RequestBody @Schema(implementation = PortOnePaymentCancelRequest.class)
+                                                              PortOnePaymentCancelRequest request);
 }

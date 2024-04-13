@@ -8,8 +8,8 @@ public record TransactionHistoryDetailResponse(
 
         Long historyId,
         LocalDateTime transactionDate,
-        String approvalNumber,
-        String transactionType,
+        String applyNum,
+        String paymentMethod,
         long amount
 
         //TODO: 결제 구분 - 일시불?
@@ -18,8 +18,8 @@ public record TransactionHistoryDetailResponse(
         this(
                 transactionHistory.getId(),
                 transactionHistory.getTransactionDate(),
-                transactionHistory.getApprovalNumber(),
-                transactionHistory.getTransactionType(),
+                transactionHistory.getApplyNum(),
+                transactionHistory.getPaymentMethod(),
                 transactionHistory.getAmount()
         );
     }

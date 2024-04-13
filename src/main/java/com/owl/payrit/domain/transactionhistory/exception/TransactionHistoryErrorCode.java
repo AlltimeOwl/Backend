@@ -20,6 +20,7 @@ public enum TransactionHistoryErrorCode implements BaseErrorCode {
     TRANSACTION_BAD_DATE(BAD_REQUEST, "TRANSACTION_400_2", "결제 시기가 올바르지 않습니다."),
     TRANSACTION_CANT_BEFORE_ACCEPT(BAD_REQUEST, "TRANSACTION_400_3", "결제는 승인 완료 상태의 차용증만 가능합니다."),
     PAYMENT_BAD_TYPE(BAD_REQUEST, "PAYMENT_400_1", "결제 유형이 올바르지 않습니다."),
+    SECRET_KEY_NOT_VALID(BAD_REQUEST, "DEV_400_1", "결제 취소 키가 올바르지 않습니다."),
 
     //TransactionHistory 403 Error
     TRANSACTION_ONLY_WRITER(FORBIDDEN, "TRANSACTION_403_1", "결제는 첫 작성자만 가능합니다."),
@@ -31,7 +32,8 @@ public enum TransactionHistoryErrorCode implements BaseErrorCode {
     //TransactionHistory 409 Error
     TRANSACTION_APPROVAL_NUM_CONFLICT(CONFLICT, "TRANSACTION_409_1",
             "중복된 승인 코드가 사용되었습니다. 다시 시도해 주세요."),
-    TRANSACTION_ORDER_NUM_CONFLICT(CONFLICT, "TRANSACTION_409_2", "중복된 주문 코드가 사용되었습니다. 다시 시도해 주세요.");
+    TRANSACTION_MERCHANT_UID_CONFLICT(CONFLICT, "TRANSACTION_409_2", "중복된 주문 코드가 사용되었습니다. 다시 시도해 주세요."),
+    TRANSACTION_IMP_UID_CONFLICT(CONFLICT, "TRANSACTION_409_3", "중복된 IMP 코드가 사용되었습니다. 다시 시도해 주세요.");
 
     private Integer status;
     private String code;

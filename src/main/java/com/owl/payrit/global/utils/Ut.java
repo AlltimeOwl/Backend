@@ -24,6 +24,11 @@ public class Ut {
             return phoneNumber;
         }
 
+        public static String getCardNumberPrefix(String cardNumber) {
+
+            return " (" + cardNumber.substring(0, 4) + ")";
+        }
+
     }
 
 }

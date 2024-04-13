@@ -126,7 +126,7 @@ public class AuthService {
 
     }
 
-    private PortOneTokenResponse getPortOneAccessToken() {
+    public PortOneTokenResponse getPortOneAccessToken() {
         RestTemplate restTemplate = new RestTemplateBuilder().build();
         try {
             JSONObject formData = new JSONObject();
