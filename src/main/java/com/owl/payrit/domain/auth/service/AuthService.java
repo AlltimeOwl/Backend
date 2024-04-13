@@ -55,8 +55,8 @@ public class AuthService {
 
         Member memberInformation = oauthClientComposite.fetch(oauthProvider, loginTokenRequest);
         Member savedMember = memberService.findByOauthInformationOrSave(memberInformation);
-
-        if(savedMember.getOauthInformation().getAppleRefreshToken() == null) {
+        // 애플 로그인일 시 리프레시 토큰 갱신 작업, apple composite 안으로 넣는거 고려해봐야 할 듯
+        if(oauthProvider == OauthProvider.APPLE && savedMember.getOauthInformation().getAppleRefreshToken() == null) {
             String appleRefreshToken = requestAppleRefreshToken(loginTokenRequest.authorizationCode());
             savedMember.getOauthInformation().updateAppleRefreshToken(appleRefreshToken);
         }
