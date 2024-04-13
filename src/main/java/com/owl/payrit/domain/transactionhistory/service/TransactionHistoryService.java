@@ -10,11 +10,9 @@ import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.domain.transactionhistory.configuration.PaymentConfigProps;
+import com.owl.payrit.domain.transactionhistory.dto.request.PortOnePaymentCancelRequest;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
-import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
-import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
-import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
-import com.owl.payrit.domain.transactionhistory.dto.response.PortOnePaymentInfoResponse;
+import com.owl.payrit.domain.transactionhistory.dto.response.*;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionHistory;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
 import com.owl.payrit.domain.transactionhistory.exception.TransactionHistoryErrorCode;
@@ -23,8 +21,15 @@ import com.owl.payrit.domain.transactionhistory.repository.TransactionHistoryRep
 import com.owl.payrit.global.utils.Ut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -207,5 +212,36 @@ public class TransactionHistoryService {
         sb.append(Ut.str.getCardNumberPrefix(portOneResponse.response().cardNumber()));
 
         return sb.toString();
+    }
+
+    public PortOnePaymentCancelResponse cancelForDev(LoginUser loginUser, String secretKey, PortOnePaymentCancelRequest request) {
+
+        if (!secretKey.equals(paymentConfigProps.getSecretKeyForDev())) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.SECRET_KEY_NOT_VALID);
+        }
+
+        PortOneTokenResponse portOneTokenResponse = authService.getPortOneAccessToken();
+
+        RestTemplate restTemplate = new RestTemplateBuilder().build();
+        try {
+            JSONObject formData = new JSONObject();
+            formData.put("imp_uid", request.impUid());
+            formData.put("merchant_uid", request.merchantUid());
+            formData.put("reason", request.reason());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.add("Authorization", "Bearer %s".formatted(portOneTokenResponse.response().accessToken()));
+
+            HttpEntity<String> requestEntity = new HttpEntity<>(formData.toString(), headers);
+
+            ResponseEntity<PortOnePaymentCancelResponse> responseEntity =
+                    restTemplate.postForEntity("https://api.iamport.kr/payments/cancel", requestEntity, PortOnePaymentCancelResponse.class);
+
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("Error occurred while canceled payment", e);
+        }
+        return null;
     }
 }

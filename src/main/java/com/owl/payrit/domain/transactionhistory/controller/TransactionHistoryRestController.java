@@ -1,9 +1,11 @@
 package com.owl.payrit.domain.transactionhistory.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.transactionhistory.dto.request.PortOnePaymentCancelRequest;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionHistorySaveRequest;
 import com.owl.payrit.domain.transactionhistory.dto.request.TransactionInfoRequest;
 import com.owl.payrit.domain.transactionhistory.dto.response.PaymentInfoResponse;
+import com.owl.payrit.domain.transactionhistory.dto.response.PortOnePaymentCancelResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryDetailResponse;
 import com.owl.payrit.domain.transactionhistory.dto.response.TransactionHistoryListResponse;
 import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
@@ -27,8 +29,8 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
     @Override
     @PostMapping("/paymentInfo/{id}/{transaction_type}")
     public ResponseEntity<PaymentInfoResponse> getPaymentInfo(@AuthenticationPrincipal LoginUser loginUser,
-                                                              @PathVariable(name="id") Long paperId,
-                                                              @PathVariable(name="transaction_type") TransactionType transactionType) {
+                                                              @PathVariable(name = "id") Long paperId,
+                                                              @PathVariable(name = "transaction_type") TransactionType transactionType) {
 
         PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), paperId, transactionType);
 
@@ -68,5 +70,16 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
         List<TransactionHistoryListResponse> listResponses = transactionHistoryService.getListResponses(loginUser);
 
         return ResponseEntity.ok().body(listResponses);
+    }
+
+    @PostMapping("/dev/cancel/{secretKey}")
+    public ResponseEntity<PortOnePaymentCancelResponse> cancelForDev(@AuthenticationPrincipal LoginUser loginUser,
+                                                                     @PathVariable(name = "secretKey") String secretKey,
+                                                                     @RequestBody PortOnePaymentCancelRequest request) {
+
+        PortOnePaymentCancelResponse portOnePaymentCancelResponse =
+                transactionHistoryService.cancelForDev(loginUser, secretKey, request);
+
+        return ResponseEntity.ok().body(portOnePaymentCancelResponse);
     }
 }

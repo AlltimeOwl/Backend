@@ -20,6 +20,7 @@ public enum TransactionHistoryErrorCode implements BaseErrorCode {
     TRANSACTION_BAD_DATE(BAD_REQUEST, "TRANSACTION_400_2", "결제 시기가 올바르지 않습니다."),
     TRANSACTION_CANT_BEFORE_ACCEPT(BAD_REQUEST, "TRANSACTION_400_3", "결제는 승인 완료 상태의 차용증만 가능합니다."),
     PAYMENT_BAD_TYPE(BAD_REQUEST, "PAYMENT_400_1", "결제 유형이 올바르지 않습니다."),
+    SECRET_KEY_NOT_VALID(BAD_REQUEST, "DEV_400_1", "결제 취소 키가 올바르지 않습니다."),
 
     //TransactionHistory 403 Error
     TRANSACTION_ONLY_WRITER(FORBIDDEN, "TRANSACTION_403_1", "결제는 첫 작성자만 가능합니다."),

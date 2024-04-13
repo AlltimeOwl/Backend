@@ -16,4 +16,5 @@ public class PaymentConfigProps {
     private String testPGCode;
     private int paperCost;
     private int notiCost;
+    private String secretKeyForDev;
 }
