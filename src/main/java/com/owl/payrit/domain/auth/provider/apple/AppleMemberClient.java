@@ -3,6 +3,7 @@ package com.owl.payrit.domain.auth.provider.apple;
 import com.owl.payrit.domain.auth.domain.OauthProvider;
 import com.owl.payrit.domain.auth.dto.request.AppleRevokeRequest;
 import com.owl.payrit.domain.auth.dto.request.AppleTokenGenerateRequest;
+import com.owl.payrit.domain.auth.dto.request.LoginTokenRequest;
 import com.owl.payrit.domain.auth.dto.response.AppleTokenResponse;
 import com.owl.payrit.domain.auth.dto.response.AppleUser;
 import com.owl.payrit.domain.auth.exception.AuthErrorCode;
@@ -39,24 +40,33 @@ public class AppleMemberClient implements OauthClient {
     }
 
     @Override
-    public Member fetch(String accessToken) {
+    public Member fetch(LoginTokenRequest loginTokenRequest) {
         ApplePublicKeyResponse applePublicKeyResponse = appleApiClient.fetchPublicKey();
-        Map<String, String> appleToken = appleJwtValidator.parseHeaders(accessToken);
+        Map<String, String> appleToken = appleJwtValidator.parseHeaders(loginTokenRequest.accessToken());
         PublicKey publicKey = applePublicKeyGenerator.generate(appleToken, applePublicKeyResponse);
-        Claims claims = appleJwtValidator.getTokenClaims(accessToken, publicKey);
+        Claims claims = appleJwtValidator.getTokenClaims(loginTokenRequest.accessToken(), publicKey);
         return mapClaimToMember(claims);
     }
 
     @Override
-    public void revoke(String authorizationCode) {
+    public void revoke(String refreshToken) {
+//        AppleTokenGenerateRequest appleTokenGenerateRequest = appleJwtValidator.generateAppleToken(authorizationCode);
+//        log.info("TokenGenerate Result is : {}", appleTokenGenerateRequest.toString());
+//        AppleTokenResponse appleTokenResponse = generateAppleToken(appleTokenGenerateRequest.toRequestBody());
+//        log.info("TokenGenerate Response is : {}", appleTokenResponse.toString());
+        AppleRevokeRequest appleRevokeRequest = appleJwtValidator.generateAppleRevokeRequest(refreshToken);
+        log.info("RevokeRequest is : {}", appleRevokeRequest.toString());
+        revokeAppleToken(appleRevokeRequest.toRequestBody());
+
+    }
+
+    @Override
+    public String requestRefreshToken(String authorizationCode) {
         AppleTokenGenerateRequest appleTokenGenerateRequest = appleJwtValidator.generateAppleToken(authorizationCode);
         log.info("TokenGenerate Result is : {}", appleTokenGenerateRequest.toString());
         AppleTokenResponse appleTokenResponse = generateAppleToken(appleTokenGenerateRequest.toRequestBody());
         log.info("TokenGenerate Response is : {}", appleTokenResponse.toString());
-        AppleRevokeRequest appleRevokeRequest = appleJwtValidator.generateAppleRevokeRequest(appleTokenResponse.accessToken());
-        log.info("RevokeRequest is : {}", appleRevokeRequest.toString());
-        revokeAppleToken(appleRevokeRequest.toRequestBody());
-
+        return appleTokenResponse.refreshToken();
     }
 
     public Member mapClaimToMember(Claims claims) {

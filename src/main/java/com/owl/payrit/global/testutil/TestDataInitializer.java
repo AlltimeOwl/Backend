@@ -6,16 +6,14 @@ import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.entity.Role;
 import com.owl.payrit.domain.member.repository.MemberRepository;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Profile({"local", "h2"})
 @RequiredArgsConstructor
@@ -38,7 +36,7 @@ public class TestDataInitializer implements CommandLineRunner {
 
     private Member createTestMember(int index) {
         OauthProvider provider = (index % 2 == 0) ? OauthProvider.KAKAO : OauthProvider.APPLE;
-        OauthInformation oauthInformation = new OauthInformation(String.valueOf(index), provider);
+        OauthInformation oauthInformation = new OauthInformation(String.valueOf(index), provider, null);
         String email = "test0%s".formatted(index);
         String name = "name0%s".formatted(index);
         return Member.builder()
