@@ -273,7 +273,7 @@ public class PromissoryPaperService {
 
     public boolean checkMemberData(Member member, PromissoryPaper paper, PaperRole paperRole) {
 
-        String name = member.getName();
+        String name = member.getCertificationInformation().getName();
         String phoneNumber = member.getCertificationInformation().getPhone();
 
         if (paperRole.equals(PaperRole.CREDITOR)) {
