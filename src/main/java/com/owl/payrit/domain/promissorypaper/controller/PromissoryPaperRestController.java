@@ -130,4 +130,12 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/reload")
+    public ResponseEntity<Void> reload(@AuthenticationPrincipal LoginUser loginUser) {
+
+        promissoryPaperService.reload(loginUser);
+
+        return ResponseEntity.noContent().build();
+    }
 }

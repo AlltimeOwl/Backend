@@ -97,6 +97,14 @@ public class PromissoryPaper extends BaseEntity {
     public void removeWriterRelation() {
         this.writer = null;
     }
+
+    public void reloadCreditor(Member creditor) {
+        this.creditor = creditor;
+    }
+
+    public void reloadDebtor(Member debtor) {
+        this.debtor = debtor;
+    }
 }
 
 
