@@ -60,6 +60,15 @@ public class AppleMemberClient implements OauthClient {
 
     }
 
+    @Override
+    public String requestRefreshToken(String authorizationCode) {
+        AppleTokenGenerateRequest appleTokenGenerateRequest = appleJwtValidator.generateAppleToken(authorizationCode);
+        log.info("TokenGenerate Result is : {}", appleTokenGenerateRequest.toString());
+        AppleTokenResponse appleTokenResponse = generateAppleToken(appleTokenGenerateRequest.toRequestBody());
+        log.info("TokenGenerate Response is : {}", appleTokenResponse.toString());
+        return appleTokenResponse.refreshToken();
+    }
+
     public Member mapClaimToMember(Claims claims) {
         final String SUB = "sub";
         final String EMAIL = "email";

@@ -56,9 +56,19 @@ public class AuthService {
 
         Member memberInformation = oauthClientComposite.fetch(oauthProvider, loginTokenRequest);
         Member savedMember = memberService.findByOauthInformationOrSave(memberInformation);
+
+        if(savedMember.getOauthInformation().getAppleRefreshToken() == null) {
+            String appleRefreshToken = requestAppleRefreshToken(loginTokenRequest.authorizationCode());
+            savedMember.getOauthInformation().updateAppleRefreshToken(appleRefreshToken);
+        }
+
         savedMember.upsertFirebaseToken(loginTokenRequest.firebaseToken());
-        // TODO : 새로 만들었다면, 차용증 매핑
+
         return jwtProvider.createTokenResponse(savedMember.getId(), savedMember.getOauthInformation(), savedMember.getRole(), secretKey);
+    }
+
+    private String requestAppleRefreshToken(String authorizationCode) {
+        return oauthClientComposite.requestRefreshToken(OauthProvider.APPLE, authorizationCode);
     }
 
     public TokenResponse createTokenForTest(String email) {

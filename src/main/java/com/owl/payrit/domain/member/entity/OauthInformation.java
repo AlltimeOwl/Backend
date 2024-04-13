@@ -25,4 +25,8 @@ public class OauthInformation {
 
     @Column(nullable = true, name = "apple_refresh_token")
     private String appleRefreshToken;
+
+    public void updateAppleRefreshToken(String refreshToken) {
+        this.appleRefreshToken = refreshToken;
+    }
 }

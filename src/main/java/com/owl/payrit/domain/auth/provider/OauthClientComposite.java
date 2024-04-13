@@ -40,4 +40,8 @@ public class OauthClientComposite {
     public void revoke(OauthProvider oauthProvider, String oauthCode) {
         getProvider(oauthProvider).revoke(oauthCode);
     }
+
+    public String requestRefreshToken(OauthProvider oauthProvider, String oauthCode) {
+        return getProvider(oauthProvider).requestRefreshToken(oauthCode);
+    }
 }

@@ -31,4 +31,10 @@ public class KakaoMemberClient implements OauthClient {
     public void revoke(String authorizationCode) {
       log.info("kakao user requests revoke");
     }
+
+    @Override
+    public String requestRefreshToken(String authorizationCode) {
+        // 카카오는 필요 없지만, 정보 갱신을 위해 추후 구현 예정
+        return null;
+    }
 }

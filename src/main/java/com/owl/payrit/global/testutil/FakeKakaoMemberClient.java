@@ -29,4 +29,9 @@ public class FakeKakaoMemberClient implements OauthClient {
     public void revoke(String authorizationCode) {
 
     }
+
+    @Override
+    public String requestRefreshToken(String authorizationCode) {
+        return null;
+    }
 }

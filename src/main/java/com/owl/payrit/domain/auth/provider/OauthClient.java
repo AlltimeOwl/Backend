@@ -10,5 +10,7 @@ public interface OauthClient {
 
     Member fetch(LoginTokenRequest loginTokenRequest);
 
-    void revoke(String authorizationCode );
+    void revoke(String authorizationCode);
+
+    String requestRefreshToken(String authorizationCode);
 }
