@@ -17,4 +17,6 @@ public interface PromissoryPaperRepository extends JpaRepository<PromissoryPaper
     List<PromissoryPaper> findAllByUpdatedAtBeforeAndPaperStatus(LocalDateTime expireStandardDate, PaperStatus paperStatus);
     @Query("SELECT p FROM PromissoryPaper p WHERE p.creditor = :member OR p.debtor = :member OR p.writer = :member")
     List<PromissoryPaper> findAllByCreditorOrDebtorOrWriter(@Param("member") Member member);
+    List<PromissoryPaper> findAllByCreditorProfileNameAndCreditorProfilePhoneNumber(String name, String phoneNumber);
+    List<PromissoryPaper> findAllByDebtorProfileNameAndDebtorProfilePhoneNumber(String name, String phoneNumber);
 }

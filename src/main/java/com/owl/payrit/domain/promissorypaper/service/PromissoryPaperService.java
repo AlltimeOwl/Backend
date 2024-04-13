@@ -3,6 +3,7 @@ package com.owl.payrit.domain.promissorypaper.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.docsinfo.entity.DocsInfo;
 import com.owl.payrit.domain.docsinfo.service.DocsInfoService;
+import com.owl.payrit.domain.member.entity.CertificationInformation;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
@@ -490,12 +491,73 @@ public class PromissoryPaperService {
         PaperRole memberRole = isWriter(paper, loginedMember) ? paper.getWriterRole() : paper.getWriterRole().getReverse();
         Member memberInPaper = memberRole.equals(PaperRole.CREDITOR) ? paper.getCreditor() : paper.getDebtor();
 
-        if(!paper.getPaperStatus().equals(PaperStatus.WAITING_AGREE)) {
+        if (!paper.getPaperStatus().equals(PaperStatus.WAITING_AGREE)) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.REFUSE_NEED_WAITING_STATUS);
         }
 
-        if(!memberInPaper.equals(loginedMember)) {
+        if (!memberInPaper.equals(loginedMember)) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.REFUSE_CANT_OTHER_PERSON);
         }
+    }
+
+    @Transactional
+    public void reload(LoginUser loginUser) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+        CertificationInformation certInfo = loginedMember.getCertificationInformation();
+
+        if(certInfo == null) {
+            throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_RELOAD_CAN_AFTER_CERTIFICATION);
+        }
+
+        String name = certInfo.getName();
+        String phone = certInfo.getPhone();
+
+        List<PromissoryPaper> targetsOfCreditor = getReloadTargets(name, phone, PaperRole.CREDITOR);
+        for(PromissoryPaper target : targetsOfCreditor) {
+            target.reloadCreditor(loginedMember);
+        }
+
+        List<PromissoryPaper> targetsOfDebtor = getReloadTargets(name, phone, PaperRole.DEBTOR);
+        for(PromissoryPaper target : targetsOfDebtor) {
+            target.reloadDebtor(loginedMember);
+        }
+
+        promissoryPaperRepository.saveAll(targetsOfCreditor);
+        promissoryPaperRepository.saveAll(targetsOfDebtor);
+    }
+
+    public List<PromissoryPaper> getReloadTargets(String name, String phone, PaperRole paperRole) {
+
+        List<PromissoryPaper> paperList;
+
+        if (paperRole.equals(PaperRole.CREDITOR)) {
+            paperList = promissoryPaperRepository.findAllByCreditorProfileNameAndCreditorProfilePhoneNumber(name, phone);
+        } else {
+            paperList = promissoryPaperRepository.findAllByDebtorProfileNameAndDebtorProfilePhoneNumber(name, phone);
+        }
+
+        return paperList.stream()
+                .filter(paper -> paperRole.equals(PaperRole.CREDITOR) ? paper.getCreditor() == null : paper.getDebtor() == null)
+                .filter(paper -> checkReloadConditions(paperRole.equals(PaperRole.CREDITOR) ? paper.getCreditorProfile() : paper.getDebtorProfile(), name, phone))
+                .collect(Collectors.toList());
+    }
+
+    public boolean checkReloadConditions(PaperProfile profile, String name, String phone) {
+
+        String paperProfileName = profile.getName();
+        String paperProfilePhone = profile.getPhoneNumber();
+
+        if (!name.equals(paperProfileName)) {
+            log.info("{ 갱신 검사 결과 : 이름이 동일하지 않습니다.}");
+            return false;
+        }
+
+        if (!phone.equals(Ut.str.parsedPhoneNumber(paperProfilePhone))) {
+            log.info("{ 갱신 검사 결과 : 번호가 동일하지 않습니다.}");
+            return false;
+        }
+
+        return true;
     }
 }

@@ -44,6 +44,7 @@ public enum PromissoryPaperErrorCode implements BaseErrorCode {
 
     @ExplainError("차용증의 수정은 첫 작성자만 할 수 있습니다.")
     PAPER_WRITER_CAN_MODIFY(FORBIDDEN, "PAPER_403_2", "수정을 진행할 권한이 없습니다."),
+    PAPER_RELOAD_CAN_AFTER_CERTIFICATION(FORBIDDEN, "PAPER_403_3", "본인인증을 완료한 사용자만 갱신이 가능합니다."),
 
     //PromissoryPaper 404 Error
     PAPER_NOT_FOUND(NOT_FOUND, "PAPER_404_1", "차용증 정보가 존재하지 않습니다.");
