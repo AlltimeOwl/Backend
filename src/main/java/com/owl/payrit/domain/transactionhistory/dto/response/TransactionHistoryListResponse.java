@@ -9,7 +9,7 @@ public record TransactionHistoryListResponse(
         Long historyId,
         LocalDate transactionDate,
         long amount,
-        String transactionType,
+        String paymentMethod,
         boolean isSuccess
 ) {
 
@@ -18,7 +18,7 @@ public record TransactionHistoryListResponse(
                 transactionHistory.getId(),
                 transactionDate,
                 transactionHistory.getAmount(),
-                transactionHistory.getTransactionType(),
+                transactionHistory.getPaymentMethod(),
                 transactionHistory.isSuccess()
         );
     }
