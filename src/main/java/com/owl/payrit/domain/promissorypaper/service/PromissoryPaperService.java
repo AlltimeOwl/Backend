@@ -505,6 +505,11 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
         CertificationInformation certInfo = loginedMember.getCertificationInformation();
+
+        if(certInfo == null) {
+            throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_RELOAD_CAN_AFTER_CERTIFICATION);
+        }
+
         String name = certInfo.getName();
         String phone = certInfo.getPhone();
 
