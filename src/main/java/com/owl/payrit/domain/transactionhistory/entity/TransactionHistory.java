@@ -34,11 +34,13 @@ public class TransactionHistory extends BaseEntity {
 
     private String contents;            //결제 내용
 
-    private String transactionType;     //결제 유형
+    private String paymentMethod;       //결제 수단
 
-    private String approvalNumber;      //승인 번호
+    private String applyNum;      //승인 번호
 
-    private String orderNumber;         //주문 번호
+    private String impUid;              //주문 번호
+
+    private String merchantUid;         //고유 내부 상품 번호
 
     private boolean isSuccess;          //결제 성공 여부
 }

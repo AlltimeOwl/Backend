@@ -2,6 +2,7 @@ package com.owl.payrit.domain.auth.provider.portone;
 
 import com.owl.payrit.domain.auth.dto.response.PortOneCertificationResponse;
 import com.owl.payrit.domain.auth.dto.response.PortOneTokenResponse;
+import com.owl.payrit.domain.transactionhistory.dto.response.PortOnePaymentInfoResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -17,4 +18,7 @@ public interface PortOneApiClient {
 
     @GetExchange("https://api.iamport.kr/certifications/{impUid}")
     PortOneCertificationResponse getCertificationInformation(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String bearerToken,  @PathVariable("impUid") String impUid);
+
+    @GetExchange("https://api.iamport.kr/payments/{impUid}")
+    PortOnePaymentInfoResponse getSinglePaymentInformation(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String bearerToken, @PathVariable("impUid") String impUid);
 }

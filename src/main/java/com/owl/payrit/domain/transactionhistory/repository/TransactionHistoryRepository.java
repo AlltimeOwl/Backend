@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory, Long> {
 
     List<TransactionHistory> findAllByPaidMember(Member paidMember);
-    Optional<TransactionHistory> findByOrderNumber(String orderNumber);
-    Optional<TransactionHistory> findByApprovalNumber(String approvalNumber);
+    Optional<TransactionHistory> findByMerchantUid(String merchantUid);
+    Optional<TransactionHistory> findByApplyNum(String applyNum);
+    Optional<TransactionHistory> findByImpUid(String impUid);
 }

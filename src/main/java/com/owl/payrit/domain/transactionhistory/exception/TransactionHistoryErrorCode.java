@@ -31,7 +31,8 @@ public enum TransactionHistoryErrorCode implements BaseErrorCode {
     //TransactionHistory 409 Error
     TRANSACTION_APPROVAL_NUM_CONFLICT(CONFLICT, "TRANSACTION_409_1",
             "중복된 승인 코드가 사용되었습니다. 다시 시도해 주세요."),
-    TRANSACTION_ORDER_NUM_CONFLICT(CONFLICT, "TRANSACTION_409_2", "중복된 주문 코드가 사용되었습니다. 다시 시도해 주세요.");
+    TRANSACTION_MERCHANT_UID_CONFLICT(CONFLICT, "TRANSACTION_409_2", "중복된 주문 코드가 사용되었습니다. 다시 시도해 주세요."),
+    TRANSACTION_IMP_UID_CONFLICT(CONFLICT, "TRANSACTION_409_3", "중복된 IMP 코드가 사용되었습니다. 다시 시도해 주세요.");
 
     private Integer status;
     private String code;
