@@ -8,11 +8,17 @@ import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
 import com.owl.payrit.domain.memo.entity.Memo;
+import com.owl.payrit.domain.notification.entity.NotificationMessage;
+import com.owl.payrit.domain.notification.event.NotificationEvent;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
-import com.owl.payrit.domain.promissorypaper.entity.*;
+import com.owl.payrit.domain.promissorypaper.entity.PaperFormInfo;
+import com.owl.payrit.domain.promissorypaper.entity.PaperProfile;
+import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
+import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
+import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperErrorCode;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
@@ -22,21 +28,22 @@ import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
 import com.owl.payrit.global.utils.Ut;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -52,6 +59,7 @@ public class PromissoryPaperService {
     private final RepaymentHistoryService repaymentHistoryService;
     private final MemberService memberService;
     private final PromissoryPaperRepository promissoryPaperRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public Long writePaper(LoginUser loginUser, PaperWriteRequest paperWriteRequest, HttpServletRequest req) throws IOException {
@@ -82,6 +90,14 @@ public class PromissoryPaperService {
                 .build();
 
         checkPaperData(loginedMember, paper);
+
+        // 상대방도 가입 된 상태라면, 푸시 알림을 전송합니다
+        Member notificationTarget = loginedMember.equals(creditor) ? debtor : creditor;
+        if(notificationTarget != null) {
+            String[] messageArgs = {notificationTarget.getName(), loginedMember.getCertificationInformation().getName()};
+            NotificationEvent notificationEvent = new NotificationEvent(notificationTarget.getId(), NotificationMessage.APPROVAL_REQUEST, messageArgs);
+            applicationEventPublisher.publishEvent(notificationEvent);
+        }
 
         return promissoryPaperRepository.save(paper).getId();
     }
@@ -191,6 +207,14 @@ public class PromissoryPaperService {
                 loginedMember.getCertificationInformation().getImpUid(), documentFile);
 
         paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
+
+        // 차용증이 승인됐을 때, 양쪽 모두에게 알람을 전송합니다. (현재 둘다 앱 가입이 되어있다는 가정)
+        String[] messageArgs = {paper.getCreditor().getCertificationInformation().getName(), paper.getDebtor().getCertificationInformation().getName()};
+        NotificationEvent creditorNotificationEvent = new NotificationEvent(paper.getCreditor().getId(), NotificationMessage.PAYMENT_COMPLETE, messageArgs);
+        NotificationEvent debtorNotificationEvent = new NotificationEvent(paper.getDebtor().getId(), NotificationMessage.PAYMENT_COMPLETE, messageArgs);
+
+        applicationEventPublisher.publishEvent(creditorNotificationEvent);
+        applicationEventPublisher.publishEvent(debtorNotificationEvent);
     }
 
     public void checkAcceptData(Member member, PromissoryPaper paper) {
@@ -228,6 +252,18 @@ public class PromissoryPaperService {
 
         paper.modifyPaperStatus(PaperStatus.MODIFYING);
         paperFormInfo.addModifyMsg(MODIFY_HEADER + paperModifyRequest.contents());
+
+        // 상대방(로그인멤버 아닌 사람) 에게 알림 전송, 수정 상황에서는 둘 다 가입되어있다고 가정
+        Member creditor = paper.getCreditor();
+        Member debtor = paper.getDebtor();
+
+        Member receiver = loginedMember.equals(creditor) ? debtor : creditor;
+        String[] messageArgs = {loginedMember.getCertificationInformation().getName()};
+
+        NotificationEvent notificationEvent = new NotificationEvent(receiver.getId(), NotificationMessage.MODIFY_REQUEST, messageArgs);
+        applicationEventPublisher.publishEvent(notificationEvent);
+
+
     }
 
     public void checkModifyRequestData(Member member, PromissoryPaper paper) {
@@ -257,6 +293,15 @@ public class PromissoryPaperService {
                 .build();
 
         checkPaperData(loginedMember, modifiedPaper);
+
+        // 수정 프로세스에서는 둘다 가입 되어있다고 가정
+        Member creditor = paper.getCreditor();
+        Member debtor = paper.getDebtor();
+
+        Member receiver = loginedMember.equals(creditor) ? debtor : creditor;
+        String[] messageArgs = {loginedMember.getCertificationInformation().getName()};
+        NotificationEvent notificationEvent = new NotificationEvent(receiver.getId(), NotificationMessage.MODIFICATION_COMPLETE, messageArgs);
+        applicationEventPublisher.publishEvent(notificationEvent);
 
         promissoryPaperRepository.save(modifiedPaper);
     }
@@ -355,8 +400,49 @@ public class PromissoryPaperService {
 
         if (totalRemainingAmount == 0) {
             modifiedPaper.modifyPaperStatus(PaperStatus.EXPIRED);
-        }
+            // 빌려준 사람은 돈을 기록했으므로, null일수가 없음.
+            Member creditor = paper.getCreditor();
+            Optional<Member> debtor = Optional.ofNullable(paper.getDebtor());
 
+            if(debtor.isPresent()) {
+                String[] creditorNotificationArgs = { creditor.getCertificationInformation().getName(), debtor.get().getCertificationInformation().getName() };
+                String[] debtorNotificationArgs = { debtor.get().getCertificationInformation().getName(), creditor.getCertificationInformation().getName() };
+
+                NotificationEvent creditorNotificationEvent = new NotificationEvent(creditor.getId(), NotificationMessage.FULL_REPAYMENT_RECEIVED, creditorNotificationArgs);
+                NotificationEvent debtorNotificationEvent = new NotificationEvent(debtor.get().getId(), NotificationMessage.FULL_REPAYMENT_MADE, debtorNotificationArgs);
+
+                applicationEventPublisher.publishEvent(creditorNotificationEvent);
+                applicationEventPublisher.publishEvent(debtorNotificationEvent);
+            }else {
+                // 상대방이 탈퇴한 경우라면, 암호화된 docsInfo에서 상대방 이름을 가져온 뒤, 푸시 알람을 전송합니다.
+                DocsInfo docsInfo = paper.getDocsInfo();
+                String writerName = docsInfo.getWriterName();
+                String accepterName = docsInfo.getAccepterName();
+
+                String creditorName = creditor.getCertificationInformation().getName();
+                String debtorName = creditorName.equals(writerName)? accepterName : writerName;
+
+                String[] creditorNotificationArgs = {creditorName, debtorName};
+                NotificationEvent creditorNotificationEvent = new NotificationEvent(creditor.getId(), NotificationMessage.FULL_REPAYMENT_RECEIVED, creditorNotificationArgs);
+
+                applicationEventPublisher.publishEvent(creditorNotificationEvent);
+            }
+        // 전액 상환이 아닐 시, 상환한 금액을 채무자에게 푸시알림 전송합니다.
+        }else {
+            Member creditor = paper.getCreditor();
+            Optional<Member> debtor = Optional.ofNullable(paper.getDebtor());
+
+            if(debtor.isPresent()) {
+                String[] messageArgs = { creditor.getCertificationInformation().getName(), String.valueOf(repaymentRequest.repaymentAmount()) };
+                NotificationEvent notificationEvent = new NotificationEvent(debtor.get().getId(), NotificationMessage.PARTIAL_REPAYMENT, messageArgs);
+                applicationEventPublisher.publishEvent(notificationEvent);
+            }
+        }
+        /*
+        아래의 save부분은 사실 불필요합니다.
+        hibernate의 변경감지 기능을 통해, 이 트랜잭션이 종료될 시 자동으로 update쿼리를 날리기 때문입니다.
+        아래의 save 기능을 없앨 수 있다면, 위의 알람 전송 로직에서 early return으로 조금 더 가독성 있게 변경할 수 있습니다.
+         */
         promissoryPaperRepository.save(modifiedPaper);
     }
 
@@ -378,6 +464,15 @@ public class PromissoryPaperService {
 
         if(modifiedPaper.getPaperStatus().equals(PaperStatus.EXPIRED)) {
             modifiedPaper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
+        }
+
+        Member creditor = paper.getCreditor();
+        Optional<Member> debtor = Optional.ofNullable(paper.getDebtor());
+
+        if(debtor.isPresent()) {
+            String[] messageArgs = { creditor.getCertificationInformation().getName(), String.valueOf(history.getRepaymentAmount()) };
+            NotificationEvent notificationEvent = new NotificationEvent(debtor.get().getId(), NotificationMessage.PARTIAL_REPAYMENT_CANCELLED, messageArgs);
+            applicationEventPublisher.publishEvent(notificationEvent);
         }
 
         promissoryPaperRepository.save(modifiedPaper);
@@ -445,12 +540,21 @@ public class PromissoryPaperService {
 
     @Transactional
     public void removeRelation(Member member) {
-        promissoryPaperRepository.findAllByCreditorOrDebtorOrWriter(member).parallelStream()
-                .forEach(paper -> {
-                    if (paper.getWriter().equals(member)) paper.removeWriterRelation();
-                    if (paper.getDebtor().equals(member)) paper.removeDebtorRelation();
-                    if (paper.getCreditor().equals(member)) paper.removeCreditorRelation();
-                });
+//        promissoryPaperRepository.findAllByCreditorOrDebtorOrWriter(member).parallelStream()
+//                .forEach(paper -> {
+//                    if (paper.getWriter().equals(member)) paper.removeWriterRelation();
+//                    if (paper.getDebtor().equals(member)) paper.removeDebtorRelation();
+//                    if (paper.getCreditor().equals(member)) paper.removeCreditorRelation();
+//                });
+
+        List<PromissoryPaper> creditorList = promissoryPaperRepository.findAllByCreditor(member);
+        List<PromissoryPaper> debtorList = promissoryPaperRepository.findAllByDebtor(member);
+        List<PromissoryPaper> writerList = promissoryPaperRepository.findAllByWriter(member);
+
+        creditorList.forEach(PromissoryPaper::removeCreditorRelation);
+        debtorList.forEach(PromissoryPaper::removeDebtorRelation);
+        writerList.forEach(PromissoryPaper::removeWriterRelation);
+
     }
 
     public PaperProfile getProfileByReqAndRole(PaperWriteRequest request, PaperRole paperRole) {
