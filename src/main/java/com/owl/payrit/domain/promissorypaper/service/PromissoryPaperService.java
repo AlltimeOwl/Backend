@@ -445,6 +445,15 @@ public class PromissoryPaperService {
             modifiedPaper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
         }
 
+        Member creditor = paper.getCreditor();
+        Optional<Member> debtor = Optional.ofNullable(paper.getDebtor());
+
+        if(debtor.isPresent()) {
+            String[] messageArgs = { creditor.getCertificationInformation().getName(), String.valueOf(history.getRepaymentAmount()) };
+            NotificationEvent notificationEvent = new NotificationEvent(debtor.get().getId(), NotificationMessage.PARTIAL_REPAYMENT_CANCELLED, messageArgs);
+            applicationEventPublisher.publishEvent(notificationEvent);
+        }
+
         promissoryPaperRepository.save(modifiedPaper);
     }
 
