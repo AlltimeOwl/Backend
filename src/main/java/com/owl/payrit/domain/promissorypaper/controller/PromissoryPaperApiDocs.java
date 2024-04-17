@@ -118,4 +118,8 @@ public interface PromissoryPaperApiDocs {
     })
     ResponseEntity<Void> reload(@AuthenticationPrincipal LoginUser loginUser);
 
+    @Operation(summary = "차용증 숨김 처리 API", description = "차용증의 숨김 처리를 진행합니다.")
+    @ApiResponse(responseCode = "204", description = "숨김 처리가 완료되었습니다.")
+    ResponseEntity<Void> hide(@AuthenticationPrincipal LoginUser loginUser,
+                              @PathVariable(name = "id") Long paperId);
 }

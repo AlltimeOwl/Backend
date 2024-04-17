@@ -39,8 +39,10 @@ public record PaperDetailResponse(
         List<MemoListResponse> memoListResponses,
 
         @Schema(description = "상환내역 객체 리스트")
-        List<RepaymentHistoryDto> repaymentHistories
+        List<RepaymentHistoryDto> repaymentHistories,
 
+        @Schema(description = "수정 요청 사항")
+        String modifyRequest
 ) {
     public PaperDetailResponse(PromissoryPaper promissoryPaper, PaperRole memberRole,
                                double repaymentRate, long dueDate, List<MemoListResponse> memoListResponses) {
@@ -57,7 +59,8 @@ public record PaperDetailResponse(
                         .stream()
                         .map(history -> new RepaymentHistoryDto(history.getId(), history.getRepaymentDate(),
                                 history.getRepaymentAmount()))
-                        .collect(Collectors.toList())
+                        .collect(Collectors.toList()),
+                promissoryPaper.getModifyRequest()
         );
     }
 }
