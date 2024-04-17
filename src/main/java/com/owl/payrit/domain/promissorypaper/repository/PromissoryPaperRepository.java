@@ -19,4 +19,6 @@ public interface PromissoryPaperRepository extends JpaRepository<PromissoryPaper
     List<PromissoryPaper> findAllByCreditorOrDebtorOrWriter(@Param("member") Member member);
     List<PromissoryPaper> findAllByCreditorProfileNameAndCreditorProfilePhoneNumber(String name, String phoneNumber);
     List<PromissoryPaper> findAllByDebtorProfileNameAndDebtorProfilePhoneNumber(String name, String phoneNumber);
+
+    List<PromissoryPaper> findAllByWriter(Member writer);
 }

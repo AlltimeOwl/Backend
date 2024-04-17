@@ -445,12 +445,21 @@ public class PromissoryPaperService {
 
     @Transactional
     public void removeRelation(Member member) {
-        promissoryPaperRepository.findAllByCreditorOrDebtorOrWriter(member).parallelStream()
-                .forEach(paper -> {
-                    if (paper.getWriter().equals(member)) paper.removeWriterRelation();
-                    if (paper.getDebtor().equals(member)) paper.removeDebtorRelation();
-                    if (paper.getCreditor().equals(member)) paper.removeCreditorRelation();
-                });
+//        promissoryPaperRepository.findAllByCreditorOrDebtorOrWriter(member).parallelStream()
+//                .forEach(paper -> {
+//                    if (paper.getWriter().equals(member)) paper.removeWriterRelation();
+//                    if (paper.getDebtor().equals(member)) paper.removeDebtorRelation();
+//                    if (paper.getCreditor().equals(member)) paper.removeCreditorRelation();
+//                });
+
+        List<PromissoryPaper> creditorList = promissoryPaperRepository.findAllByCreditor(member);
+        List<PromissoryPaper> debtorList = promissoryPaperRepository.findAllByDebtor(member);
+        List<PromissoryPaper> writerList = promissoryPaperRepository.findAllByWriter(member);
+
+        creditorList.forEach(PromissoryPaper::removeCreditorRelation);
+        debtorList.forEach(PromissoryPaper::removeDebtorRelation);
+        writerList.forEach(PromissoryPaper::removeWriterRelation);
+
     }
 
     public PaperProfile getProfileByReqAndRole(PaperWriteRequest request, PaperRole paperRole) {
