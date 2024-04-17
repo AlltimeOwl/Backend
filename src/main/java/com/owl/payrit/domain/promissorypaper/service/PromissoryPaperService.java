@@ -252,6 +252,18 @@ public class PromissoryPaperService {
 
         paper.modifyPaperStatus(PaperStatus.MODIFYING);
         paperFormInfo.addModifyMsg(MODIFY_HEADER + paperModifyRequest.contents());
+
+        // 상대방(로그인멤버 아닌 사람) 에게 알림 전송, 수정 상황에서는 둘 다 가입되어있다고 가정
+        Member creditor = paper.getCreditor();
+        Member debtor = paper.getDebtor();
+
+        Member receiver = loginedMember.equals(creditor) ? debtor : creditor;
+        String[] messageArgs = {loginedMember.getCertificationInformation().getName()};
+
+        NotificationEvent notificationEvent = new NotificationEvent(receiver.getId(), NotificationMessage.MODIFY_REQUEST, messageArgs);
+        applicationEventPublisher.publishEvent(notificationEvent);
+
+
     }
 
     public void checkModifyRequestData(Member member, PromissoryPaper paper) {
