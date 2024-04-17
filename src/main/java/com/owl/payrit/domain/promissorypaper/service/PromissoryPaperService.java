@@ -206,6 +206,14 @@ public class PromissoryPaperService {
                 loginedMember.getCertificationInformation().getImpUid(), documentFile);
 
         paper.modifyPaperStatus(PaperStatus.PAYMENT_REQUIRED);
+
+        // 차용증이 승인됐을 때, 양쪽 모두에게 알람을 전송합니다. (현재 둘다 앱 가입이 되어있다는 가정)
+        String[] messageArgs = {paper.getCreditor().getCertificationInformation().getName(), paper.getDebtor().getCertificationInformation().getName()};
+        NotificationEvent creditorNotificationEvent = new NotificationEvent(paper.getCreditor().getId(), NotificationMessage.PAYMENT_COMPLETE, messageArgs);
+        NotificationEvent debtorNotificationEvent = new NotificationEvent(paper.getDebtor().getId(), NotificationMessage.PAYMENT_COMPLETE, messageArgs);
+
+        applicationEventPublisher.publishEvent(creditorNotificationEvent);
+        applicationEventPublisher.publishEvent(debtorNotificationEvent);
     }
 
     public void checkAcceptData(Member member, PromissoryPaper paper) {

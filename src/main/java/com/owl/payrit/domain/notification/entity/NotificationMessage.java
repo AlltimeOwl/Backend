@@ -8,8 +8,8 @@ import lombok.Getter;
 public enum NotificationMessage {
     WELCOME(NotificationType.GENERAL, 1, "%s님, 페이릿에 오신 것을 환영해요!"), // 필요한가?
     ID_VERIFICATION(NotificationType.GENERAL, 1, "%s님, 본인인증이 필요해요."), // 필요한가?
-    APPROVAL_REQUEST(NotificationType.APPROVAL_REQUEST, 2, "%s님, %s님으로부터 페이릿 승인 요청이 왔어요."), // 생성
-    AFTER_APPROVAL_REQUEST(NotificationType.GENERAL, 1, "%s님에게 차용증 승인요청을 했어요. 승인 재요청을 원하시면 <홈-> 페이릿 카드>를 눌러 재요청해 보세요."), // 생성
+    APPROVAL_REQUEST(NotificationType.APPROVAL_REQUEST, 2, "%s님, %s님으로부터 페이릿 승인 요청이 왔어요."), // 생성O
+    AFTER_APPROVAL_REQUEST(NotificationType.GENERAL, 1, "%s님에게 차용증 승인요청을 했어요. 승인 재요청을 원하시면 <홈-> 페이릿 카드>를 눌러 재요청해 보세요."), // 필요한가?
     MODIFY_REQUEST(NotificationType.MODIFY_REQUEST, 1, "%s님이 페이릿 수정을 요청했어요. 해당 알림을 누르면 수정하러 갈 수 있어요."), // 생성
     MODIFICATION_COMPLETE(NotificationType.MODIFY_REQUEST, 1, "%s님이 페이릿 수정을 완료했어요. 해당 알림을 누르면 수락하러 갈 수 있어요."), // 생성
     PAYMENT_REQUIRED(NotificationType.PAYMENT_REQUEST, 1, "%s님, 아직 거래 중인 페이릿이 있어요. 해당 알림을 누르면 결제하러 갈 수 있어요."), // 필요한가?
