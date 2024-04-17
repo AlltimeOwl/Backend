@@ -2,6 +2,7 @@ package com.owl.payrit.domain.member.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.dto.response.CertificationResponse;
+import com.owl.payrit.domain.member.dto.response.StatusResponse;
 import com.owl.payrit.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,5 +32,12 @@ public class MemberController implements MemberApiDocs{
         log.info("{} member request certification information", loginUser.oauthInformation().getOauthProviderId());
         CertificationResponse certificationResponse = memberService.findCertificationInformation(loginUser);
         return ResponseEntity.ok().body(certificationResponse);
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<StatusResponse> getStatus(@AuthenticationPrincipal LoginUser loginUser) {
+        log.info("{} member request status information", loginUser.oauthInformation().getOauthProviderId());
+        StatusResponse statusResponse = memberService.getStatus(loginUser);
+        return ResponseEntity.ok().body(statusResponse);
     }
 }

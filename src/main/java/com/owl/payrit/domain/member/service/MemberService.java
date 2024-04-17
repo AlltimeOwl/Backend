@@ -2,6 +2,7 @@ package com.owl.payrit.domain.member.service;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.dto.response.CertificationResponse;
+import com.owl.payrit.domain.member.dto.response.StatusResponse;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.exception.MemberErrorCode;
@@ -79,5 +80,10 @@ public class MemberService {
     public CertificationResponse findCertificationInformation(LoginUser loginUser) {
         Member member = findByOauthDetailInformation(loginUser.oauthInformation());
         return CertificationResponse.of(member);
+    }
+
+    public StatusResponse getStatus(LoginUser loginUser) {
+        Member member = findByOauthDetailInformation(loginUser.oauthInformation());
+        return StatusResponse.of(member);
     }
 }

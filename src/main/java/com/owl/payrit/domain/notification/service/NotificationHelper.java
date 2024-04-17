@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationHelper {
 
     private final NotificationRepository notificationRepository;
-    private final NotificationPushService notificationPushService;
+    private final NotificationService notificationService;
     private final MemberService memberService;
 
     @Transactional
@@ -26,7 +26,7 @@ public class NotificationHelper {
         Member member = memberService.findById(targetId);
         if(!checkNotificationAvailable(member)) return;
         save(notificationMessage, member, args);
-        notificationPushService.push(notificationMessage, args, member.getFirebaseToken());
+        notificationService.push(notificationMessage, args, member.getFirebaseToken());
     }
 
     public void generateNotification(NotificationEvent notificationEvent) {
