@@ -34,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
@@ -378,6 +379,34 @@ public class PromissoryPaperService {
 
         if (totalRemainingAmount == 0) {
             modifiedPaper.modifyPaperStatus(PaperStatus.EXPIRED);
+            // 빌려준 사람은 돈을 기록했으므로, null일수가 없음.
+            Member creditor = paper.getCreditor();
+            Optional<Member> debtor = Optional.ofNullable(paper.getDebtor());
+
+            if(debtor.isPresent()) {
+                String[] creditorNotificationArgs = { creditor.getCertificationInformation().getName(), debtor.get().getCertificationInformation().getName() };
+                String[] debtorNotificationArgs = { debtor.get().getCertificationInformation().getName(), creditor.getCertificationInformation().getName() };
+
+                NotificationEvent creditorNotificationEvent = new NotificationEvent(creditor.getId(), NotificationMessage.FULL_REPAYMENT_RECEIVED, creditorNotificationArgs);
+                NotificationEvent debtorNotificationEvent = new NotificationEvent(debtor.get().getId(), NotificationMessage.FULL_REPAYMENT_MADE, debtorNotificationArgs);
+
+                applicationEventPublisher.publishEvent(creditorNotificationEvent);
+                applicationEventPublisher.publishEvent(debtorNotificationEvent);
+            }else {
+                // 상대방이 탈퇴한 경우라면, 암호화된 docsInfo에서 상대방 이름을 가져온 뒤, 푸시 알람을 전송합니다.
+                DocsInfo docsInfo = paper.getDocsInfo();
+                String writerName = docsInfo.getWriterName();
+                String accepterName = docsInfo.getAccepterName();
+
+                String creditorName = creditor.getCertificationInformation().getName();
+                String debtorName = creditorName.equals(writerName)? accepterName : writerName;
+
+                String[] creditorNotificationArgs = {creditorName, debtorName};
+                NotificationEvent creditorNotificationEvent = new NotificationEvent(creditor.getId(), NotificationMessage.FULL_REPAYMENT_RECEIVED, creditorNotificationArgs);
+
+                applicationEventPublisher.publishEvent(creditorNotificationEvent);
+            }
+
         }
 
         promissoryPaperRepository.save(modifiedPaper);
