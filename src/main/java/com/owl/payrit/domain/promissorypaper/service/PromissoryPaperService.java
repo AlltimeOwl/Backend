@@ -8,11 +8,17 @@ import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
 import com.owl.payrit.domain.memo.entity.Memo;
+import com.owl.payrit.domain.notification.entity.NotificationMessage;
+import com.owl.payrit.domain.notification.event.NotificationEvent;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperModifyRequest;
 import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
 import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
-import com.owl.payrit.domain.promissorypaper.entity.*;
+import com.owl.payrit.domain.promissorypaper.entity.PaperFormInfo;
+import com.owl.payrit.domain.promissorypaper.entity.PaperProfile;
+import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
+import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
+import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperErrorCode;
 import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperException;
 import com.owl.payrit.domain.promissorypaper.repository.PromissoryPaperRepository;
@@ -22,13 +28,6 @@ import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
 import com.owl.payrit.global.utils.Ut;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +36,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -52,6 +58,7 @@ public class PromissoryPaperService {
     private final RepaymentHistoryService repaymentHistoryService;
     private final MemberService memberService;
     private final PromissoryPaperRepository promissoryPaperRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public Long writePaper(LoginUser loginUser, PaperWriteRequest paperWriteRequest, HttpServletRequest req) throws IOException {
@@ -82,6 +89,14 @@ public class PromissoryPaperService {
                 .build();
 
         checkPaperData(loginedMember, paper);
+
+        // 상대방도 가입 된 상태라면, 푸시 알림을 전송합니다
+        Member notificationTarget = loginedMember.equals(creditor) ? debtor : creditor;
+        if(notificationTarget != null) {
+            String[] messageArgs = {notificationTarget.getName(), loginedMember.getCertificationInformation().getName()};
+            NotificationEvent notificationEvent = new NotificationEvent(notificationTarget.getId(), NotificationMessage.APPROVAL_REQUEST, messageArgs);
+            applicationEventPublisher.publishEvent(notificationEvent);
+        }
 
         return promissoryPaperRepository.save(paper).getId();
     }
