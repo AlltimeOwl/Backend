@@ -25,7 +25,10 @@ public interface MemberApiDocs {
     @ApiResponse(responseCode = "204")
     ResponseEntity<Void> modifyNotificationStatus(@AuthenticationPrincipal LoginUser loginUser);
 
-    @Operation(summary = "알럼 수신 상태 조회 API", description = "알림 수신 상태를 조회합니다.")
-    @ApiResponse(responseCode = "200")
+    @Operation(summary = "알림 수신 상태 조회 API", description = "알림 수신 상태를 조회합니다.")
+    @ApiResponse(responseCode = "200",
+        content = {
+            @Content(mediaType = "application/json", schema = @Schema(implementation = StatusResponse.class))
+        })
     ResponseEntity<StatusResponse> getStatus(@AuthenticationPrincipal LoginUser loginUser);
 }
