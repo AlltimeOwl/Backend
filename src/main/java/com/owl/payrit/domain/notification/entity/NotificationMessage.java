@@ -16,9 +16,9 @@ public enum NotificationMessage {
     PAYMENT_TIMEOUT(NotificationType.PAYMENT_REQUEST, 2, "%s님, 아직 %s님이 수락하지 않았어요. 해당 알림을 누르면 재요청하러 갈 수 있어요."), // 필요한가?
     PAYMENT_COMPLETE(NotificationType.PAYMENT_REQUEST, 2, "%s님과 %s님의 페이릿이 완성됐어요! 거래된 페이릿은 홈에서 확인 가능해요."), // 생성
     REPAYMENT_DUE(NotificationType.REPAYMENT_REQUEST, 3, "%s님 %s 뒤면 돈을 돌려줘야 하는 날이에요! %s님과의 약속을 기억해 주세요."), // 생성
-    FULL_REPAYMENT_RECEIVED(NotificationType.REPAYMENT_REQUEST, 3, "%s님! %s님의 전체 상환으로 페이릿 거래가 끝났어요! %s님께 소중한 돈을 빌려줘서 고마워요."), // 생성
-    FULL_REPAYMENT_MADE(NotificationType.REPAYMENT_REQUEST, 2, "%s님! 전체 상환으로 %s님과의 페이릿이 만료됐어요! 약속을 지켜줘서 고마워요."), // 생성
-    PARTIAL_REPAYMENT(NotificationType.REPAYMENT_REQUEST, 2, "%s님과의 페이릿에서 일부 상환 %s 원 기록이 기록됐어요."), // 필요한가?
+    FULL_REPAYMENT_RECEIVED(NotificationType.REPAYMENT_REQUEST, 3, "%s님! %s님의 전체 상환으로 페이릿 거래가 끝났어요! %s님께 소중한 돈을 빌려줘서 고마워요."), // 생성O
+    FULL_REPAYMENT_MADE(NotificationType.REPAYMENT_REQUEST, 2, "%s님! 전체 상환으로 %s님과의 페이릿이 만료됐어요! 약속을 지켜줘서 고마워요."), // 생성O
+    PARTIAL_REPAYMENT(NotificationType.REPAYMENT_REQUEST, 2, "%s님과의 페이릿에서 일부 상환 %s 원 기록이 기록됐어요."), // 생성O
     PARTIAL_REPAYMENT_CANCELLED(NotificationType.REPAYMENT_REQUEST, 2, "%s님과의 페이릿에서 일부 상환 %s 원 기록이 삭제됐어요."), // 필요한가?
     UNPAID(NotificationType.REPAYMENT_REQUEST, 0, "자니? 우리의 약속 기한이 얼마 남지 않았단 거 알고 있지?");
 

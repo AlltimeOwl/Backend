@@ -406,9 +406,22 @@ public class PromissoryPaperService {
 
                 applicationEventPublisher.publishEvent(creditorNotificationEvent);
             }
+        // 전액 상환이 아닐 시, 상환한 금액을 채무자에게 푸시알림 전송합니다.
+        }else {
+            Member creditor = paper.getCreditor();
+            Optional<Member> debtor = Optional.ofNullable(paper.getDebtor());
 
+            if(debtor.isPresent()) {
+                String[] messageArgs = { creditor.getCertificationInformation().getName(), String.valueOf(repaymentRequest.repaymentAmount()) };
+                NotificationEvent notificationEvent = new NotificationEvent(debtor.get().getId(), NotificationMessage.PARTIAL_REPAYMENT, messageArgs);
+                applicationEventPublisher.publishEvent(notificationEvent);
+            }
         }
-
+        /*
+        아래의 save부분은 사실 불필요합니다.
+        hibernate의 변경감지 기능을 통해, 이 트랜잭션이 종료될 시 자동으로 update쿼리를 날리기 때문입니다.
+        아래의 save 기능을 없앨 수 있다면, 위의 알람 전송 로직에서 early return으로 조금 더 가독성 있게 변경할 수 있습니다.
+         */
         promissoryPaperRepository.save(modifiedPaper);
     }
 
