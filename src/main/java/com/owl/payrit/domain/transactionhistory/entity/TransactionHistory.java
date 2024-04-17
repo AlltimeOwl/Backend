@@ -2,7 +2,9 @@ package com.owl.payrit.domain.transactionhistory.entity;
 
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.promissorypaper.entity.PromissoryPaper;
+import com.owl.payrit.global.encryption.PromissoryPaperStringConverter;
 import com.owl.payrit.global.entity.BaseEntity;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
@@ -22,8 +24,11 @@ import java.time.LocalDateTime;
 @ToString(callSuper = true)
 public class TransactionHistory extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Member paidMember;
+    @Convert(converter = PromissoryPaperStringConverter.class)
+    private String buyerName;
+
+    @Convert(converter = PromissoryPaperStringConverter.class)
+    private String buyerPhone;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private PromissoryPaper linkedPaper;

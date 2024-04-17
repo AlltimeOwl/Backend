@@ -4,6 +4,7 @@ import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.auth.dto.response.PortOneTokenResponse;
 import com.owl.payrit.domain.auth.provider.portone.PortOneApiClient;
 import com.owl.payrit.domain.auth.service.AuthService;
+import com.owl.payrit.domain.member.entity.CertificationInformation;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promissorypaper.entity.PaperStatus;
@@ -78,6 +79,7 @@ public class TransactionHistoryService {
 
         PromissoryPaper paper = promissoryPaperService.getById(request.paperId());
         Member loginedMember = memberService.findById(loginUser.id());
+        CertificationInformation certInfo = loginedMember.getCertificationInformation();
 
         PortOneTokenResponse portOneTokenResponse = authService.getPortOneAccessToken();
 
@@ -85,7 +87,8 @@ public class TransactionHistoryService {
                 portOneApiClient.getSinglePaymentInformation("Bearer %s".formatted(portOneTokenResponse.response().accessToken()), request.impUid());
 
         TransactionHistory history = TransactionHistory.builder()
-                .paidMember(loginedMember)
+                .buyerName(certInfo.getName())
+                .buyerPhone(certInfo.getPhone())
                 .linkedPaper(paper)
                 .transactionDate(request.transactionDate())
                 .amount(request.amount())
@@ -143,7 +146,9 @@ public class TransactionHistoryService {
 
     public List<TransactionHistory> getAllByPaidMember(Member member) {
 
-        return transactionHistoryRepository.findAllByPaidMember(member);
+        CertificationInformation certInfo = member.getCertificationInformation();
+
+        return transactionHistoryRepository.findAllByBuyerNameAndBuyerPhone(certInfo.getName(), certInfo.getPhone());
     }
 
     public void checkSaveRequest(Member loginedMember, PromissoryPaper paper, TransactionHistory transactionHistory) {
@@ -175,7 +180,13 @@ public class TransactionHistoryService {
 
     public void checkDetailRequest(Member loginedMember, TransactionHistory history) {
 
-        if (!history.getPaidMember().equals(loginedMember)) {
+        CertificationInformation certInfo = loginedMember.getCertificationInformation();
+
+        if (!certInfo.getPhone().equals(history.getBuyerPhone())) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_FORBIDDEN);
+        }
+
+        if (!certInfo.getName().equals(history.getBuyerName())) {
             throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_FORBIDDEN);
         }
 
