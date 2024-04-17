@@ -4,6 +4,7 @@ import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.notification.entity.Notification;
 import com.owl.payrit.domain.notification.entity.NotificationMessage;
+import com.owl.payrit.domain.notification.event.NotificationEvent;
 import com.owl.payrit.domain.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,10 @@ public class NotificationHelper {
         if(!checkNotificationAvailable(member)) return;
         save(notificationMessage, member, args);
         notificationPushService.push(notificationMessage, args, member.getFirebaseToken());
+    }
+
+    public void generateNotification(NotificationEvent notificationEvent) {
+        generateNotification(notificationEvent.targetId(), notificationEvent.notificationMessage(), notificationEvent.messageArgs());
     }
 
     private boolean checkNotificationAvailable(Member member) {
