@@ -473,26 +473,26 @@ public class PromissoryPaperService {
         promissoryPaperRepository.save(modifiedPaper);
     }
 
-    @Transactional
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void expiringForUnusedData() {
-
-        //FIXME: 만료 기준 지정 및 보관
-        LocalDateTime expiredStandardDate = LocalDateTime.now().minusDays(EXPIRED_STANDARD_DATE);
-
-        List<PromissoryPaper> targetPapers = new ArrayList<>();
-
-        List<PromissoryPaper> targetFromWaitingAgree = promissoryPaperRepository
-                .findAllByUpdatedAtBeforeAndPaperStatus(expiredStandardDate, PaperStatus.WAITING_AGREE);
-
-        List<PromissoryPaper> targetFromPaymentRequired = promissoryPaperRepository
-                .findAllByUpdatedAtBeforeAndPaperStatus(expiredStandardDate, PaperStatus.PAYMENT_REQUIRED);
-
-        targetPapers.addAll(targetFromWaitingAgree);
-        targetPapers.addAll(targetFromPaymentRequired);
-
-        promissoryPaperRepository.deleteAll(targetPapers);
-    }
+//    @Transactional
+//    @Scheduled(cron = "0 0 0 * * ?")
+//    public void expiringForUnusedData() {
+//
+//        //FIXME: 만료 기준 지정 및 보관
+//        LocalDateTime expiredStandardDate = LocalDateTime.now().minusDays(EXPIRED_STANDARD_DATE);
+//
+//        List<PromissoryPaper> targetPapers = new ArrayList<>();
+//
+//        List<PromissoryPaper> targetFromWaitingAgree = promissoryPaperRepository
+//                .findAllByUpdatedAtBeforeAndPaperStatus(expiredStandardDate, PaperStatus.WAITING_AGREE);
+//
+//        List<PromissoryPaper> targetFromPaymentRequired = promissoryPaperRepository
+//                .findAllByUpdatedAtBeforeAndPaperStatus(expiredStandardDate, PaperStatus.PAYMENT_REQUIRED);
+//
+//        targetPapers.addAll(targetFromWaitingAgree);
+//        targetPapers.addAll(targetFromPaymentRequired);
+//
+//        promissoryPaperRepository.deleteAll(targetPapers);
+//    }
 
     public String getIpByReq(HttpServletRequest req) {
 
