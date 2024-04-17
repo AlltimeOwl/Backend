@@ -167,7 +167,6 @@ public class PromissoryPaperService {
     public List<PaperListResponse> getListResponsesByRole(LoginUser loginUser, PaperRole role) {
 
         Member loginedMember = memberService.findById(loginUser.id());
-
         List<PromissoryPaper> papers;
 
         if (role.equals(PaperRole.CREDITOR)) {
@@ -176,15 +175,23 @@ public class PromissoryPaperService {
             papers = promissoryPaperRepository.findAllByDebtor(loginedMember);
         }
 
-        return papers.stream().map(paper -> {
-            if (role.equals(PaperRole.CREDITOR)) {
-                return new PaperListResponse(paper, PaperRole.CREDITOR, paper.getDebtorProfile().getName(),
-                        calcDueDate(paper), calcRepaymentRate(paper), isWriter(paper, loginedMember));
-            } else {
-                return new PaperListResponse(paper, PaperRole.DEBTOR, paper.getCreditorProfile().getName()
-                        , calcDueDate(paper), calcRepaymentRate(paper), isWriter(paper, loginedMember));
-            }
-        }).collect(Collectors.toList());
+        return papers.stream()
+                .filter(paper -> {
+                    if (role.equals(PaperRole.CREDITOR)) {
+                        return paper.isCreditorActivated();
+                    } else {
+                        return paper.isDebtorActivated();
+                    }
+                })
+                .map(paper -> {
+                    String peerName = role.equals(PaperRole.CREDITOR) ?
+                            paper.getDebtorProfile().getName() :
+                            paper.getCreditorProfile().getName();
+
+                    return new PaperListResponse(paper, role, peerName,
+                            calcDueDate(paper), calcRepaymentRate(paper), isWriter(paper, loginedMember));
+                })
+                .collect(Collectors.toList());
     }
 
     private long calcDueDate(PromissoryPaper paper) {
