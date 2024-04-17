@@ -140,6 +140,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @PutMapping("/hide/{id}")
     public ResponseEntity<Void> hide(@AuthenticationPrincipal LoginUser loginUser,
                                      @PathVariable(name = "id") Long paperId) {
