@@ -2,6 +2,7 @@ package com.owl.payrit.domain.member.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.dto.response.CertificationResponse;
+import com.owl.payrit.domain.member.dto.response.StatusResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,4 +24,8 @@ public interface MemberApiDocs {
     @Operation(summary = "알럼 수신 변경 API", description = "알람 수신 여부를 변경합니다. True -> false, false -> true")
     @ApiResponse(responseCode = "204")
     ResponseEntity<Void> modifyNotificationStatus(@AuthenticationPrincipal LoginUser loginUser);
+
+    @Operation(summary = "알럼 수신 상태 조회 API", description = "알림 수신 상태를 조회합니다.")
+    @ApiResponse(responseCode = "200")
+    ResponseEntity<StatusResponse> getStatus(@AuthenticationPrincipal LoginUser loginUser);
 }

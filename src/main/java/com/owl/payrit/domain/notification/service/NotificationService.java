@@ -4,6 +4,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.owl.payrit.domain.notification.entity.NotificationMessage;
+import com.owl.payrit.domain.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class NotificationPushService {
+public class NotificationService {
+
+    private final NotificationRepository notificationRepository;
 
     @Async("notificationThreadPoolBean")
     public void push(NotificationMessage notificationMessage, String[] args, String firebaseToken) {
