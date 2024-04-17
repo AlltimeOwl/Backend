@@ -294,6 +294,15 @@ public class PromissoryPaperService {
 
         checkPaperData(loginedMember, modifiedPaper);
 
+        // 수정 프로세스에서는 둘다 가입 되어있다고 가정
+        Member creditor = paper.getCreditor();
+        Member debtor = paper.getDebtor();
+
+        Member receiver = loginedMember.equals(creditor) ? debtor : creditor;
+        String[] messageArgs = {loginedMember.getCertificationInformation().getName()};
+        NotificationEvent notificationEvent = new NotificationEvent(receiver.getId(), NotificationMessage.MODIFICATION_COMPLETE, messageArgs);
+        applicationEventPublisher.publishEvent(notificationEvent);
+
         promissoryPaperRepository.save(modifiedPaper);
     }
 
