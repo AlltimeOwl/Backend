@@ -243,15 +243,11 @@ public class PromissoryPaperService {
 
         Member loginedMember = memberService.findById(loginUser.id());
         PromissoryPaper paper = getById(paperModifyRequest.paperId());
-        PaperFormInfo paperFormInfo = paper.getPaperFormInfo();
 
         checkModifyRequestData(loginedMember, paper);
 
-        //TODO: 초기 작성자에게 paperModifyRequest의 contents로 알림(자체 or 알림톡) 발송하는 기능 필요
-        Member writer = paper.getWriter();
-
         paper.modifyPaperStatus(PaperStatus.MODIFYING);
-        paperFormInfo.addModifyMsg(MODIFY_HEADER + paperModifyRequest.contents());
+        paper.saveModifyRequest(paperModifyRequest.contents());
 
         // 상대방(로그인멤버 아닌 사람) 에게 알림 전송, 수정 상황에서는 둘 다 가입되어있다고 가정
         Member creditor = paper.getCreditor();
@@ -262,8 +258,6 @@ public class PromissoryPaperService {
 
         NotificationEvent notificationEvent = new NotificationEvent(receiver.getId(), NotificationMessage.MODIFY_REQUEST, messageArgs);
         applicationEventPublisher.publishEvent(notificationEvent);
-
-
     }
 
     public void checkModifyRequestData(Member member, PromissoryPaper paper) {
@@ -290,6 +284,7 @@ public class PromissoryPaperService {
                 .creditorProfile(getProfileByReqAndRole(paperWriteRequest, PaperRole.CREDITOR))
                 .debtorProfile(getProfileByReqAndRole(paperWriteRequest, PaperRole.DEBTOR))
                 .paperStatus(PaperStatus.WAITING_AGREE)
+                .modifyRequest(null)
                 .build();
 
         checkPaperData(loginedMember, modifiedPaper);

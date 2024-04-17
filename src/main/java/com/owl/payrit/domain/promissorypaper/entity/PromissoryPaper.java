@@ -78,6 +78,9 @@ public class PromissoryPaper extends BaseEntity {
     @OneToMany(mappedBy = "promissoryPaper", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Memo> memos = new ArrayList<>();
 
+    @Builder.Default
+    private String modifyRequest = null;
+
     public void modifyPaperStatus(PaperStatus status) {
         this.paperStatus = status;
     }
@@ -104,6 +107,10 @@ public class PromissoryPaper extends BaseEntity {
 
     public void reloadDebtor(Member debtor) {
         this.debtor = debtor;
+    }
+
+    public void saveModifyRequest(String modifyRequest) {
+        this.modifyRequest = modifyRequest;
     }
 }
 
