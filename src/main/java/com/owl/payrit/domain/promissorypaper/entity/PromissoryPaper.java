@@ -81,6 +81,12 @@ public class PromissoryPaper extends BaseEntity {
     @Builder.Default
     private String modifyRequest = null;
 
+    @Builder.Default
+    private boolean isCreditorActivated = true;
+
+    @Builder.Default
+    private boolean isDebtorActivated = true;
+
     public void modifyPaperStatus(PaperStatus status) {
         this.paperStatus = status;
     }
@@ -111,6 +117,14 @@ public class PromissoryPaper extends BaseEntity {
 
     public void saveModifyRequest(String modifyRequest) {
         this.modifyRequest = modifyRequest;
+    }
+
+    public void hidingByRole(PaperRole paperRole) {
+        if (paperRole.equals(PaperRole.CREDITOR)) {
+            this.isCreditorActivated = false;
+        } else {
+            this.isDebtorActivated = false;
+        }
     }
 }
 

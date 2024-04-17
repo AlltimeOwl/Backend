@@ -28,6 +28,7 @@ import com.owl.payrit.domain.repaymenthistory.entity.RepaymentHistory;
 import com.owl.payrit.domain.repaymenthistory.service.RepaymentHistoryService;
 import com.owl.payrit.global.utils.Ut;
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -93,7 +95,7 @@ public class PromissoryPaperService {
 
         // 상대방도 가입 된 상태라면, 푸시 알림을 전송합니다
         Member notificationTarget = loginedMember.equals(creditor) ? debtor : creditor;
-        if(notificationTarget != null) {
+        if (notificationTarget != null) {
             String[] messageArgs = {notificationTarget.getName(), loginedMember.getCertificationInformation().getName()};
             NotificationEvent notificationEvent = new NotificationEvent(notificationTarget.getId(), NotificationMessage.APPROVAL_REQUEST, messageArgs);
             applicationEventPublisher.publishEvent(notificationEvent);
@@ -399,36 +401,36 @@ public class PromissoryPaperService {
             Member creditor = paper.getCreditor();
             Optional<Member> debtor = Optional.ofNullable(paper.getDebtor());
 
-            if(debtor.isPresent()) {
-                String[] creditorNotificationArgs = { creditor.getCertificationInformation().getName(), debtor.get().getCertificationInformation().getName() };
-                String[] debtorNotificationArgs = { debtor.get().getCertificationInformation().getName(), creditor.getCertificationInformation().getName() };
+            if (debtor.isPresent()) {
+                String[] creditorNotificationArgs = {creditor.getCertificationInformation().getName(), debtor.get().getCertificationInformation().getName()};
+                String[] debtorNotificationArgs = {debtor.get().getCertificationInformation().getName(), creditor.getCertificationInformation().getName()};
 
                 NotificationEvent creditorNotificationEvent = new NotificationEvent(creditor.getId(), NotificationMessage.FULL_REPAYMENT_RECEIVED, creditorNotificationArgs);
                 NotificationEvent debtorNotificationEvent = new NotificationEvent(debtor.get().getId(), NotificationMessage.FULL_REPAYMENT_MADE, debtorNotificationArgs);
 
                 applicationEventPublisher.publishEvent(creditorNotificationEvent);
                 applicationEventPublisher.publishEvent(debtorNotificationEvent);
-            }else {
+            } else {
                 // 상대방이 탈퇴한 경우라면, 암호화된 docsInfo에서 상대방 이름을 가져온 뒤, 푸시 알람을 전송합니다.
                 DocsInfo docsInfo = paper.getDocsInfo();
                 String writerName = docsInfo.getWriterName();
                 String accepterName = docsInfo.getAccepterName();
 
                 String creditorName = creditor.getCertificationInformation().getName();
-                String debtorName = creditorName.equals(writerName)? accepterName : writerName;
+                String debtorName = creditorName.equals(writerName) ? accepterName : writerName;
 
                 String[] creditorNotificationArgs = {creditorName, debtorName};
                 NotificationEvent creditorNotificationEvent = new NotificationEvent(creditor.getId(), NotificationMessage.FULL_REPAYMENT_RECEIVED, creditorNotificationArgs);
 
                 applicationEventPublisher.publishEvent(creditorNotificationEvent);
             }
-        // 전액 상환이 아닐 시, 상환한 금액을 채무자에게 푸시알림 전송합니다.
-        }else {
+            // 전액 상환이 아닐 시, 상환한 금액을 채무자에게 푸시알림 전송합니다.
+        } else {
             Member creditor = paper.getCreditor();
             Optional<Member> debtor = Optional.ofNullable(paper.getDebtor());
 
-            if(debtor.isPresent()) {
-                String[] messageArgs = { creditor.getCertificationInformation().getName(), String.valueOf(repaymentRequest.repaymentAmount()) };
+            if (debtor.isPresent()) {
+                String[] messageArgs = {creditor.getCertificationInformation().getName(), String.valueOf(repaymentRequest.repaymentAmount())};
                 NotificationEvent notificationEvent = new NotificationEvent(debtor.get().getId(), NotificationMessage.PARTIAL_REPAYMENT, messageArgs);
                 applicationEventPublisher.publishEvent(notificationEvent);
             }
@@ -457,15 +459,15 @@ public class PromissoryPaperService {
                 .paperFormInfo(paperFormInfo.cancelRepayment(needToCancelAmount))
                 .build();
 
-        if(modifiedPaper.getPaperStatus().equals(PaperStatus.EXPIRED)) {
+        if (modifiedPaper.getPaperStatus().equals(PaperStatus.EXPIRED)) {
             modifiedPaper.modifyPaperStatus(PaperStatus.COMPLETE_WRITING);
         }
 
         Member creditor = paper.getCreditor();
         Optional<Member> debtor = Optional.ofNullable(paper.getDebtor());
 
-        if(debtor.isPresent()) {
-            String[] messageArgs = { creditor.getCertificationInformation().getName(), String.valueOf(history.getRepaymentAmount()) };
+        if (debtor.isPresent()) {
+            String[] messageArgs = {creditor.getCertificationInformation().getName(), String.valueOf(history.getRepaymentAmount())};
             NotificationEvent notificationEvent = new NotificationEvent(debtor.get().getId(), NotificationMessage.PARTIAL_REPAYMENT_CANCELLED, messageArgs);
             applicationEventPublisher.publishEvent(notificationEvent);
         }
@@ -609,7 +611,7 @@ public class PromissoryPaperService {
         Member loginedMember = memberService.findById(loginUser.id());
         CertificationInformation certInfo = loginedMember.getCertificationInformation();
 
-        if(certInfo == null) {
+        if (certInfo == null) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_RELOAD_CAN_AFTER_CERTIFICATION);
         }
 
@@ -617,12 +619,12 @@ public class PromissoryPaperService {
         String phone = certInfo.getPhone();
 
         List<PromissoryPaper> targetsOfCreditor = getReloadTargets(name, phone, PaperRole.CREDITOR);
-        for(PromissoryPaper target : targetsOfCreditor) {
+        for (PromissoryPaper target : targetsOfCreditor) {
             target.reloadCreditor(loginedMember);
         }
 
         List<PromissoryPaper> targetsOfDebtor = getReloadTargets(name, phone, PaperRole.DEBTOR);
-        for(PromissoryPaper target : targetsOfDebtor) {
+        for (PromissoryPaper target : targetsOfDebtor) {
             target.reloadDebtor(loginedMember);
         }
 
@@ -662,5 +664,20 @@ public class PromissoryPaperService {
         }
 
         return true;
+    }
+
+    @Transactional
+    public void hide(LoginUser loginUser, Long paperId) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+        PromissoryPaper paper = getById(paperId);
+
+        if (!isMine(loginedMember.getId(), paper)) {
+            throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_IS_NOT_MINE);
+        }
+
+        PaperRole memberRole = isWriter(paper, loginedMember) ? paper.getWriterRole() : paper.getWriterRole().getReverse();
+
+        paper.hidingByRole(memberRole);
     }
 }

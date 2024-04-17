@@ -124,7 +124,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     @Override
     @PutMapping("/refuse/{id}")
     public ResponseEntity<Void> refuse(@AuthenticationPrincipal LoginUser loginUser,
-                                       @PathVariable(name="id") Long paperId) {
+                                       @PathVariable(name = "id") Long paperId) {
 
         promissoryPaperService.refuse(loginUser, paperId);
 
@@ -136,6 +136,15 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     public ResponseEntity<Void> reload(@AuthenticationPrincipal LoginUser loginUser) {
 
         promissoryPaperService.reload(loginUser);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/hide/{id}")
+    public ResponseEntity<Void> hide(@AuthenticationPrincipal LoginUser loginUser,
+                                     @PathVariable(name = "id") Long paperId) {
+
+        promissoryPaperService.hide(loginUser, paperId);
 
         return ResponseEntity.noContent().build();
     }
