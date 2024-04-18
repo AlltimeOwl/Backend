@@ -9,11 +9,15 @@ import lombok.Getter;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
+import static com.owl.payrit.global.consts.PayritStatic.FORBIDDEN;
 import static com.owl.payrit.global.consts.PayritStatic.NOT_FOUND;
 
 @Getter
 @AllArgsConstructor
 public enum PromiseErrorCode implements BaseErrorCode {
+
+    // PROMISE 403 ERROR
+    PROMISE_IS_NOT_MINE(FORBIDDEN, "PROMISE_403_1", "약속 접근 권한이 없습니다."),
 
     // PROMISE 404 ERROR
     PROMISE_NOT_FOUND(NOT_FOUND, "PROMISE_404_1", "약속을 찾을 수 없습니다.");

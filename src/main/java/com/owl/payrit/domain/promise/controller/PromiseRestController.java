@@ -53,4 +53,15 @@ public class PromiseRestController {
 
         return ResponseEntity.ok().body(detailResponse);
     }
+
+    @DeleteMapping("/remove/{id}")
+    public ResponseEntity<Void> remove(@AuthenticationPrincipal LoginUser loginUser,
+                                       @PathVariable(name = "id") Long promiseId) {
+
+        log.info("{ promise remove rq : user_%d }".formatted(loginUser.id()));
+
+        promiseService.remove(loginUser, promiseId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

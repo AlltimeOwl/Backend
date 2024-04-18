@@ -71,6 +71,10 @@ public class PromiseService {
         Promise promise = getById(promiseId);
         String myName = memberService.getMyNameByMember(loginedMember);
 
+        if (!promise.getWriter().equals(loginedMember)) {
+            throw new PromiseException(PromiseErrorCode.PROMISE_IS_NOT_MINE);
+        }
+
         return new PromiseDetailResponse(promise, myName);
     }
 
@@ -83,5 +87,19 @@ public class PromiseService {
         }
 
         return OPromise.get();
+    }
+
+    @Transactional
+    public void remove(LoginUser loginUser, Long promiseId) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        Promise promise = getById(promiseId);
+
+        if (!promise.getWriter().equals(loginedMember)) {
+            throw new PromiseException(PromiseErrorCode.PROMISE_IS_NOT_MINE);
+        }
+
+        promiseRepository.delete(promise);
     }
 }
