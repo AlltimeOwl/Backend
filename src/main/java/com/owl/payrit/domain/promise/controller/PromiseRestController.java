@@ -18,10 +18,11 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/promise")
-public class PromiseRestController {
+public class PromiseRestController implements PromiseApiDocs {
 
     private final PromiseService promiseService;
 
+    @Override
     @PostMapping("/write")
     public ResponseEntity<Void> write(@AuthenticationPrincipal LoginUser loginUser,
                                       @RequestBody PromiseWriteRequest promiseWriteRequest) {
@@ -33,6 +34,7 @@ public class PromiseRestController {
         return ResponseEntity.noContent().build();
     }
 
+    @Override
     @GetMapping("/list")
     public ResponseEntity<List<PromiseListResponse>> list(@AuthenticationPrincipal LoginUser loginUser) {
 
@@ -43,6 +45,7 @@ public class PromiseRestController {
         return ResponseEntity.ok().body(promiseListResponses);
     }
 
+    @Override
     @GetMapping("/detail/{id}")
     public ResponseEntity<PromiseDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
                                                         @PathVariable(name = "id") Long promiseId) {
@@ -54,6 +57,7 @@ public class PromiseRestController {
         return ResponseEntity.ok().body(detailResponse);
     }
 
+    @Override
     @DeleteMapping("/remove/{id}")
     public ResponseEntity<Void> remove(@AuthenticationPrincipal LoginUser loginUser,
                                        @PathVariable(name = "id") Long promiseId) {
