@@ -3,14 +3,21 @@ package com.owl.payrit.domain.promise.service;
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.memo.dto.response.MemoListResponse;
 import com.owl.payrit.domain.promise.dto.request.PromiseWriteRequest;
+import com.owl.payrit.domain.promise.dto.response.PromiseListResponse;
 import com.owl.payrit.domain.promise.entity.Promise;
 import com.owl.payrit.domain.promise.reposiroty.PromiseRepository;
+import com.owl.payrit.domain.promissorypaper.dto.response.PaperListResponse;
+import com.owl.payrit.domain.promissorypaper.entity.PaperRole;
 import com.owl.payrit.global.utils.Ut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,5 +43,20 @@ public class PromiseService {
                 .build();
 
         promiseRepository.save(promise);
+    }
+
+    public List<PromiseListResponse> getList(LoginUser loginUser) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        String myName = loginedMember.getCertificationInformation().getName().isEmpty() ? "나" : loginedMember.getName();
+
+        List<Promise> promises = promiseRepository.findAllByWriter(loginedMember);
+
+        return promises.stream()
+                .map(promise -> {
+                    return new PromiseListResponse(promise, myName);
+                })
+                .collect(Collectors.toList());
     }
 }
