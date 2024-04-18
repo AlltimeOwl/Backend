@@ -4,6 +4,7 @@ import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.global.entity.BaseEntity;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,7 +25,7 @@ import java.util.List;
 @DynamicUpdate
 public class Promise extends BaseEntity {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;
 
     private long amount;
