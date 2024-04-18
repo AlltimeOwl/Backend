@@ -3,6 +3,10 @@ package com.owl.payrit.global.utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Slf4j
 @Component
 public class Ut {
@@ -29,6 +33,10 @@ public class Ut {
             return " (" + cardNumber.substring(0, 4) + ")";
         }
 
+        public static List<String> parsedParticipants(String participants) {
+
+            return Arrays.stream(participants.split(",")).toList();
+        }
     }
 
 }
