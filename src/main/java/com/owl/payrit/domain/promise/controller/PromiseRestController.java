@@ -3,6 +3,7 @@ package com.owl.payrit.domain.promise.controller;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
 import com.owl.payrit.domain.promise.dto.request.PromiseWriteRequest;
+import com.owl.payrit.domain.promise.dto.response.PromiseDetailResponse;
 import com.owl.payrit.domain.promise.dto.response.PromiseListResponse;
 import com.owl.payrit.domain.promise.service.PromiseService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class PromiseRestController {
     public ResponseEntity<Void> write(@AuthenticationPrincipal LoginUser loginUser,
                                       @RequestBody PromiseWriteRequest promiseWriteRequest) {
 
-        log.info("{promise write rq : user_%d }".formatted(loginUser.id()));
+        log.info("{ promise write rq : user_%d }".formatted(loginUser.id()));
 
         promiseService.write(loginUser, promiseWriteRequest);
 
@@ -35,10 +36,21 @@ public class PromiseRestController {
     @GetMapping("/list")
     public ResponseEntity<List<PromiseListResponse>> list(@AuthenticationPrincipal LoginUser loginUser) {
 
-        log.info("{promise list rq : user_%d}".formatted(loginUser.id()));
+        log.info("{ promise list rq : user_%d }".formatted(loginUser.id()));
 
         List<PromiseListResponse> promiseListResponses = promiseService.getList(loginUser);
 
         return ResponseEntity.ok().body(promiseListResponses);
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<PromiseDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
+                                                        @PathVariable(name = "id") Long promiseId) {
+
+        log.info("{ promise detail rq : user_%d }".formatted(loginUser.id()));
+
+        PromiseDetailResponse detailResponse = promiseService.getDetail(loginUser, promiseId);
+
+        return ResponseEntity.ok().body(detailResponse);
     }
 }
