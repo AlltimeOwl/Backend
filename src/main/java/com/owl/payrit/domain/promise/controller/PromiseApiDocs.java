@@ -5,9 +5,6 @@ import com.owl.payrit.domain.promise.dto.request.PromiseWriteRequest;
 import com.owl.payrit.domain.promise.dto.response.PromiseDetailResponse;
 import com.owl.payrit.domain.promise.dto.response.PromiseListResponse;
 import com.owl.payrit.domain.promise.exception.PromiseErrorCode;
-import com.owl.payrit.domain.promissorypaper.dto.request.PaperWriteRequest;
-import com.owl.payrit.domain.promissorypaper.dto.response.PaperDetailResponse;
-import com.owl.payrit.domain.promissorypaper.exception.PromissoryPaperErrorCode;
 import com.owl.payrit.global.swagger.annotation.ApiErrorCodeExample;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,13 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.io.IOException;
 import java.util.List;
 
 @Tag(name = "약속 관련 API", description = "약속 서비스 API 입니다.")
