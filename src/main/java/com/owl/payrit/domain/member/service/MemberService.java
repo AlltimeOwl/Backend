@@ -26,19 +26,19 @@ public class MemberService {
     public Member findById(long id) {
 
         return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberException(
-                        MemberErrorCode.MEMBER_NOT_FOUND));
+                               .orElseThrow(() -> new MemberException(
+                                   MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     public Member findByPhoneNumber(String phoneNumber) {
 
         return memberRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+                               .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+                               .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
 
@@ -51,17 +51,17 @@ public class MemberService {
 
     public Member findByOauthInformation(OauthInformation oauthInformation) {
         return memberRepository.findByOauthInformation(oauthInformation)
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+                               .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     public Member findByOauthInformationOrSave(Member member) {
         return memberRepository.findByOauthInformationOauthProviderIdAndOauthInformationOauthProvider(member.getOauthInformation().getOauthProviderId(), member.getOauthInformation().getOauthProvider())
-                .orElseGet(() -> memberRepository.save(member));
+                               .orElseGet(() -> memberRepository.save(member));
     }
 
     public Member findByOauthDetailInformation(OauthInformation oauthInformation) {
         return memberRepository.findByOauthInformationOauthProviderIdAndOauthInformationOauthProvider(oauthInformation.getOauthProviderId(), oauthInformation.getOauthProvider())
-                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
+                               .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
 
     public void modifyAlarmStatus(LoginUser loginUser) {
@@ -88,7 +88,6 @@ public class MemberService {
     }
 
     public String getMyNameByMember(Member member) {
-
         return member.getCertificationInformation().getName().isEmpty() ? "나" : member.getCertificationInformation().getName();
     }
 }
