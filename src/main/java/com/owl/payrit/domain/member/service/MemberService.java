@@ -86,4 +86,8 @@ public class MemberService {
         Member member = findByOauthDetailInformation(loginUser.oauthInformation());
         return StatusResponse.of(member);
     }
+
+    public String getMyNameByMember(Member member) {
+        return member.getCertificationInformation().getName().isEmpty() ? "나" : member.getCertificationInformation().getName();
+    }
 }
