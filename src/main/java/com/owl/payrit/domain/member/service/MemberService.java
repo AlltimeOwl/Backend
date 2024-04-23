@@ -63,7 +63,8 @@ public class MemberService {
         return memberRepository.findByOauthInformationOauthProviderIdAndOauthInformationOauthProvider(oauthInformation.getOauthProviderId(), oauthInformation.getOauthProvider())
                                .orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
     }
-
+    
+    @Transactional
     public void modifyAlarmStatus(LoginUser loginUser) {
         Member member = findByOauthDetailInformation(loginUser.oauthInformation());
         member.modifyAlarmStatus();
