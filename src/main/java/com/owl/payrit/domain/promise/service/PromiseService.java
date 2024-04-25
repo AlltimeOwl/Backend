@@ -1,12 +1,15 @@
 package com.owl.payrit.domain.promise.service;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.docsinfo.config.AzureStorageConfigProps;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promise.dto.request.PromiseWriteRequest;
 import com.owl.payrit.domain.promise.dto.response.PromiseDetailResponse;
 import com.owl.payrit.domain.promise.dto.response.PromiseListResponse;
+import com.owl.payrit.domain.promise.entity.ParticipantsInfo;
 import com.owl.payrit.domain.promise.entity.Promise;
+import com.owl.payrit.domain.promise.entity.PromiseImageType;
 import com.owl.payrit.domain.promise.exception.PromiseErrorCode;
 import com.owl.payrit.domain.promise.exception.PromiseException;
 import com.owl.payrit.domain.promise.reposiroty.PromiseRepository;
@@ -16,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class PromiseService {
 
+    private final AzureStorageConfigProps azureStorageConfigProps;
     private final MemberService memberService;
 
     private final PromiseRepository promiseRepository;
@@ -38,12 +43,32 @@ public class PromiseService {
         Promise promise = Promise.builder()
                 .writer(loginedMember)
                 .amount(request.amount())
+                .promiseStartDate(request.promiseStartDate())
                 .promiseEndDate(request.promiseEndDate())
                 .contents(request.contents())
-                .participants(Ut.str.parsedParticipants(request.participants()))
+                .participants(getParticipantsInfoListByReq(request))
+                .promiseImageUrl(getPromiseImageUrl(request.promiseImageType()))
                 .build();
 
         promiseRepository.save(promise);
+    }
+
+    private List<ParticipantsInfo> getParticipantsInfoListByReq(PromiseWriteRequest request) {
+
+        List<ParticipantsInfo> infoList = new ArrayList<>();
+        List<String> nameList = Ut.str.parsedParticipants(request.participantsName());
+        List<String> phoneList = Ut.str.parsedParticipants(request.participantsPhone());
+
+        if (nameList.size() != phoneList.size()) {
+            throw new PromiseException(PromiseErrorCode.PROMISE_PARTICIPANTS_SIZE);
+        }
+
+        for (int i = 0; i < nameList.size(); i++) {
+            ParticipantsInfo participantsInfo = new ParticipantsInfo(nameList.get(i), phoneList.get(i));
+            infoList.add(participantsInfo);
+        }
+
+        return infoList;
     }
 
     public List<PromiseListResponse> getList(LoginUser loginUser) {
@@ -98,5 +123,16 @@ public class PromiseService {
         }
 
         promiseRepository.delete(promise);
+    }
+
+    private String getPromiseImageUrl(PromiseImageType promiseImageType) {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(azureStorageConfigProps.getImgHeader());
+        sb.append(promiseImageType.getFileName());
+        sb.append(azureStorageConfigProps.getSasToken());
+
+        return sb.toString();
     }
 }
