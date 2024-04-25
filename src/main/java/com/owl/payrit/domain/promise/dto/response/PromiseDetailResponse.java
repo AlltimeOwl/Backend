@@ -13,7 +13,8 @@ public record PromiseDetailResponse(
         LocalDate promiseEndDate,
         String myName,
         List<ParticipantsInfo> participants,
-        String contents
+        String contents,
+        String promiseImageUrl
 ) {
     public PromiseDetailResponse(Promise promise, String myName) {
         this(
@@ -22,7 +23,8 @@ public record PromiseDetailResponse(
                 promise.getPromiseEndDate(),
                 myName,
                 promise.getParticipants(),
-                promise.getContents()
+                promise.getContents(),
+                promise.getPromiseImageUrl()
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.owl.payrit.domain.promise.dto.request;
 
+import com.owl.payrit.domain.promise.entity.PromiseImageType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
@@ -19,6 +20,9 @@ public record PromiseWriteRequest(
         String participantsName,
 
         @Schema(description = "참가자들의 전화번호를 공백 없이, 쉼표로 구분하여 작성 해 주세요. (이름 순서와 같게)")
-        String participantsPhone
+        String participantsPhone,
+
+        @Schema(description = "이미지 종류")
+        PromiseImageType promiseImageType
 ) {
 }

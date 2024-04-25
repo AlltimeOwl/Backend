@@ -10,14 +10,16 @@ public record PromiseListResponse(
         LocalDate promiseStartDate,
         LocalDate promiseEndDate,
         String writerName,
-        List<ParticipantsInfo> participants
+        List<ParticipantsInfo> participants,
+        String promiseImageUrl
 ) {
     public PromiseListResponse(Promise promise, String myName) {
         this(
                 promise.getPromiseStartDate(),
                 promise.getPromiseEndDate(),
                 myName,
-                promise.getParticipants()
+                promise.getParticipants(),
+                promise.getPromiseImageUrl()
         );
     }
 }

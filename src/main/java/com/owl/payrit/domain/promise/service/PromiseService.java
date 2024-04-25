@@ -1,6 +1,7 @@
 package com.owl.payrit.domain.promise.service;
 
 import com.owl.payrit.domain.auth.dto.response.LoginUser;
+import com.owl.payrit.domain.docsinfo.config.AzureStorageConfigProps;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promise.dto.request.PromiseWriteRequest;
@@ -8,6 +9,7 @@ import com.owl.payrit.domain.promise.dto.response.PromiseDetailResponse;
 import com.owl.payrit.domain.promise.dto.response.PromiseListResponse;
 import com.owl.payrit.domain.promise.entity.ParticipantsInfo;
 import com.owl.payrit.domain.promise.entity.Promise;
+import com.owl.payrit.domain.promise.entity.PromiseImageType;
 import com.owl.payrit.domain.promise.exception.PromiseErrorCode;
 import com.owl.payrit.domain.promise.exception.PromiseException;
 import com.owl.payrit.domain.promise.reposiroty.PromiseRepository;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class PromiseService {
 
+    private final AzureStorageConfigProps azureStorageConfigProps;
     private final MemberService memberService;
 
     private final PromiseRepository promiseRepository;
@@ -44,6 +47,7 @@ public class PromiseService {
                 .promiseEndDate(request.promiseEndDate())
                 .contents(request.contents())
                 .participants(getParticipantsInfoListByReq(request))
+                .promiseImageUrl(getPromiseImageUrl(request.promiseImageType()))
                 .build();
 
         promiseRepository.save(promise);
@@ -119,5 +123,16 @@ public class PromiseService {
         }
 
         promiseRepository.delete(promise);
+    }
+
+    private String getPromiseImageUrl(PromiseImageType promiseImageType) {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(azureStorageConfigProps.getImgHeader());
+        sb.append(promiseImageType.getFileName());
+        sb.append(azureStorageConfigProps.getSasToken());
+
+        return sb.toString();
     }
 }

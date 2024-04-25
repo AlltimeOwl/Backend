@@ -12,7 +12,6 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Getter
@@ -36,4 +35,6 @@ public class Promise extends BaseEntity {
 
     @ElementCollection
     private List<ParticipantsInfo> participants;
+
+    private String promiseImageUrl;
 }
