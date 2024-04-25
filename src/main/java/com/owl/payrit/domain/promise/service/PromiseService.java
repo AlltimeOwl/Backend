@@ -6,6 +6,7 @@ import com.owl.payrit.domain.member.service.MemberService;
 import com.owl.payrit.domain.promise.dto.request.PromiseWriteRequest;
 import com.owl.payrit.domain.promise.dto.response.PromiseDetailResponse;
 import com.owl.payrit.domain.promise.dto.response.PromiseListResponse;
+import com.owl.payrit.domain.promise.entity.ParticipantsInfo;
 import com.owl.payrit.domain.promise.entity.Promise;
 import com.owl.payrit.domain.promise.exception.PromiseErrorCode;
 import com.owl.payrit.domain.promise.exception.PromiseException;
@@ -16,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,10 +42,28 @@ public class PromiseService {
                 .amount(request.amount())
                 .promiseEndDate(request.promiseEndDate())
                 .contents(request.contents())
-                .participants(Ut.str.parsedParticipants(request.participants()))
+                .participants(getParticipantsInfoListByReq(request))
                 .build();
 
         promiseRepository.save(promise);
+    }
+
+    private List<ParticipantsInfo> getParticipantsInfoListByReq(PromiseWriteRequest request) {
+
+        List<ParticipantsInfo> infoList = new ArrayList<>();
+        List<String> nameList = Ut.str.parsedParticipants(request.participantsName());
+        List<String> phoneList = Ut.str.parsedParticipants(request.participantsPhone());
+
+        if (nameList.size() != phoneList.size()) {
+            throw new PromiseException(PromiseErrorCode.PROMISE_PARTICIPANTS_SIZE);
+        }
+
+        for (int i = 0; i < nameList.size(); i++) {
+            ParticipantsInfo participantsInfo = new ParticipantsInfo(nameList.get(i), phoneList.get(i));
+            infoList.add(participantsInfo);
+        }
+
+        return infoList;
     }
 
     public List<PromiseListResponse> getList(LoginUser loginUser) {

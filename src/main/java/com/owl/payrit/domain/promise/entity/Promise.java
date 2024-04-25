@@ -2,10 +2,7 @@ package com.owl.payrit.domain.promise.entity;
 
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.global.entity.BaseEntity;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +12,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -30,10 +28,12 @@ public class Promise extends BaseEntity {
 
     private long amount;
 
+    private LocalDate promiseStartDate;
+
     private LocalDate promiseEndDate;
 
     private String contents;
 
     @ElementCollection
-    private List<String> participants;
+    private List<ParticipantsInfo> participants;
 }

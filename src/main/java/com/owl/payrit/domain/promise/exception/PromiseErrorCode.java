@@ -9,12 +9,14 @@ import lombok.Getter;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import static com.owl.payrit.global.consts.PayritStatic.FORBIDDEN;
-import static com.owl.payrit.global.consts.PayritStatic.NOT_FOUND;
+import static com.owl.payrit.global.consts.PayritStatic.*;
 
 @Getter
 @AllArgsConstructor
 public enum PromiseErrorCode implements BaseErrorCode {
+
+    // PROMISE 400 ERROR
+    PROMISE_PARTICIPANTS_SIZE(BAD_REQUEST, "PROMISE_400_1", "참여자들의 이름과 전화번호 수가 일치하지 않습니다"),
 
     // PROMISE 403 ERROR
     PROMISE_IS_NOT_MINE(FORBIDDEN, "PROMISE_403_1", "약속 접근 권한이 없습니다."),
