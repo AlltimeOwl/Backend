@@ -9,6 +9,7 @@ import java.util.List;
 public record PromiseDetailResponse(
 
         long amount,
+        LocalDate promiseStartDate,
         LocalDate promiseEndDate,
         String myName,
         List<ParticipantsInfo> participants,
@@ -17,6 +18,7 @@ public record PromiseDetailResponse(
     public PromiseDetailResponse(Promise promise, String myName) {
         this(
                 promise.getAmount(),
+                promise.getPromiseStartDate(),
                 promise.getPromiseEndDate(),
                 myName,
                 promise.getParticipants(),

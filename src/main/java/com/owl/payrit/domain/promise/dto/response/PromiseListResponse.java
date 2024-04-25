@@ -7,12 +7,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record PromiseListResponse(
+        LocalDate promiseStartDate,
         LocalDate promiseEndDate,
         String writerName,
         List<ParticipantsInfo> participants
 ) {
     public PromiseListResponse(Promise promise, String myName) {
         this(
+                promise.getPromiseStartDate(),
                 promise.getPromiseEndDate(),
                 myName,
                 promise.getParticipants()

@@ -9,6 +9,8 @@ public record PromiseWriteRequest(
         @Schema(minimum = "0")
         long amount,
 
+        LocalDate promiseStartDate,
+
         LocalDate promiseEndDate,
 
         String contents,

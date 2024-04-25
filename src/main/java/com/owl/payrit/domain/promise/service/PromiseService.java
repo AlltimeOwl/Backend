@@ -40,6 +40,7 @@ public class PromiseService {
         Promise promise = Promise.builder()
                 .writer(loginedMember)
                 .amount(request.amount())
+                .promiseStartDate(request.promiseStartDate())
                 .promiseEndDate(request.promiseEndDate())
                 .contents(request.contents())
                 .participants(getParticipantsInfoListByReq(request))
