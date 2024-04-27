@@ -13,6 +13,7 @@ public record PromiseListResponse(
         LocalDate promiseStartDate,
         LocalDate promiseEndDate,
         String writerName,
+        String contents,
         List<ParticipantsInfo> participants,
         PromiseImageType promiseImageType
 ) {
@@ -22,6 +23,7 @@ public record PromiseListResponse(
                 promise.getPromiseStartDate(),
                 promise.getPromiseEndDate(),
                 writerName,
+                promise.getContents(),
                 promise.getParticipants(),
                 promise.getPromiseImageType()
         );
