@@ -11,17 +11,17 @@ public record PromiseDetailResponse(
         long amount,
         LocalDate promiseStartDate,
         LocalDate promiseEndDate,
-        String myName,
+        String writerName,
         List<ParticipantsInfo> participants,
         String contents,
         String promiseImageUrl
 ) {
-    public PromiseDetailResponse(Promise promise, String myName) {
+    public PromiseDetailResponse(Promise promise, String writerName) {
         this(
                 promise.getAmount(),
                 promise.getPromiseStartDate(),
                 promise.getPromiseEndDate(),
-                myName,
+                writerName,
                 promise.getParticipants(),
                 promise.getContents(),
                 promise.getPromiseImageUrl()

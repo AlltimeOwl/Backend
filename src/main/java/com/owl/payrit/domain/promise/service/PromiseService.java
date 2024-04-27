@@ -41,6 +41,7 @@ public class PromiseService {
         Member loginedMember = memberService.findById(loginUser.id());
 
         Promise promise = Promise.builder()
+                .owner(loginedMember)
                 .writer(loginedMember)
                 .amount(request.amount())
                 .promiseStartDate(request.promiseStartDate())
@@ -91,13 +92,13 @@ public class PromiseService {
         Member loginedMember = memberService.findById(loginUser.id());
 
         Promise promise = getById(promiseId);
-        String myName = memberService.getMyNameByMember(loginedMember);
+        String writerName = memberService.getMyNameByMember(promise.getWriter());
 
-        if (!promise.getWriter().equals(loginedMember)) {
+        if (!promise.getWriter().equals(loginedMember) || !promise.getOwner().equals(loginedMember)) {
             throw new PromiseException(PromiseErrorCode.PROMISE_IS_NOT_MINE);
         }
 
-        return new PromiseDetailResponse(promise, myName);
+        return new PromiseDetailResponse(promise, writerName);
     }
 
     public Promise getById(Long promiseId) {

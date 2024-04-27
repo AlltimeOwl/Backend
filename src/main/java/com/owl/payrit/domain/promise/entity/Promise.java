@@ -23,6 +23,9 @@ import java.util.List;
 public class Promise extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
+    private Member owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;
 
     private long amount;
