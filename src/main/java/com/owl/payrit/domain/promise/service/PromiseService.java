@@ -48,7 +48,7 @@ public class PromiseService {
                 .promiseEndDate(request.promiseEndDate())
                 .contents(request.contents())
                 .participants(getParticipantsInfoListByReq(request))
-                .promiseImageUrl(getPromiseImageUrlByType(request.promiseImageType()))
+                .promiseImageType(request.promiseImageType())
                 .build();
 
         promiseRepository.save(promise);
@@ -162,7 +162,7 @@ public class PromiseService {
                 .promiseEndDate(existPromise.getPromiseEndDate())
                 .contents(existPromise.getContents())
                 .participants(new ArrayList<>(existPromise.getParticipants()))
-                .promiseImageUrl(existPromise.getPromiseImageUrl())
+                .promiseImageType(existPromise.getPromiseImageType())
                 .build();
 
         promiseRepository.save(promise);

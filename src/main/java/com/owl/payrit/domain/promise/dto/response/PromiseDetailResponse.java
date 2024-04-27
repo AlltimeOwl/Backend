@@ -2,6 +2,7 @@ package com.owl.payrit.domain.promise.dto.response;
 
 import com.owl.payrit.domain.promise.entity.ParticipantsInfo;
 import com.owl.payrit.domain.promise.entity.Promise;
+import com.owl.payrit.domain.promise.entity.PromiseImageType;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,7 +15,7 @@ public record PromiseDetailResponse(
         String writerName,
         List<ParticipantsInfo> participants,
         String contents,
-        String promiseImageUrl
+        PromiseImageType promiseImageType
 ) {
     public PromiseDetailResponse(Promise promise, String writerName) {
         this(
@@ -24,7 +25,7 @@ public record PromiseDetailResponse(
                 writerName,
                 promise.getParticipants(),
                 promise.getContents(),
-                promise.getPromiseImageUrl()
+                promise.getPromiseImageType()
         );
     }
 }
