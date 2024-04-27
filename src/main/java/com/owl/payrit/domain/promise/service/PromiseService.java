@@ -12,7 +12,7 @@ import com.owl.payrit.domain.promise.entity.Promise;
 import com.owl.payrit.domain.promise.entity.PromiseImageType;
 import com.owl.payrit.domain.promise.exception.PromiseErrorCode;
 import com.owl.payrit.domain.promise.exception.PromiseException;
-import com.owl.payrit.domain.promise.reposiroty.PromiseRepository;
+import com.owl.payrit.domain.promise.repository.PromiseRepository;
 import com.owl.payrit.global.utils.Ut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -76,13 +76,11 @@ public class PromiseService {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
-        String myName = memberService.getMyNameByMember(loginedMember);
-
-        List<Promise> promises = promiseRepository.findAllByWriter(loginedMember);
+        List<Promise> promises = promiseRepository.findAllByOwner(loginedMember);
 
         return promises.stream()
                 .map(promise -> {
-                    return new PromiseListResponse(promise, myName);
+                    return new PromiseListResponse(promise, memberService.getMyNameByMember(promise.getWriter()));
                 })
                 .collect(Collectors.toList());
     }

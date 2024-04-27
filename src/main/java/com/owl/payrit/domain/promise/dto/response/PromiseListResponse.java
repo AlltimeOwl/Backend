@@ -7,17 +7,20 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record PromiseListResponse(
+
+        long amount,
         LocalDate promiseStartDate,
         LocalDate promiseEndDate,
         String writerName,
         List<ParticipantsInfo> participants,
         String promiseImageUrl
 ) {
-    public PromiseListResponse(Promise promise, String myName) {
+    public PromiseListResponse(Promise promise, String writerName) {
         this(
+                promise.getAmount(),
                 promise.getPromiseStartDate(),
                 promise.getPromiseEndDate(),
-                myName,
+                writerName,
                 promise.getParticipants(),
                 promise.getPromiseImageUrl()
         );
