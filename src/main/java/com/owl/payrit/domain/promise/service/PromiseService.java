@@ -117,7 +117,7 @@ public class PromiseService {
 
         Promise promise = getById(promiseId);
 
-        if (!promise.getWriter().equals(loginedMember)) {
+        if (!promise.getOwner().equals(loginedMember)) {
             throw new PromiseException(PromiseErrorCode.PROMISE_IS_NOT_MINE);
         }
 
