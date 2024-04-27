@@ -9,6 +9,7 @@ import java.util.List;
 
 public record PromiseListResponse(
 
+        long promiseId,
         long amount,
         LocalDate promiseStartDate,
         LocalDate promiseEndDate,
@@ -19,6 +20,7 @@ public record PromiseListResponse(
 ) {
     public PromiseListResponse(Promise promise, String writerName) {
         this(
+                promise.getId(),
                 promise.getAmount(),
                 promise.getPromiseStartDate(),
                 promise.getPromiseEndDate(),

@@ -25,9 +25,10 @@ public interface PromiseApiDocs {
     @Operation(summary = "약속 작성 API", description = "약속 관련 데이터를 입력해 request 하면, 약속 작성이 완료됩니다.")
     @ApiErrorCodeExample(PromiseErrorCode.class)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
+            @ApiResponse(responseCode = "200", description = "성공적으로 작성되었습니다.",
+                    content = @Content(mediaType = "application/json", schema = @Schema(type = "Long")))
     })
-    ResponseEntity<Void> write(@AuthenticationPrincipal LoginUser loginUser,
+    ResponseEntity<Long> write(@AuthenticationPrincipal LoginUser loginUser,
                                @RequestBody @Schema(implementation = PromiseWriteRequest.class) PromiseWriteRequest promiseWriteRequest);
 
     @Operation(summary = "약속 리스트 조회 API", description = "로그인한 사용자의 약속 리스트를 가져옵니다.")
@@ -48,7 +49,7 @@ public interface PromiseApiDocs {
                     }),
     })
     ResponseEntity<PromiseDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
-                                @PathVariable(name = "id") Long promiseId);
+                                                 @PathVariable(name = "id") Long promiseId);
 
     @Operation(summary = "약속 삭제 API", description = "약속을 삭제합니다.")
     @ApiErrorCodeExample(PromiseErrorCode.class)

@@ -36,7 +36,7 @@ public class PromiseService {
     private final PromiseRepository promiseRepository;
 
     @Transactional
-    public void write(LoginUser loginUser, PromiseWriteRequest request) {
+    public Long write(LoginUser loginUser, PromiseWriteRequest request) {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
@@ -51,7 +51,9 @@ public class PromiseService {
                 .promiseImageType(request.promiseImageType())
                 .build();
 
-        promiseRepository.save(promise);
+        Promise savedPromise = promiseRepository.save(promise);
+
+        return savedPromise.getId();
     }
 
     private List<ParticipantsInfo> getParticipantsInfoListByReq(PromiseWriteRequest request) {
