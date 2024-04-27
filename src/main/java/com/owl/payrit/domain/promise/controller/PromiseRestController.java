@@ -24,14 +24,14 @@ public class PromiseRestController implements PromiseApiDocs {
 
     @Override
     @PostMapping("/write")
-    public ResponseEntity<Void> write(@AuthenticationPrincipal LoginUser loginUser,
+    public ResponseEntity<Long> write(@AuthenticationPrincipal LoginUser loginUser,
                                       @RequestBody PromiseWriteRequest promiseWriteRequest) {
 
         log.info("{ promise write rq : user_%d }".formatted(loginUser.id()));
 
-        promiseService.write(loginUser, promiseWriteRequest);
+        Long promiseId = promiseService.write(loginUser, promiseWriteRequest);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(promiseId);
     }
 
     @Override
