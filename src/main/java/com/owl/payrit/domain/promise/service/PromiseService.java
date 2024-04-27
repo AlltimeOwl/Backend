@@ -48,7 +48,7 @@ public class PromiseService {
                 .promiseEndDate(request.promiseEndDate())
                 .contents(request.contents())
                 .participants(getParticipantsInfoListByReq(request))
-                .promiseImageUrl(getPromiseImageUrl(request.promiseImageType()))
+                .promiseImageUrl(getPromiseImageUrlByType(request.promiseImageType()))
                 .build();
 
         promiseRepository.save(promise);
@@ -92,7 +92,7 @@ public class PromiseService {
         Promise promise = getById(promiseId);
         String writerName = memberService.getMyNameByMember(promise.getWriter());
 
-        if (!promise.getWriter().equals(loginedMember) || !promise.getOwner().equals(loginedMember)) {
+        if (!promise.getWriter().equals(loginedMember) && !promise.getOwner().equals(loginedMember)) {
             throw new PromiseException(PromiseErrorCode.PROMISE_IS_NOT_MINE);
         }
 
@@ -124,7 +124,7 @@ public class PromiseService {
         promiseRepository.delete(promise);
     }
 
-    private String getPromiseImageUrl(PromiseImageType promiseImageType) {
+    private String getPromiseImageUrlByType(PromiseImageType promiseImageType) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -145,5 +145,26 @@ public class PromiseService {
         }
 
         promiseRepository.deleteAll(promises);
+    }
+
+    @Transactional
+    public void join(LoginUser loginUser, Long promiseId) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        Promise existPromise = getById(promiseId);
+
+        Promise promise = Promise.builder()
+                .owner(loginedMember)
+                .writer(existPromise.getWriter())
+                .amount(existPromise.getAmount())
+                .promiseStartDate(existPromise.getPromiseStartDate())
+                .promiseEndDate(existPromise.getPromiseEndDate())
+                .contents(existPromise.getContents())
+                .participants(new ArrayList<>(existPromise.getParticipants()))
+                .promiseImageUrl(existPromise.getPromiseImageUrl())
+                .build();
+
+        promiseRepository.save(promise);
     }
 }

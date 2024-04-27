@@ -68,4 +68,15 @@ public class PromiseRestController implements PromiseApiDocs {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/join/{id}")
+    public ResponseEntity<Void> join(@AuthenticationPrincipal LoginUser loginUser,
+                                     @PathVariable(name = "id") Long promiseId) {
+
+        log.info("{ promise join rq : user_%d }".formatted(loginUser.id()));
+
+        promiseService.join(loginUser, promiseId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
