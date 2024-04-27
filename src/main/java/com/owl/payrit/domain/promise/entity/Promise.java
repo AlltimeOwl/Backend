@@ -40,4 +40,10 @@ public class Promise extends BaseEntity {
     private List<ParticipantsInfo> participants;
 
     private String promiseImageUrl;
+
+    public void removeRelation() {
+
+        this.owner = null;
+        this.writer = null;
+    }
 }

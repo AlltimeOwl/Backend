@@ -136,4 +136,16 @@ public class PromiseService {
 
         return sb.toString();
     }
+
+    @Transactional
+    public void removeAllByRevoke(Member member) {
+
+        List<Promise> promises = promiseRepository.findAllByWriter(member);
+
+        for (Promise promise : promises) {
+            promise.removeRelation();
+        }
+
+        promiseRepository.deleteAll(promises);
+    }
 }
