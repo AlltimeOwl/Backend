@@ -148,7 +148,7 @@ public class PromiseService {
     }
 
     @Transactional
-    public void join(LoginUser loginUser, Long promiseId) {
+    public void share(LoginUser loginUser, Long promiseId) {
 
         Member loginedMember = memberService.findById(loginUser.id());
 

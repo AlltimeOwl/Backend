@@ -48,7 +48,7 @@ public interface PromiseApiDocs {
                     }),
     })
     ResponseEntity<PromiseDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
-                                @PathVariable(name = "id") Long paperId);
+                                @PathVariable(name = "id") Long promiseId);
 
     @Operation(summary = "약속 삭제 API", description = "약속을 삭제합니다.")
     @ApiErrorCodeExample(PromiseErrorCode.class)
@@ -56,5 +56,10 @@ public interface PromiseApiDocs {
             @ApiResponse(responseCode = "204", description = "성공적으로 삭제되었습니다."),
     })
     ResponseEntity<Void> remove(@AuthenticationPrincipal LoginUser loginUser,
-                                @PathVariable(name = "id") Long paperId);
+                                @PathVariable(name = "id") Long promiseId);
+
+    @Operation(summary = "약속 공유하기 API", description = "약속 공유하기를 통해 복사본을 생성합니다.")
+    @ApiResponse(responseCode = "204", description = "공유가 완료되었습니다.")
+    ResponseEntity<Void> share(@AuthenticationPrincipal LoginUser loginUser,
+                               @PathVariable(name = "id") Long promiseId);
 }
