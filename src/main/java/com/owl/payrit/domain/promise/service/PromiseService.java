@@ -82,7 +82,7 @@ public class PromiseService {
 
         return promises.stream()
                 .map(promise -> {
-                    return new PromiseListResponse(promise, memberService.getMyNameByMember(promise.getWriter()));
+                    return new PromiseListResponse(promise, memberService.getWriterNameByMemberForPromise(promise, loginedMember));
                 })
                 .collect(Collectors.toList());
     }
@@ -92,7 +92,7 @@ public class PromiseService {
         Member loginedMember = memberService.findById(loginUser.id());
 
         Promise promise = getById(promiseId);
-        String writerName = memberService.getMyNameByMember(promise.getWriter());
+        String writerName = memberService.getWriterNameByMemberForPromise(promise, loginedMember);
 
         if (!promise.getWriter().equals(loginedMember) && !promise.getOwner().equals(loginedMember)) {
             throw new PromiseException(PromiseErrorCode.PROMISE_IS_NOT_MINE);
