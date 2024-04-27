@@ -42,7 +42,7 @@ public class Promise extends BaseEntity {
     @ElementCollection
     private List<ParticipantsInfo> participants;
 
-    private String promiseImageUrl;
+    private PromiseImageType promiseImageType;
 
     public void removeRelation() {
 
