@@ -2,7 +2,10 @@ package com.owl.payrit.domain.promise.entity;
 
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.global.entity.BaseEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +26,9 @@ import java.util.List;
 public class Promise extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
+    private Member owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;
 
     private long amount;
@@ -37,4 +43,10 @@ public class Promise extends BaseEntity {
     private List<ParticipantsInfo> participants;
 
     private String promiseImageUrl;
+
+    public void removeRelation() {
+
+        this.owner = null;
+        this.writer = null;
+    }
 }

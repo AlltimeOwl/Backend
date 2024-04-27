@@ -68,4 +68,16 @@ public class PromiseRestController implements PromiseApiDocs {
 
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    @PostMapping("/share/{id}")
+    public ResponseEntity<Void> share(@AuthenticationPrincipal LoginUser loginUser,
+                                     @PathVariable(name = "id") Long promiseId) {
+
+        log.info("{ promise share rq : user_%d }".formatted(loginUser.id()));
+
+        promiseService.share(loginUser, promiseId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

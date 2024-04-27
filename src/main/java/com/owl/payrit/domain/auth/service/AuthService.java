@@ -17,6 +17,7 @@ import com.owl.payrit.domain.member.entity.CertificationInformation;
 import com.owl.payrit.domain.member.entity.Member;
 import com.owl.payrit.domain.member.entity.OauthInformation;
 import com.owl.payrit.domain.member.service.MemberService;
+import com.owl.payrit.domain.promise.service.PromiseService;
 import com.owl.payrit.domain.promissorypaper.service.PromissoryPaperService;
 import com.owl.payrit.global.configuration.PortOneConfigProps;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class AuthService {
     private final MemberService memberService;
     private final OauthClientComposite oauthClientComposite;
     private final PromissoryPaperService promissoryPaperService;
+    private final PromiseService promiseService;
     private final JwtProvider jwtProvider;
     private final RedisTemplate<OauthInformation, String> oauthRedisTemplate;
     private final PortOneApiClient portOneApiClient;
@@ -88,6 +90,7 @@ public class AuthService {
         log.info("member : {}", member.getOauthInformation().getOauthProviderId());
         oauthClientComposite.revoke(member.getOauthInformation().getOauthProvider(), member.getOauthInformation().getAppleRefreshToken());
         promissoryPaperService.removeRelation(member);
+        promiseService.removeAllByRevoke(member);
         memberService.delete(member);
     }
 

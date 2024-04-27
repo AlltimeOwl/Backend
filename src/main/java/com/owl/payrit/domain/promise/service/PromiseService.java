@@ -12,7 +12,7 @@ import com.owl.payrit.domain.promise.entity.Promise;
 import com.owl.payrit.domain.promise.entity.PromiseImageType;
 import com.owl.payrit.domain.promise.exception.PromiseErrorCode;
 import com.owl.payrit.domain.promise.exception.PromiseException;
-import com.owl.payrit.domain.promise.reposiroty.PromiseRepository;
+import com.owl.payrit.domain.promise.repository.PromiseRepository;
 import com.owl.payrit.global.utils.Ut;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,13 +41,14 @@ public class PromiseService {
         Member loginedMember = memberService.findById(loginUser.id());
 
         Promise promise = Promise.builder()
+                .owner(loginedMember)
                 .writer(loginedMember)
                 .amount(request.amount())
                 .promiseStartDate(request.promiseStartDate())
                 .promiseEndDate(request.promiseEndDate())
                 .contents(request.contents())
                 .participants(getParticipantsInfoListByReq(request))
-                .promiseImageUrl(getPromiseImageUrl(request.promiseImageType()))
+                .promiseImageUrl(getPromiseImageUrlByType(request.promiseImageType()))
                 .build();
 
         promiseRepository.save(promise);
@@ -75,13 +76,11 @@ public class PromiseService {
 
         Member loginedMember = memberService.findById(loginUser.id());
 
-        String myName = memberService.getMyNameByMember(loginedMember);
-
-        List<Promise> promises = promiseRepository.findAllByWriter(loginedMember);
+        List<Promise> promises = promiseRepository.findAllByOwner(loginedMember);
 
         return promises.stream()
                 .map(promise -> {
-                    return new PromiseListResponse(promise, myName);
+                    return new PromiseListResponse(promise, memberService.getMyNameByMember(promise.getWriter()));
                 })
                 .collect(Collectors.toList());
     }
@@ -91,13 +90,13 @@ public class PromiseService {
         Member loginedMember = memberService.findById(loginUser.id());
 
         Promise promise = getById(promiseId);
-        String myName = memberService.getMyNameByMember(loginedMember);
+        String writerName = memberService.getMyNameByMember(promise.getWriter());
 
-        if (!promise.getWriter().equals(loginedMember)) {
+        if (!promise.getWriter().equals(loginedMember) && !promise.getOwner().equals(loginedMember)) {
             throw new PromiseException(PromiseErrorCode.PROMISE_IS_NOT_MINE);
         }
 
-        return new PromiseDetailResponse(promise, myName);
+        return new PromiseDetailResponse(promise, writerName);
     }
 
     public Promise getById(Long promiseId) {
@@ -118,14 +117,14 @@ public class PromiseService {
 
         Promise promise = getById(promiseId);
 
-        if (!promise.getWriter().equals(loginedMember)) {
+        if (!promise.getOwner().equals(loginedMember)) {
             throw new PromiseException(PromiseErrorCode.PROMISE_IS_NOT_MINE);
         }
 
         promiseRepository.delete(promise);
     }
 
-    private String getPromiseImageUrl(PromiseImageType promiseImageType) {
+    private String getPromiseImageUrlByType(PromiseImageType promiseImageType) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -134,5 +133,38 @@ public class PromiseService {
         sb.append(azureStorageConfigProps.getSasToken());
 
         return sb.toString();
+    }
+
+    @Transactional
+    public void removeAllByRevoke(Member member) {
+
+        List<Promise> promises = promiseRepository.findAllByWriter(member);
+
+        for (Promise promise : promises) {
+            promise.removeRelation();
+        }
+
+        promiseRepository.deleteAll(promises);
+    }
+
+    @Transactional
+    public void share(LoginUser loginUser, Long promiseId) {
+
+        Member loginedMember = memberService.findById(loginUser.id());
+
+        Promise existPromise = getById(promiseId);
+
+        Promise promise = Promise.builder()
+                .owner(loginedMember)
+                .writer(existPromise.getWriter())
+                .amount(existPromise.getAmount())
+                .promiseStartDate(existPromise.getPromiseStartDate())
+                .promiseEndDate(existPromise.getPromiseEndDate())
+                .contents(existPromise.getContents())
+                .participants(new ArrayList<>(existPromise.getParticipants()))
+                .promiseImageUrl(existPromise.getPromiseImageUrl())
+                .build();
+
+        promiseRepository.save(promise);
     }
 }
