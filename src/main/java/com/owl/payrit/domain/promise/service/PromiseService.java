@@ -43,6 +43,7 @@ public class PromiseService {
         Promise promise = Promise.builder()
                 .owner(loginedMember)
                 .writer(loginedMember)
+                .writerName(request.writerName())
                 .amount(request.amount())
                 .promiseStartDate(request.promiseStartDate())
                 .promiseEndDate(request.promiseEndDate())
@@ -82,7 +83,7 @@ public class PromiseService {
 
         return promises.stream()
                 .map(promise -> {
-                    return new PromiseListResponse(promise, memberService.getWriterNameByMemberForPromise(promise, loginedMember));
+                    return new PromiseListResponse(promise);
                 })
                 .collect(Collectors.toList());
     }
@@ -92,13 +93,12 @@ public class PromiseService {
         Member loginedMember = memberService.findById(loginUser.id());
 
         Promise promise = getById(promiseId);
-        String writerName = memberService.getWriterNameByMemberForPromise(promise, loginedMember);
 
         if (!promise.getWriter().equals(loginedMember) && !promise.getOwner().equals(loginedMember)) {
             throw new PromiseException(PromiseErrorCode.PROMISE_IS_NOT_MINE);
         }
 
-        return new PromiseDetailResponse(promise, writerName);
+        return new PromiseDetailResponse(promise);
     }
 
     public Promise getById(Long promiseId) {
