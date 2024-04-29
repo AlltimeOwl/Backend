@@ -16,6 +16,9 @@ public record PromiseWriteRequest(
 
         String contents,
 
+        @Schema(description = "작성자 이름")
+        String writerName,
+
         @Schema(description = "참가자들의 이름을 공백 없이, 쉼표로 구분하여 작성 해 주세요. ex)\"김이름,박이름\"")
         String participantsName,
 

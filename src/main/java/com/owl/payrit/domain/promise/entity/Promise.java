@@ -31,6 +31,8 @@ public class Promise extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member writer;
 
+    private String writerName;
+
     private long amount;
 
     private LocalDate promiseStartDate;

@@ -18,13 +18,13 @@ public record PromiseDetailResponse(
         String contents,
         PromiseImageType promiseImageType
 ) {
-    public PromiseDetailResponse(Promise promise, String writerName) {
+    public PromiseDetailResponse(Promise promise) {
         this(
                 promise.getId(),
                 promise.getAmount(),
                 promise.getPromiseStartDate(),
                 promise.getPromiseEndDate(),
-                writerName,
+                promise.getWriterName(),
                 promise.getParticipants(),
                 promise.getContents(),
                 promise.getPromiseImageType()
