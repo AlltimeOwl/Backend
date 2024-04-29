@@ -159,6 +159,7 @@ public class PromiseService {
         Promise promise = Promise.builder()
                 .owner(loginedMember)
                 .writer(existPromise.getWriter())
+                .writerName(existPromise.getWriterName())
                 .amount(existPromise.getAmount())
                 .promiseStartDate(existPromise.getPromiseStartDate())
                 .promiseEndDate(existPromise.getPromiseEndDate())
