@@ -42,6 +42,7 @@ public class NotificationService {
                                  .build();
 
         FirebaseMessaging.getInstance().sendAsync(message);
+        log.info("알람을 전송하였습니다.");
     }
 
     public List<NotificationResponse> findNotificationList(LoginUser loginUser) {
