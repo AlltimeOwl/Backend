@@ -2,7 +2,9 @@ package com.owl.payrit.domain.notification.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @AllArgsConstructor
 public enum NotificationMessage {
@@ -28,6 +30,8 @@ public enum NotificationMessage {
 
     public String generateMessage(String... args) {
         if(args.length != numArgs) {
+            log.info("입력 인자 수 {}, 요구 인자 수 {} 로 메세지 생성에 실패하였습니다.", args.length, numArgs);
+            log.info(message);
             throw new IllegalArgumentException("알람 인자가 일치하지 않습니다.");
         }
 
