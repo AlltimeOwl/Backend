@@ -9,6 +9,7 @@ import com.owl.payrit.domain.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -21,10 +22,13 @@ public class NotificationHelper {
     private final NotificationService notificationService;
     private final MemberService memberService;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void generateNotification(Long targetId, NotificationMessage notificationMessage, String[] args) {
         Member member = memberService.findById(targetId);
-        if(!checkNotificationAvailable(member)) return;
+        if(!checkNotificationAvailable(member)) {
+            log.info("회원이 알람을 동의하지 않았거나, 파이어베이스 토큰이 없어 알람 전송에 실패했습니다.");
+            return;
+        }
         save(notificationMessage, member, args);
         notificationService.push(notificationMessage, args, member.getFirebaseToken());
     }
@@ -46,13 +50,4 @@ public class NotificationHelper {
                                                 .build();
         notificationRepository.save(notification);
     }
-
-    /*
-    TODO
-    FCM 의존성
-    알람 전송 기능 (제목, 내용 생성)
-    알람 리스트 조회 기능
-    알람 조회 기능 (read = true)
-     */
-
 }
