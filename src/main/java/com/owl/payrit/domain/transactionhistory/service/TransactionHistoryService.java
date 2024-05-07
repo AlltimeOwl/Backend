@@ -55,6 +55,16 @@ public class TransactionHistoryService {
     public PaymentInfoResponse getPaymentInfo(Long memberId, Long paperId, TransactionType transactionType) {
 
         Member loginedMember = memberService.findById(memberId);
+        PromissoryPaper targetPaper = promissoryPaperService.getById(paperId);
+
+        //TODO: conditions 묶어서 정리
+        if (!targetPaper.getPaperStatus().equals(PaperStatus.PAYMENT_REQUIRED)) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_CANT_BEFORE_ACCEPT);
+        }
+
+        if(!loginedMember.isAuthenticated()) {
+            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_NEED_AUTHENTICATION);
+        }
 
         String PID = paymentConfigProps.getPID();
         String PGCode = paymentConfigProps.getPGCode();     //NOTE: PGCODE <-> TESTPGCODE
@@ -62,14 +72,8 @@ public class TransactionHistoryService {
         String name = transactionType.getContent();
         int amount = getCostByType(transactionType);
         String buyerEmail = loginedMember.getEmail();
-        String buyerName = loginedMember.getName();
-        String buyerTel = loginedMember.getPhoneNumber();
-
-        PromissoryPaper targetPaper = promissoryPaperService.getById(paperId);
-
-        if (!targetPaper.getPaperStatus().equals(PaperStatus.PAYMENT_REQUIRED)) {
-            throw new TransactionHistoryException(TransactionHistoryErrorCode.TRANSACTION_CANT_BEFORE_ACCEPT);
-        }
+        String buyerName = loginedMember.getCertificationInformation().getName();
+        String buyerTel = loginedMember.getCertificationInformation().getPhone();
 
         return new PaymentInfoResponse(PID, PGCode, merchantUID, name, amount, buyerEmail, buyerName, buyerTel);
     }
