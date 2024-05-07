@@ -25,6 +25,7 @@ public enum TransactionHistoryErrorCode implements BaseErrorCode {
     //TransactionHistory 403 Error
     TRANSACTION_ONLY_WRITER(FORBIDDEN, "TRANSACTION_403_1", "결제는 첫 작성자만 가능합니다."),
     TRANSACTION_FORBIDDEN(FORBIDDEN, "TRANSACTION_403_2", "결제 내역 조회 권한이 없습니다."),
+    TRANSACTION_NEED_AUTHENTICATION(FORBIDDEN, "TRANSACTION_403_3", "결제는 본인인증이 완료된 회원만 가능합니다."),
 
     //TransactionHistory 404 Error
     TRANSACTION_NOT_FOUND(NOT_FOUND, "TRANSACTION_404_1", "결제 내역을 찾을 수 없습니다."),
