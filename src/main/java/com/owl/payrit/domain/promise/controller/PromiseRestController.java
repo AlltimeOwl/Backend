@@ -50,7 +50,7 @@ public class PromiseRestController implements PromiseApiDocs {
     public ResponseEntity<PromiseDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
                                                         @PathVariable(name = "id") Long promiseId) {
 
-        log.info("{ promise detail rq : user_%d }".formatted(loginUser.id()));
+        log.info("{ promise detail rq : user_%d, promise_%d }".formatted(loginUser.id(), promiseId));
 
         PromiseDetailResponse detailResponse = promiseService.getDetail(loginUser, promiseId);
 
@@ -62,7 +62,7 @@ public class PromiseRestController implements PromiseApiDocs {
     public ResponseEntity<Void> remove(@AuthenticationPrincipal LoginUser loginUser,
                                        @PathVariable(name = "id") Long promiseId) {
 
-        log.info("{ promise remove rq : user_%d }".formatted(loginUser.id()));
+        log.info("{ promise remove rq : user_%d , promise_%d }".formatted(loginUser.id(), promiseId));
 
         promiseService.remove(loginUser, promiseId);
 
@@ -72,9 +72,9 @@ public class PromiseRestController implements PromiseApiDocs {
     @Override
     @PostMapping("/share/{id}")
     public ResponseEntity<Void> share(@AuthenticationPrincipal LoginUser loginUser,
-                                     @PathVariable(name = "id") Long promiseId) {
+                                      @PathVariable(name = "id") Long promiseId) {
 
-        log.info("{ promise share rq : user_%d }".formatted(loginUser.id()));
+        log.info("{ promise share rq : user_%d, promise_%d }".formatted(loginUser.id(), promiseId));
 
         promiseService.share(loginUser, promiseId);
 

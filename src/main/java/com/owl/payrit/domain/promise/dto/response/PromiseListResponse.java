@@ -9,7 +9,7 @@ import java.util.List;
 
 public record PromiseListResponse(
 
-        long promiseId,
+        Long promiseId,
         long amount,
         LocalDate promiseStartDate,
         LocalDate promiseEndDate,

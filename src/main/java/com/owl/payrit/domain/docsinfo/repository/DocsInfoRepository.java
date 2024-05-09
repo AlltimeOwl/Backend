@@ -7,6 +7,5 @@ import java.util.Optional;
 
 public interface DocsInfoRepository extends JpaRepository<DocsInfo, Long> {
 
-    Optional<DocsInfo> findByDocsKey(String docsKey);
     boolean existsByDocsKey(String docsKey);
 }

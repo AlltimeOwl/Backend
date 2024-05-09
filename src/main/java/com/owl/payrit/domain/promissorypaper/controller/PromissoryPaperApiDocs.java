@@ -11,7 +11,6 @@ import com.owl.payrit.domain.repaymenthistory.dto.request.RepaymentRequest;
 import com.owl.payrit.domain.repaymenthistory.exception.RepaymentErrorCode;
 import com.owl.payrit.global.swagger.annotation.ApiErrorCodeExample;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -48,7 +47,7 @@ public interface PromissoryPaperApiDocs {
                     })
     })
     ResponseEntity<PaperDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
-                                               @Parameter(description = "차용증 id", required = true) Long id);
+                                               @PathVariable(name = "id") Long paperId);
 
     @Operation(summary = "차용증 목록 조회 API", description = "로그인한 회원의 정보를 기반으로 연관 차용증을 조회합니다.")
     @ApiResponses(value = {
@@ -65,7 +64,7 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
     })
     ResponseEntity<Void> acceptPaper(@AuthenticationPrincipal LoginUser loginUser,
-                                     @Parameter(description = "차용증 id", required = true) Long id,
+                                     @PathVariable(name = "id") Long paperId,
                                      @RequestPart("file")
                                      @Schema(example = "multipart/form-data") MultipartFile file,
                                      HttpServletRequest req) throws IOException;
@@ -84,7 +83,7 @@ public interface PromissoryPaperApiDocs {
             @ApiResponse(responseCode = "204", description = "성공적으로 작성되었습니다."),
     })
     ResponseEntity<Void> modifying(@AuthenticationPrincipal LoginUser loginUser,
-                                   @Parameter(description = "차용증 id", required = true) Long id,
+                                   @PathVariable(name = "id") Long paperId,
                                    @RequestBody @Schema(implementation = PaperWriteRequest.class) PaperWriteRequest paperWriteRequest);
 
     @Operation(summary = "일부 상환 내역기록 API", description = "채권자가 일부 상환 내용을 작성합니다.")

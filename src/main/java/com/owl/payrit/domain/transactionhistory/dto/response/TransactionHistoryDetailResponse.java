@@ -11,8 +11,6 @@ public record TransactionHistoryDetailResponse(
         String applyNum,
         String paymentMethod,
         long amount
-
-        //TODO: 결제 구분 - 일시불?
 ) {
     public TransactionHistoryDetailResponse(TransactionHistory transactionHistory) {
         this(

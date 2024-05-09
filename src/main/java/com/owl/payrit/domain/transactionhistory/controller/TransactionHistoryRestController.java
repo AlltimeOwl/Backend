@@ -32,6 +32,8 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
                                                               @PathVariable(name = "id") Long paperId,
                                                               @PathVariable(name = "transaction_type") TransactionType transactionType) {
 
+        log.info("{ transaction info rq : user_%d, paper_%d, type_%s }".formatted(loginUser.id(), paperId, transactionType.name()));
+
         PaymentInfoResponse paymentInfo = transactionHistoryService.getPaymentInfo(loginUser.id(), paperId, transactionType);
 
         return ResponseEntity.ok().body(paymentInfo);
@@ -42,7 +44,8 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
     public ResponseEntity<Void> save(@AuthenticationPrincipal LoginUser loginUser,
                                      @RequestBody TransactionHistorySaveRequest transactionHistorySaveRequest) {
 
-        log.info(transactionHistorySaveRequest.toString());
+        log.info("{ transaction save(success) rq : user_%d, paper_%d, type_%s }"
+                .formatted(loginUser.id(), transactionHistorySaveRequest.paperId(), transactionHistorySaveRequest.transactionType().name()));
 
         transactionHistoryService.saveHistory(loginUser, transactionHistorySaveRequest);
 
@@ -52,11 +55,11 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
     @Override
     @GetMapping("/detail/{id}")
     public ResponseEntity<TransactionHistoryDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
-                                                                   @PathVariable(value = "id") Long id) {
+                                                                   @PathVariable(value = "id") Long transactionHistoryId) {
 
-        log.info("{user id : %d, history id : %d }".formatted(loginUser.id(), id));
+        log.info("{ transaction detail rq : user_%d, transaction_%d }".formatted(loginUser.id(), transactionHistoryId));
 
-        TransactionHistoryDetailResponse detailResponse = transactionHistoryService.getDetail(loginUser, id);
+        TransactionHistoryDetailResponse detailResponse = transactionHistoryService.getDetail(loginUser, transactionHistoryId);
 
         return ResponseEntity.ok().body(detailResponse);
     }
@@ -65,7 +68,7 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
     @GetMapping("/list")
     public ResponseEntity<List<TransactionHistoryListResponse>> list(@AuthenticationPrincipal LoginUser loginUser) {
 
-        log.info("{user id : %d }".formatted(loginUser.id()));
+        log.info("{ transaction list rq : user_%d }".formatted(loginUser.id()));
 
         List<TransactionHistoryListResponse> listResponses = transactionHistoryService.getListResponses(loginUser);
 
@@ -77,6 +80,8 @@ public class TransactionHistoryRestController implements TransactionHistoryApiDo
     public ResponseEntity<PortOnePaymentCancelResponse> cancelForDev(@AuthenticationPrincipal LoginUser loginUser,
                                                                      @PathVariable(name = "secretKey") String secretKey,
                                                                      @RequestBody PortOnePaymentCancelRequest request) {
+
+        log.info("{ transaction cancel for dev rq : developer_user_%d }".formatted(loginUser.id()));
 
         PortOnePaymentCancelResponse portOnePaymentCancelResponse =
                 transactionHistoryService.cancelForDev(loginUser, secretKey, request);
