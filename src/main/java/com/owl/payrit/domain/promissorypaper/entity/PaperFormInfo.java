@@ -49,9 +49,4 @@ public class PaperFormInfo {
 
         return this;
     }
-
-    public void addModifyMsg(String contents) {
-
-        this.specialConditions = this.specialConditions.concat(contents);
-    }
 }
