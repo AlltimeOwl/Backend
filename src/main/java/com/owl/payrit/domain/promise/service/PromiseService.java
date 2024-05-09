@@ -32,7 +32,6 @@ public class PromiseService {
 
     private final AzureStorageConfigProps azureStorageConfigProps;
     private final MemberService memberService;
-
     private final PromiseRepository promiseRepository;
 
     @Transactional
@@ -82,9 +81,7 @@ public class PromiseService {
         List<Promise> promises = promiseRepository.findAllByOwner(loginedMember);
 
         return promises.stream()
-                .map(promise -> {
-                    return new PromiseListResponse(promise);
-                })
+                .map(PromiseListResponse::new)
                 .collect(Collectors.toList());
     }
 
@@ -124,17 +121,6 @@ public class PromiseService {
         }
 
         promiseRepository.delete(promise);
-    }
-
-    private String getPromiseImageUrlByType(PromiseImageType promiseImageType) {
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append(azureStorageConfigProps.getImgHeader());
-        sb.append(promiseImageType.getFileName());
-        sb.append(azureStorageConfigProps.getSasToken());
-
-        return sb.toString();
     }
 
     @Transactional

@@ -10,10 +10,13 @@ public record PromiseWriteRequest(
         @Schema(minimum = "0")
         long amount,
 
+        @Schema(description = "약속 시작일")
         LocalDate promiseStartDate,
 
+        @Schema(description = "약속 마감일")
         LocalDate promiseEndDate,
 
+        @Schema(description = "약속 상세 내용")
         String contents,
 
         @Schema(description = "작성자 이름")
