@@ -4,6 +4,7 @@ import com.owl.payrit.domain.transactionhistory.entity.TransactionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record TransactionInfoRequest(
+
         @Schema(description = "결제를 진행할 차용증의 id값 입니다.")
         Long paperId,
         
