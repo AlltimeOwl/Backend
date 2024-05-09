@@ -33,7 +33,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
                                       @RequestBody PaperWriteRequest paperWriteRequest,
                                       HttpServletRequest req) throws IOException {
 
-        log.info(paperWriteRequest.toString());
+        log.info("{ paper write rq : user_%d }".formatted(loginUser.id()));
 
         promissoryPaperService.writePaper(loginUser, paperWriteRequest, req);
 
@@ -43,11 +43,11 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     @Override
     @GetMapping("/{id}")
     public ResponseEntity<PaperDetailResponse> detail(@AuthenticationPrincipal LoginUser loginUser,
-                                                      @PathVariable(value = "id") Long id) {
+                                                      @PathVariable(value = "id") Long paperId) {
 
-        log.info("request paper id : " + id);
+        log.info("{ paper detail rq : user_%d, paper_%d }".formatted(loginUser.id(), paperId));
 
-        PaperDetailResponse paperDetailResponse = promissoryPaperService.getDetail(loginUser, id);
+        PaperDetailResponse paperDetailResponse = promissoryPaperService.getDetail(loginUser, paperId);
 
         return ResponseEntity.ok().body(paperDetailResponse);
     }
@@ -56,7 +56,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     @GetMapping("/list")
     public ResponseEntity<List<PaperListResponse>> list(@AuthenticationPrincipal LoginUser loginUser) {
 
-        log.info("request user id : " + loginUser.id());
+        log.info("{ paper list rq : user_%d }".formatted(loginUser.id()));
 
         List<PaperListResponse> allListResponses = promissoryPaperService.getAllListResponse(loginUser);
 
@@ -70,7 +70,7 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
                                             @RequestPart("file") MultipartFile file,
                                             HttpServletRequest req) throws IOException {
 
-        log.info("request user id : " + loginUser.id());
+        log.info("{ paper accept rq : user_%d, paper_%d }".formatted(loginUser.id(), paperId));
 
         promissoryPaperService.acceptPaper(loginUser, paperId, file, req);
 
@@ -82,8 +82,8 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     public ResponseEntity<Void> requestModify(@AuthenticationPrincipal LoginUser loginUser,
                                               @RequestBody PaperModifyRequest paperModifyRequest) {
 
-        log.info("request user id : " + loginUser.id());
-        log.info("contents : " + paperModifyRequest.contents());
+        log.info("{ paper modify rq : user_%d, paper_%d }".formatted(loginUser.id(), paperModifyRequest.paperId()));
+        log.info("{ modify rq contents : %s }".formatted(paperModifyRequest.contents()));
 
         promissoryPaperService.sendModifyRequest(loginUser, paperModifyRequest);
 
@@ -93,10 +93,12 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     @Override
     @PutMapping("/modify/accept/{id}")
     public ResponseEntity<Void> modifying(@AuthenticationPrincipal LoginUser loginUser,
-                                          @PathVariable(value = "id") Long id,
+                                          @PathVariable(value = "id") Long paperId,
                                           @RequestBody PaperWriteRequest paperWriteRequest) {
 
-        promissoryPaperService.modifyingPaper(loginUser, id, paperWriteRequest);
+        log.info("{ paper modify accept rq : user_%d, paper_%d }".formatted(loginUser.id(), paperId));
+
+        promissoryPaperService.modifyingPaper(loginUser, paperId, paperWriteRequest);
 
         return ResponseEntity.noContent().build();
     }
@@ -105,6 +107,8 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     @PostMapping("/repayment/request")
     public ResponseEntity<Void> repaymentRequest(@AuthenticationPrincipal LoginUser loginUser,
                                                  @RequestBody RepaymentRequest repaymentRequest) {
+
+        log.info("{ paper repayment rq : user_%d, paper_%d }".formatted(loginUser.id(), repaymentRequest.paperId()));
 
         promissoryPaperService.repayment(loginUser, repaymentRequest);
 
@@ -116,6 +120,9 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     public ResponseEntity<Void> repaymentCancel(@AuthenticationPrincipal LoginUser loginUser,
                                                 @RequestBody RepaymentCancelRequest repaymentCancelRequest) {
 
+        log.info("{ paper repayment cancel rq : user_%d }".formatted(loginUser.id()));
+        log.info("{ cancel target : paper_%d, history_%d }".formatted(repaymentCancelRequest.paperId(), repaymentCancelRequest.historyId()));
+
         promissoryPaperService.cancelRepayment(loginUser, repaymentCancelRequest);
 
         return ResponseEntity.noContent().build();
@@ -126,6 +133,8 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     public ResponseEntity<Void> refuse(@AuthenticationPrincipal LoginUser loginUser,
                                        @PathVariable(name = "id") Long paperId) {
 
+        log.info("{ paper refuse rq : user_%d, paper_%d }".formatted(loginUser.id(), paperId));
+
         promissoryPaperService.refuse(loginUser, paperId);
 
         return ResponseEntity.noContent().build();
@@ -134,6 +143,8 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     @Override
     @PostMapping("/reload")
     public ResponseEntity<Void> reload(@AuthenticationPrincipal LoginUser loginUser) {
+
+        log.info("{ paper reload rq : user_%d }".formatted(loginUser.id()));
 
         promissoryPaperService.reload(loginUser);
 
@@ -144,6 +155,8 @@ public class PromissoryPaperRestController implements PromissoryPaperApiDocs {
     @PutMapping("/hide/{id}")
     public ResponseEntity<Void> hide(@AuthenticationPrincipal LoginUser loginUser,
                                      @PathVariable(name = "id") Long paperId) {
+
+        log.info("{ paper hide rq : user_%d, paper_%d }".formatted(loginUser.id(), paperId));
 
         promissoryPaperService.hide(loginUser, paperId);
 
