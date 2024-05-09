@@ -27,11 +27,10 @@ import java.util.UUID;
 public class DocsInfoService {
 
     private final AzureStorageConfigProps storageConfigProps;
-
     private final DocsInfoRepository docsInfoRepository;
 
     @Transactional
-    public DocsInfo createByWriter(Member writer, String writerIpAddr, String writerCI) throws IOException {
+    public DocsInfo createByWriter(Member writer, String writerIpAddr, String writerCI) {
 
         DocsInfo docsInfo = DocsInfo.builder()
                 .writerId(writer.getId())
@@ -47,7 +46,7 @@ public class DocsInfoService {
 
     @Transactional
     public void acceptByAccepter(DocsInfo docsInfo, Member accepter, String accepterIpAddr, String accepterCI,
-                                 MultipartFile documentFile) throws IOException {
+                                 MultipartFile documentFile) {
 
         StringBuilder sb = new StringBuilder();
         sb.append(getUniqueDocsKey());
@@ -67,7 +66,7 @@ public class DocsInfoService {
         docsInfoRepository.save(completedDocsInfo);
     }
 
-    public String uploadFile(MultipartFile documentFile, String docsName) throws IOException {
+    public String uploadFile(MultipartFile documentFile, String docsName) {
 
         try {
             String connectStr = storageConfigProps.getConnectStr();
@@ -75,7 +74,8 @@ public class DocsInfoService {
             String dirName = storageConfigProps.getDirName();
 
             ShareDirectoryClient dirClient = new ShareFileClientBuilder()
-                    .connectionString(connectStr).shareName(shareName)
+                    .connectionString(connectStr)
+                    .shareName(shareName)
                     .resourcePath(dirName)
                     .buildDirectoryClient();
 
@@ -89,7 +89,7 @@ public class DocsInfoService {
             return fileClient.getFileUrl();
 
         } catch (Exception e) {
-            log.error("uploadFile exception: " + e.getMessage());
+            log.error("uploadFile exception : " + e.getMessage());
             throw new DocsInfoException(DocsInfoErrorCode.DOCS_BAD_REQUEST);
         }
     }
