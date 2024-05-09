@@ -31,7 +31,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,6 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,9 +51,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true)
 public class PromissoryPaperService {
 
-    private static final String MODIFY_HEADER = "[MODIFY]";
     private static final Integer INTEREST_LIMIT = 20;
-    private static final Long EXPIRED_STANDARD_DATE = 30L;
 
     private final DocsInfoService docsInfoService;
     private final RepaymentHistoryService repaymentHistoryService;
@@ -91,7 +87,7 @@ public class PromissoryPaperService {
                 .memos(new ArrayList<>())
                 .build();
 
-        checkPaperData(loginedMember, paper);
+        checkPaperData(loginedMember, paper, paperWriteRequest);
 
         // 상대방도 가입 된 상태라면, 푸시 알림을 전송합니다
         Member notificationTarget = loginedMember.equals(creditor) ? debtor : creditor;
@@ -296,7 +292,7 @@ public class PromissoryPaperService {
                 .modifyRequest(null)
                 .build();
 
-        checkPaperData(loginedMember, modifiedPaper);
+        checkPaperData(loginedMember, modifiedPaper, paperWriteRequest);
 
         // 수정 프로세스에서는 둘다 가입 되어있다고 가정
         Member creditor = paper.getCreditor();
@@ -335,7 +331,7 @@ public class PromissoryPaperService {
         }
     }
 
-    public void checkPaperData(Member member, PromissoryPaper paper) {
+    public void checkPaperData(Member member, PromissoryPaper paper, PaperWriteRequest paperWriteRequest) {
 
         LocalDate today = LocalDate.now();
 
@@ -343,6 +339,10 @@ public class PromissoryPaperService {
 
         if (!member.isAuthenticated()) {
             throw new PromissoryPaperException(PromissoryPaperErrorCode.NEED_AUTHENTICATION);
+        }
+
+        if(paperWriteRequest.debtorPhoneNumber().equals(paperWriteRequest.creditorPhoneNumber())) {
+            throw new PromissoryPaperException(PromissoryPaperErrorCode.PAPER_CANT_WRITE_SELF);
         }
 
         if (!checkMemberData(member, paper, paper.getWriterRole())) {
@@ -374,7 +374,7 @@ public class PromissoryPaperService {
         return Math.round(repaymentRate * 100.0) / 100.0;
     }
 
-    //NOTE: 기간이 지나더라도 일부 상환, 메모 작성이 가능하도록 주석 처리
+    //NOTE: 상환 기간이 지난 차용증을 만료(expired) 처리하는 스케줄러 => 기간이 지나도 가능하도록 주석처리
 //    @Transactional
 //    @Scheduled(cron = "0 0 0 * * ?")
 //    public void expiringByRepaymentEndDate() {
@@ -482,6 +482,7 @@ public class PromissoryPaperService {
         promissoryPaperRepository.save(modifiedPaper);
     }
 
+    //NOTE: 사용되지 않고 있는 차용증 데이터를 주기적으로 자동 삭제하는 스케줄러
 //    @Transactional
 //    @Scheduled(cron = "0 0 0 * * ?")
 //    public void expiringForUnusedData() {
